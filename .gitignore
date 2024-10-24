@@ -1,0 +1,14 @@
+# Ignorar la carpeta node_modules
+node_modules/
+
+# Ignorar la carpeta .cache dentro de node_modules
+node_modules/.cache/
+
+# Ignorar archivos de configuración del entorno
+.env
+.env.local
+
+# Ignorar logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
