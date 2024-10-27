@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../App.css";
+import styles from "../styles/login.module.css";
 import {
   signInWithPopup,
   createUserWithEmailAndPassword,
@@ -150,100 +150,128 @@ const AppLogin = () => {
 
   return (
     <div
-      className={`container ${isRightPanelActive ? "right-panel-active" : ""}`}
+      className={`${styles.container} ${
+        isRightPanelActive ? styles["right-panel-active"] : ""
+      }`}
     >
       {/* Contenedor para Iniciar Sesión */}
-      <div className="form-container sign-in-container">
+      <div
+        className={`${styles["form-container"]} ${styles["sign-in-container"]}`}
+      >
         <form>
-          <h1>Sign In</h1>
-          {message && <p className="message">{message}</p>}
-          <div className="social-container">
-            <a href="#" className="social" onClick={handleFacebookSignIn}>
+          <h1>Iniciar Sesión</h1>
+          {message && <p className={styles.message}>{message}</p>}
+          <div className={styles["social-container"]}>
+            <a
+              href="#"
+              className={styles.social}
+              onClick={handleFacebookSignIn}
+            >
               <i className="fab fa-facebook-f"></i>
             </a>
-            <a href="#" className="social" onClick={handleGoogleSignIn}>
+            <a href="#" className={styles.social} onClick={handleGoogleSignIn}>
               <i className="fab fa-google-plus-g"></i>
             </a>
           </div>
-          <span>or use your account</span>
+          <span>o usa tu cuenta</span>
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={emailError ? "input-error" : ""}
+            className={`${emailError ? styles["input-error"] : ""} ${
+              styles.input
+            }`} // Aplicar clase de error
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={passwordError ? "input-error" : ""}
+            className={`${passwordError ? styles["input-error"] : ""} ${
+              styles.input
+            }`} // Aplicar clase de error
           />
           <button type="button" onClick={handleEmailSignIn}>
-            Sign In
+            Iniciar Sesión
           </button>
         </form>
       </div>
 
       {/* Contenedor para Crear Cuenta */}
-      <div className="form-container sign-up-container">
+      <div
+        className={`${styles["form-container"]} ${styles["sign-up-container"]}`}
+      >
         <form>
-          <h1>Create Account</h1>
-          {message && <p className="message">{message}</p>}{" "}
+          <h1>Crear Cuenta</h1>
+          {message && <p className={styles.message}>{message}</p>}{" "}
           {/* Mensaje de éxito o error */}
-          <div className="social-container">
-            <a href="#" className="social" onClick={handleFacebookSignIn}>
+          <div className={styles["social-container"]}>
+            <a
+              href="#"
+              className={styles.social}
+              onClick={handleFacebookSignIn}
+            >
               <i className="fab fa-facebook-f"></i>
             </a>
-            <a href="#" className="social" onClick={handleGoogleSignIn}>
+            <a href="#" className={styles.social} onClick={handleGoogleSignIn}>
               <i className="fab fa-google-plus-g"></i>
             </a>
           </div>
-          <span>or use your email for registration</span>
+          <span>o usa tu email para registrarte</span>
           <input
             type="text"
             placeholder="Nombre"
             value={name}
             onChange={(e) => setName(e.target.value)} // Maneja el cambio del nombre
             required
+            className={styles.input} // Asegúrate de que tenga la clase de estilo
           />
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={emailError ? "input-error" : ""}
+            className={`${emailError ? styles["input-error"] : ""} ${
+              styles.input
+            }`} // Aplicar clase de error
           />
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Contraseña"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={passwordError ? "input-error" : ""}
+            className={`${passwordError ? styles["input-error"] : ""} ${
+              styles.input
+            }`} // Aplicar clase de error
           />
           <button type="button" onClick={handleEmailSignUp}>
-            Sign Up
+            Crear Cuenta
           </button>
         </form>
       </div>
 
-      <div className="overlay-container">
-        <div className="overlay">
-          <div className="overlay-panel overlay-left">
-            <h1>Welcome Back!</h1>
+      <div className={styles["overlay-container"]}>
+        <div className={styles.overlay}>
+          <div
+            className={`${styles["overlay-panel"]} ${styles["overlay-left"]}`}
+          >
+            <h1>¡Bienvenido de nuevo!</h1>
             <p>
-              To keep connected with us, please login with your personal info
+              Para mantenerte conectado con nosotros, por favor inicia sesión
+              con tu información personal.
             </p>
-            <button className="ghost" onClick={handleSignInClick}>
-              Sign In
+            <button className={`${styles.ghost}`} onClick={handleSignInClick}>
+              Iniciar Sesión
             </button>
           </div>
-          <div className="overlay-panel overlay-right">
-            <h1>Hello, Friend!</h1>
-            <p>Enter your personal details and start to-do list.</p>
-            <button className="ghost" onClick={handleSignUpClick}>
-              Sign Up
+          <div
+            className={`${styles["overlay-panel"]} ${styles["overlay-right"]}`}
+          >
+            <h1>¡Hola, Amigo!</h1>
+            <p>Ingresa tus datos personales y comienza tu lista de tareas.</p>
+            <button className={`${styles.ghost}`} onClick={handleSignUpClick}>
+              Crear Cuenta
             </button>
           </div>
         </div>
