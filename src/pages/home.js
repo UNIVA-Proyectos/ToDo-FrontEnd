@@ -1,30 +1,12 @@
 // Home.js
 import React from "react";
 import styles from "../styles/home.module.css";
+import Sidebar from "../components/Sidebar";
 
 const Home = () => {
   return (
     <div className={styles["home-container"]}>
-      <div className={styles.sidebar}>
-        <h2>Mis Tareas</h2>
-        <ul>
-          <li>
-            <a href="#">
-              <i className="fas fa-inbox"></i> Inbox
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i className="fas fa-list"></i> Actividad
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <i className="fas fa-chart-bar"></i> Reportes
-            </a>
-          </li>
-        </ul>
-      </div>
+      <Sidebar />
 
       <div className={styles["main-content"]}>
         <header>
