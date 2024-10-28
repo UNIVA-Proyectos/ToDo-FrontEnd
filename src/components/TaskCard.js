@@ -1,5 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCheckCircle,
+  faExclamationCircle,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 import styles from "../styles/taskCard.module.css";
 
 const TaskCard = ({ task }) => {
@@ -10,12 +16,20 @@ const TaskCard = ({ task }) => {
     if (estado === "Vencida") return styles.overdue;
     return "";
   };
+  const getStatusIcon = () => {
+    if (estado === "Completada")
+      return <FontAwesomeIcon icon={faCheckCircle} />;
+    if (estado === "Pendiente") return <FontAwesomeIcon icon={faClock} />;
+    if (estado === "Vencida")
+      return <FontAwesomeIcon icon={faExclamationCircle} />;
+    return null;
+  };
 
   return (
     <div className={styles.taskCard}>
       <div className={`${styles.statusIcon} ${getStatusClass()}`}>
         {/* Puedes usar un ícono o la primera letra del estado */}
-        {estado[0]}
+        {getStatusIcon()}
       </div>
       <h3>{task.titulo}</h3>
       <p>{task.descripcion}</p>
