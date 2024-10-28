@@ -17,12 +17,12 @@ function Sidebar() {
       <ul>
         <li>
           <a href="#">
-            <i className="fas fa-calendar"></i> Calendario
+            <i className="fas fa-list-check"></i> Tareas
           </a>
         </li>
         <li>
           <a href="#">
-            <i className="fas fa-list-check"></i> Tareas
+            <i className="fas fa-calendar"></i> Calendario
           </a>
         </li>
         <li>

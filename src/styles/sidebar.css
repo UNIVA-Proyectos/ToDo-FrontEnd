@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  height: 100vh; /* Ensure full height */
+  height: 100vh;
 }
 
 .sidebar ul {
@@ -63,4 +63,11 @@
 }
 .user-name {
   margin-right: 15px;
+}
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+  }
 }

@@ -21,47 +21,6 @@
   overflow: auto;
 }
 
-/* Barra lateral */
-.sidebar {
-  background-color: #25283d;
-  color: white;
-  padding: 30px;
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-.sidebar h2 {
-  color: #ffc247;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
-
-.sidebar ul {
-  list-style: none;
-}
-
-.sidebar ul li {
-  margin-bottom: 20px;
-}
-
-.sidebar ul li a {
-  color: white;
-  text-decoration: none;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-}
-
-.sidebar ul li a i {
-  margin-right: 10px;
-}
-
-.sidebar ul li a:hover {
-  color: #ffc247;
-}
-
 /* Contenido principal */
 .main-content {
   padding: 30px;
@@ -143,14 +102,8 @@
 
 /* Responsividad */
 @media (max-width: 768px) {
-  body {
+  .home-container {
     flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    padding: 20px;
-    text-align: center;
   }
 
   .main-content {
