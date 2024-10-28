@@ -28,6 +28,7 @@ El front-end está desarrollado con **React**, utilizando **HTML5**, **CSS3**, y
 - ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white): Para el diseño y la disposición visual de la aplicación.
 - ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black): Lenguaje de programación para la lógica del front-end.
 - ![API IA](https://img.shields.io/badge/AI_API-000000?style=for-the-badge&logo=ai&logoColor=white): Se utiliza para generar sugerencias automáticas y descripciones de tareas.
+- [![Netlify Status](https://api.netlify.com/api/v1/badges/20b76fc5-783b-4f94-82aa-22d1d292eb29/deploy-status)](https://app.netlify.com/sites/silly-semifreddo-4709e3/deploys)
 
 ## Requisitos
 
