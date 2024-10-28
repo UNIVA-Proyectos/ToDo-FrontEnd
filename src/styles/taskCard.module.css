@@ -1,0 +1,17 @@
+.taskCard {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+}
+
+.progress {
+  height: 10px;
+  background-color: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: #4caf50;
+}

@@ -9,7 +9,9 @@ function Sidebar() {
     <div className={`sidebar`}>
       <div className="user-info">
         <img src={user?.photoURL} alt="Foto de perfil" className="user-image" />
-        <span className="user-name">{user?.displayName}</span>
+        <span className="user-name">
+          {user?.displayName?.split(" ").slice(0, 2).join(" ")}
+        </span>
         <i className="fas fa-bell"></i>
       </div>
       <ul>

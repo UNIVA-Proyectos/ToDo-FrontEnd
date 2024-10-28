@@ -1,53 +1,56 @@
 // Home.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../styles/home.module.css";
 import Sidebar from "../components/Sidebar";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, db } from "../config/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import TaskCard from "../components/TaskCard";
 
 const Home = () => {
+  const [user] = useAuthState(auth);
+  const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      if (user) {
+        try {
+          const tasksRef = collection(db, "tasks"); // Cambia "tasks" por el nombre correcto de tu colección
+          const q = query(tasksRef, where("userId", "==", user.uid));
+          const querySnapshot = await getDocs(q);
+          const userTasks = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setTasks(userTasks);
+        } catch (error) {
+          console.error("Error al obtener tareas: ", error);
+        }
+      }
+    };
+
+    fetchTasks();
+  }, [user]);
+
   return (
     <div className={styles["home-container"]}>
       <Sidebar />
 
       <div className={styles["main-content"]}>
         <header>
-          <h1>Inbox</h1>
-          <p>Revisa tus mensajes y tareas recientes</p>
+          <h1>Hola, {user?.displayName?.split(" ").slice(0, 2).join(" ")} </h1>
         </header>
 
         <section className={styles["task-section"]}>
-          <h2>Tareas Faltantes</h2>
+          <h2>Tareas</h2>
           <div className={styles["task-list"]}>
-            <div className={`${styles["task-item"]} ${styles.pending}`}>
-              <h3>Escribir documento de requisitos</h3>
-              <p>Vencimiento: 12 de diciembre, 2024</p>
-              <p className={styles["task-progress"]}>Progreso: 20%</p>
-            </div>
-            <div className={`${styles["task-item"]} ${styles.pending}`}>
-              <h3>Investigar herramientas de gestión</h3>
-              <p>Vencimiento: 5 de diciembre, 2024</p>
-              <p className={styles["task-progress"]}>Progreso: 50%</p>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles["task-section"]}>
-          <h2>Tareas Vencidas</h2>
-          <div className={styles["task-list"]}>
-            <div className={`${styles["task-item"]} ${styles.overdue}`}>
-              <h3>Enviar agenda de la reunión</h3>
-              <p>Vencimiento: 1 de diciembre, 2024</p>
-            </div>
-          </div>
-        </section>
-
-        <section className={styles["task-section"]}>
-          <h2>Tareas Completadas</h2>
-          <div className={styles["task-list"]}>
-            <div className={`${styles["task-item"]} ${styles.completed}`}>
-              <h3>Diseñar el dashboard de usuario</h3>
-              <p>Completado: 30 de noviembre, 2024</p>
-              <p className={styles["task-progress"]}>Progreso: 100%</p>
-            </div>
+            {tasks.length > 0 ? (
+              tasks.map((task) => (
+                <TaskCard key={task.id} task={task} /> // Usa el componente TaskCard
+              ))
+            ) : (
+              <p>No tienes tareas pendientes</p>
+            )}
           </div>
         </section>
       </div>

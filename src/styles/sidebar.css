@@ -10,12 +10,6 @@
   height: 100vh; /* Ensure full height */
 }
 
-.sidebar h2 {
-  color: #ffc247;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
-
 .sidebar ul {
   list-style: none;
   padding: 0;
@@ -49,6 +43,16 @@
   padding: 10px;
   background-color: #25283d;
   margin-bottom: 20px; /* Add margin for spacing */
+  margin-right: 10px;
+}
+.user-info div {
+  padding: 5px; /* Añade un poco de padding interno para los elementos dentro del contenedor */
+  border-radius: 8px; /* Redondea también los elementos internos */
+  transition: background-color 0.3s ease; /* Transición suave para el hover */
+}
+
+.user-info div:hover {
+  background-color: #ffc247;
 }
 
 .user-image {
@@ -56,4 +60,7 @@
   height: 30px;
   border-radius: 50%;
   margin-right: 10px;
+}
+.user-name {
+  margin-right: 15px;
 }
