@@ -17,7 +17,10 @@ const useTasks = (db, user) => {
     }
 
     const fetchTasks = async () => {
-      const q = query(collection(db, "tasks"), where("userId", "==", user.uid));
+      const q = query(
+        collection(db, "tasks"),
+        where("user_id", "==", user.uid)
+      );
       const querySnapshot = await getDocs(q);
       const fetchedTasks = [];
 
