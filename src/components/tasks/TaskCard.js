@@ -6,16 +6,17 @@ import {
   faExclamationCircle,
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
-import styles from "../styles/taskCard.module.css";
 
 const TaskCard = ({ task }) => {
   const { titulo, descripcion, dueDate, estado } = task;
+
   const getStatusClass = () => {
-    if (estado === "Completada") return styles.completed;
-    if (estado === "Pendiente") return styles.pending;
-    if (estado === "Vencida") return styles.overdue;
+    if (estado === "Completada") return "completed";
+    if (estado === "Pendiente") return "pending";
+    if (estado === "Vencida") return "overdue";
     return "";
   };
+
   const getStatusIcon = () => {
     if (estado === "Completada")
       return <FontAwesomeIcon icon={faCheckCircle} />;
@@ -26,15 +27,12 @@ const TaskCard = ({ task }) => {
   };
 
   return (
-    <div className={styles.taskCard}>
-      <div className={`${styles.statusIcon} ${getStatusClass()}`}>
-        {/* Puedes usar un ícono o la primera letra del estado */}
-        {getStatusIcon()}
-      </div>
-      <h3>{task.titulo}</h3>
-      <p>{task.descripcion}</p>
-      <p>Vencimiento: {task.dueDate.toDate().toLocaleString()}</p>
-      <div className={styles.actions}>
+    <div className="task-card">
+      <div className={`status-icon ${getStatusClass()}`}>{getStatusIcon()}</div>
+      <h3>{titulo}</h3>
+      <p>{descripcion}</p>
+      <p>Vencimiento: {dueDate.toDate().toLocaleString()}</p>
+      <div className="actions">
         <button aria-label="Editar tarea">Editar</button>
         <button aria-label="Eliminar tarea">Eliminar</button>
         <button aria-label="Marcar tarea como completa">Completar</button>
@@ -45,10 +43,10 @@ const TaskCard = ({ task }) => {
 
 TaskCard.propTypes = {
   task: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    dueDate: PropTypes.string,
-    progress: PropTypes.number.isRequired,
+    titulo: PropTypes.string.isRequired,
+    descripcion: PropTypes.string,
+    dueDate: PropTypes.object, // Cambié esto para que acepte un objeto fecha
+    estado: PropTypes.string.isRequired,
   }).isRequired,
 };
 

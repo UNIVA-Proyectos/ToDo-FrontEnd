@@ -9,6 +9,7 @@ import {
 import AppLogin from "./pages/Login"; // Componente de login
 import Home from "./pages/home"; // Pantalla de inicio después del login
 import { auth } from "./config/firebase"; // Autenticación de Firebase
+import Calendar from "./pages/calendar";
 
 // Componente para proteger rutas privadas
 const PrivateRoute = ({ element }) => {
@@ -35,6 +36,10 @@ const App = () => {
           path="/home"
           element={<PrivateRoute element={<Home />} />}
         />{" "}
+        <Route
+          path="/calendar"
+          element={<PrivateRoute element={<Calendar />} />}
+        />
         {/* Ruta protegida */}
       </Routes>
     </Router>

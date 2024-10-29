@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../styles/sidebar.css";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../config/firebase";
+import { Link } from "react-router-dom";
 
 function Sidebar() {
   const [user] = useAuthState(auth);
@@ -16,14 +17,14 @@ function Sidebar() {
       </div>
       <ul>
         <li>
-          <a href="#">
+          <Link href="/home">
             <i className="fas fa-list-check"></i> Tareas
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="#">
+          <Link to="/calendar">
             <i className="fas fa-calendar"></i> Calendario
-          </a>
+          </Link>
         </li>
         <li>
           <a href="#">

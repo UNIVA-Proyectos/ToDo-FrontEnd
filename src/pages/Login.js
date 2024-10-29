@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import styles from "../styles/login.module.css";
 import {
   signInWithPopup,
   createUserWithEmailAndPassword,
@@ -149,32 +148,22 @@ const AppLogin = () => {
   };
 
   return (
-    <div className={styles["login-container"]}>
+    <div className="login-container">
       <div
-        className={`${styles.container} ${
-          isRightPanelActive ? styles["right-panel-active"] : ""
+        className={`container ${
+          isRightPanelActive ? "right-panel-active" : ""
         }`}
       >
         {/* Contenedor para Iniciar Sesión */}
-        <div
-          className={`${styles["form-container"]} ${styles["sign-in-container"]}`}
-        >
+        <div className={`form-container sign-in-container`}>
           <form>
             <h1>Iniciar Sesión</h1>
-            {message && <p className={styles.message}>{message}</p>}
-            <div className={styles["social-container"]}>
-              <a
-                href="#"
-                className={styles.social}
-                onClick={handleFacebookSignIn}
-              >
+            {message && <p className="message">{message}</p>}
+            <div className="social-container">
+              <a href="#" className="social" onClick={handleFacebookSignIn}>
                 <i className="fab fa-facebook-f"></i>
               </a>
-              <a
-                href="#"
-                className={styles.social}
-                onClick={handleGoogleSignIn}
-              >
+              <a href="#" className="social" onClick={handleGoogleSignIn}>
                 <i className="fab fa-google-plus-g"></i>
               </a>
             </div>
@@ -184,18 +173,14 @@ const AppLogin = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`${emailError ? styles["input-error"] : ""} ${
-                styles.input
-              }`} // Aplicar clase de error
+              className={`input ${emailError ? "input-error" : ""}`}
             />
             <input
               type="password"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`${passwordError ? styles["input-error"] : ""} ${
-                styles.input
-              }`} // Aplicar clase de error
+              className={`input ${passwordError ? "input-error" : ""}`}
             />
             <button type="button" onClick={handleEmailSignIn}>
               Iniciar Sesión
@@ -204,26 +189,15 @@ const AppLogin = () => {
         </div>
 
         {/* Contenedor para Crear Cuenta */}
-        <div
-          className={`${styles["form-container"]} ${styles["sign-up-container"]}`}
-        >
+        <div className={`form-container sign-up-container`}>
           <form>
             <h1>Crear Cuenta</h1>
-            {message && <p className={styles.message}>{message}</p>}{" "}
-            {/* Mensaje de éxito o error */}
-            <div className={styles["social-container"]}>
-              <a
-                href="#"
-                className={styles.social}
-                onClick={handleFacebookSignIn}
-              >
+            {message && <p className="message">{message}</p>}
+            <div className="social-container">
+              <a href="#" className="social" onClick={handleFacebookSignIn}>
                 <i className="fab fa-facebook-f"></i>
               </a>
-              <a
-                href="#"
-                className={styles.social}
-                onClick={handleGoogleSignIn}
-              >
+              <a href="#" className="social" onClick={handleGoogleSignIn}>
                 <i className="fab fa-google-plus-g"></i>
               </a>
             </div>
@@ -232,27 +206,23 @@ const AppLogin = () => {
               type="text"
               placeholder="Nombre"
               value={name}
-              onChange={(e) => setName(e.target.value)} // Maneja el cambio del nombre
+              onChange={(e) => setName(e.target.value)}
               required
-              className={styles.input} // Asegúrate de que tenga la clase de estilo
+              className="input"
             />
             <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`${emailError ? styles["input-error"] : ""} ${
-                styles.input
-              }`} // Aplicar clase de error
+              className={`input ${emailError ? "input-error" : ""}`}
             />
             <input
               type="password"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`${passwordError ? styles["input-error"] : ""} ${
-                styles.input
-              }`} // Aplicar clase de error
+              className={`input ${passwordError ? "input-error" : ""}`}
             />
             <button type="button" onClick={handleEmailSignUp}>
               Crear Cuenta
@@ -260,26 +230,22 @@ const AppLogin = () => {
           </form>
         </div>
 
-        <div className={styles["overlay-container"]}>
-          <div className={styles.overlay}>
-            <div
-              className={`${styles["overlay-panel"]} ${styles["overlay-left"]}`}
-            >
+        <div className="overlay-container">
+          <div className="overlay">
+            <div className={`overlay-panel overlay-left`}>
               <h1>¡Bienvenido de nuevo!</h1>
               <p>
                 Para mantenerte conectado con nosotros, por favor inicia sesión
                 con tu información personal.
               </p>
-              <button className={`${styles.ghost}`} onClick={handleSignInClick}>
+              <button className="ghost" onClick={handleSignInClick}>
                 Iniciar Sesión
               </button>
             </div>
-            <div
-              className={`${styles["overlay-panel"]} ${styles["overlay-right"]}`}
-            >
+            <div className={`overlay-panel overlay-right`}>
               <h1>¡Hola, Amigo!</h1>
               <p>Ingresa tus datos personales y comienza tu lista de tareas.</p>
-              <button className={`${styles.ghost}`} onClick={handleSignUpClick}>
+              <button className="ghost" onClick={handleSignUpClick}>
                 Crear Cuenta
               </button>
             </div>

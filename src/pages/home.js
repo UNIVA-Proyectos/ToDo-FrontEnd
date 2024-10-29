@@ -1,7 +1,7 @@
-import styles from "../styles/home.module.css";
 import Sidebar from "../components/Sidebar";
-import TaskCard from "../components/TaskCard";
-import TaskSummary from "../components/taskSummary";
+import TaskCard from "../components/tasks/TaskCard";
+import TaskSummary from "../components/tasks/taskSummary";
+import AddTask from "../components/tasks/AddTask";
 import useTasks from "../hooks/useTasks";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
@@ -15,10 +15,10 @@ const Home = () => {
 
   console.log(tasks);
   return (
-    <div className={styles["home-container"]}>
+    <div className="home-container">
       <Sidebar />
 
-      <div className={styles["main-content"]}>
+      <div className="main-content">
         <header>
           <h1>Hola, {user?.displayName?.split(" ").slice(0, 2).join(" ")} </h1>
         </header>
@@ -29,15 +29,17 @@ const Home = () => {
           overdueCount={overdueCount}
         />
 
-        <section className={styles["task-section"]}>
+        <section className="task-section">
           <h2>Tareas</h2>
-          <div className={styles["task-list"]}>
+          <div className="task-list">
             {tasks.length > 0 ? (
               tasks.map((task) => <TaskCard key={task.id} task={task} />)
             ) : (
               <p>No tienes tareas pendientes</p>
             )}
           </div>
+
+          <AddTask />
         </section>
       </div>
     </div>
