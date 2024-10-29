@@ -31,14 +31,16 @@ const useTasks = (db, user) => {
       setTasks(fetchedTasks);
 
       const completed = fetchedTasks.filter(
-        (task) => task.status === "completed"
+        (task) => task.estado === "Completada"
       );
       setCompletedCount(completed.length);
 
-      const pending = fetchedTasks.filter((task) => task.status === "pending");
+      const pending = fetchedTasks.filter(
+        (task) => task.estado === "Pendiente"
+      );
       setPendingCount(pending.length);
 
-      const overdue = fetchedTasks.filter((task) => task.status === "overdue");
+      const overdue = fetchedTasks.filter((task) => task.estado === "Vencida");
       setOverdueCount(overdue.length);
     };
 
