@@ -1,55 +1,19 @@
-// Home.js
-import React, { useEffect, useState } from "react";
 import styles from "../styles/home.module.css";
 import Sidebar from "../components/Sidebar";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "../config/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
 import TaskCard from "../components/TaskCard";
 import TaskSummary from "../components/taskSummary";
+import useTasks from "../hooks/useTasks";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, db } from "../config/firebase";
 
 const Home = () => {
   const [user] = useAuthState(auth);
-  const [tasks, setTasks] = useState([]);
-  const [completedCount, setCompletedCount] = useState(0);
-  const [pendingCount, setPendingCount] = useState(0);
-  const [overdueCount, setOverdueCount] = useState(0);
+  const { tasks, completedCount, pendingCount, overdueCount } = useTasks(
+    db,
+    user
+  );
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      if (user) {
-        try {
-          const tasksRef = collection(db, "tasks");
-          const q = query(tasksRef, where("user_id", "==", user.uid));
-          const querySnapshot = await getDocs(q);
-          const userTasks = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setTasks(userTasks);
-          // Contar tareas en cada categoría
-          const now = new Date();
-          setCompletedCount(
-            userTasks.filter((task) => task.estado === "Completada").length
-          );
-          setPendingCount(
-            userTasks.filter((task) => task.estado === "Pendiente").length
-          );
-          setOverdueCount(
-            userTasks.filter(
-              (task) =>
-                task.estado === "Pendiente" && task.dueDate?.toDate() < now
-            ).length
-          );
-        } catch (error) {
-          console.error("Error al obtener tareas: ", error);
-        }
-      }
-    };
-
-    fetchTasks();
-  }, [user]);
-
+  console.log(tasks);
   return (
     <div className={styles["home-container"]}>
       <Sidebar />
