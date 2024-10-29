@@ -10,6 +10,8 @@ import AppLogin from "./pages/Login"; // Componente de login
 import Home from "./pages/home"; // Pantalla de inicio después del login
 import { auth } from "./config/firebase"; // Autenticación de Firebase
 import Calendar from "./pages/calendar";
+import BlankLayout from "./layout/blankLayout";
+import MainLayout from "./layout/mainLayout";
 
 // Componente para proteger rutas privadas
 const PrivateRoute = ({ element }) => {
@@ -25,22 +27,18 @@ const PrivateRoute = ({ element }) => {
   return isAuthenticated ? element : null; // Mostrar el componente si está autenticado
 };
 
-// Componente principal de la aplicación
 const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<AppLogin />} />{" "}
-        {/* Página de inicio de sesión */}
-        <Route
-          path="/home"
-          element={<PrivateRoute element={<Home />} />}
-        />{" "}
-        <Route
-          path="/calendar"
-          element={<PrivateRoute element={<Calendar />} />}
-        />
-        {/* Ruta protegida */}
+        <Route element={<BlankLayout />}>
+          <Route path="/" element={<AppLogin />} />
+        </Route>
+        <Route element={<PrivateRoute element={<MainLayout />} />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/configuracion" element={<Calendar />} />
+        </Route>
       </Routes>
     </Router>
   );

@@ -15,33 +15,29 @@ const Home = () => {
 
   console.log(tasks);
   return (
-    <div className="home-container">
-      <Sidebar />
+    <div>
+      <header>
+        <h1>Hola, {user?.displayName?.split(" ").slice(0, 2).join(" ")} </h1>
+      </header>
+      {/* Resumen de tareas */}
+      <TaskSummary
+        completedCount={completedCount}
+        pendingCount={pendingCount}
+        overdueCount={overdueCount}
+      />
 
-      <div className="main-content">
-        <header>
-          <h1>Hola, {user?.displayName?.split(" ").slice(0, 2).join(" ")} </h1>
-        </header>
-        {/* Resumen de tareas */}
-        <TaskSummary
-          completedCount={completedCount}
-          pendingCount={pendingCount}
-          overdueCount={overdueCount}
-        />
+      <section className="task-section">
+        <h2>Tareas</h2>
+        <div className="task-list">
+          {tasks.length > 0 ? (
+            tasks.map((task) => <TaskCard key={task.id} task={task} />)
+          ) : (
+            <p>No tienes tareas pendientes</p>
+          )}
+        </div>
 
-        <section className="task-section">
-          <h2>Tareas</h2>
-          <div className="task-list">
-            {tasks.length > 0 ? (
-              tasks.map((task) => <TaskCard key={task.id} task={task} />)
-            ) : (
-              <p>No tienes tareas pendientes</p>
-            )}
-          </div>
-
-          <AddTask />
-        </section>
-      </div>
+        <AddTask />
+      </section>
     </div>
   );
 };
