@@ -35,13 +35,19 @@ const useTasks = (db, user) => {
       );
       setCompletedCount(completed.length);
 
-      const pending = fetchedTasks.filter(
-        (task) => task.estado === "Pendiente"
-      );
-      setPendingCount(pending.length);
-
-      const overdue = fetchedTasks.filter((task) => task.estado === "Vencida");
+      const overdue = fetchedTasks.filter((task) => {
+        const dueDate = task.dueDate?.toDate();
+        const isOverdue = dueDate && dueDate < new Date();
+        return task.estado === "Pendiente" && isOverdue;
+      });
       setOverdueCount(overdue.length);
+
+      const pending = fetchedTasks.filter((task) => {
+        const dueDate = task.dueDate?.toDate();
+        const isNotOverdue = !dueDate || dueDate >= new Date();
+        return task.estado === "Pendiente" && isNotOverdue;
+      });
+      setPendingCount(pending.length);
     };
 
     fetchTasks();

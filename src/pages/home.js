@@ -5,6 +5,7 @@ import AddTask from "../components/tasks/AddTask";
 import useTasks from "../hooks/useTasks";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
+import useAddTask from "../hooks/useAddTask";
 
 const Home = () => {
   const [user] = useAuthState(auth);
@@ -12,6 +13,7 @@ const Home = () => {
     db,
     user
   );
+  const { addTask } = useAddTask(db, user);
 
   console.log(tasks);
   return (
@@ -36,7 +38,7 @@ const Home = () => {
           )}
         </div>
 
-        <AddTask />
+        <AddTask addTask={addTask} />
       </section>
     </div>
   );

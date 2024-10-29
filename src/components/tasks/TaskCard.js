@@ -10,19 +10,25 @@ import {
 const TaskCard = ({ task }) => {
   const { titulo, descripcion, dueDate, estado } = task;
 
+  const isOverdue = dueDate?.toDate() < new Date() && estado === "Pendiente";
+
   const getStatusClass = () => {
     if (estado === "Completada") return "completed";
+    if (isOverdue) return "overdue";
     if (estado === "Pendiente") return "pending";
-    if (estado === "Vencida") return "overdue";
     return "";
   };
 
   const getStatusIcon = () => {
-    if (estado === "Completada")
+    if (estado === "Completada") {
       return <FontAwesomeIcon icon={faCheckCircle} />;
-    if (estado === "Pendiente") return <FontAwesomeIcon icon={faClock} />;
-    if (estado === "Vencida")
+    }
+    if (isOverdue) {
       return <FontAwesomeIcon icon={faExclamationCircle} />;
+    }
+    if (estado === "Pendiente") {
+      return <FontAwesomeIcon icon={faClock} />;
+    }
     return null;
   };
 
@@ -30,7 +36,7 @@ const TaskCard = ({ task }) => {
     <div className="taskCard">
       <div className={`statusIcon ${getStatusClass()}`}>{getStatusIcon()}</div>
       <h3>{titulo}</h3>
-      <p>Vencimiento: {dueDate.toDate().toLocaleString()}</p>
+      <p className="">Vencimiento: {dueDate.toDate().toLocaleString()}</p>
       <div className="actions">
         <button className="btn btn-warning me-3" aria-label="Editar tarea">
           Editar
