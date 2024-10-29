@@ -27,9 +27,9 @@ function Sidebar() {
           </Link>
         </li>
         <li>
-          <a href="#">
+          <Link to={"/configuracion"}>
             <i className="fas fa-gear"></i> Configuración
-          </a>
+          </Link>
         </li>
       </ul>
     </div>

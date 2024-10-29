@@ -37,6 +37,7 @@ const App = () => {
         <Route element={<PrivateRoute element={<MainLayout />} />}>
           <Route path="/home" element={<Home />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/configuracion" element={<Calendar />} />
         </Route>
       </Routes>
     </Router>
