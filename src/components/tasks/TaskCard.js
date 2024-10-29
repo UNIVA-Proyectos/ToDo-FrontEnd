@@ -27,15 +27,23 @@ const TaskCard = ({ task }) => {
   };
 
   return (
-    <div className="task-card">
-      <div className={`status-icon ${getStatusClass()}`}>{getStatusIcon()}</div>
+    <div className="taskCard">
+      <div className={`statusIcon ${getStatusClass()}`}>{getStatusIcon()}</div>
       <h3>{titulo}</h3>
-      <p>{descripcion}</p>
       <p>Vencimiento: {dueDate.toDate().toLocaleString()}</p>
       <div className="actions">
-        <button aria-label="Editar tarea">Editar</button>
-        <button aria-label="Eliminar tarea">Eliminar</button>
-        <button aria-label="Marcar tarea como completa">Completar</button>
+        <button className="btn btn-warning me-3" aria-label="Editar tarea">
+          Editar
+        </button>
+        <button className="btn btn-danger me-3" aria-label="Eliminar tarea">
+          Eliminar
+        </button>
+        <button
+          className="btn btn-success me-3"
+          aria-label="Marcar tarea como completa"
+        >
+          Completar
+        </button>
       </div>
     </div>
   );
