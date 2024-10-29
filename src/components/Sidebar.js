@@ -17,7 +17,7 @@ function Sidebar() {
       </div>
       <ul>
         <li>
-          <Link href="/home">
+          <Link to="/home">
             <i className="fas fa-list-check"></i> Tareas
           </Link>
         </li>
