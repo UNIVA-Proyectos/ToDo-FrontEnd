@@ -1,4 +1,4 @@
-import Sidebar from "../components/Sidebar";
+// Home.js
 import TaskCard from "../components/tasks/TaskCard";
 import TaskSummary from "../components/tasks/taskSummary";
 import AddTask from "../components/tasks/AddTask";
@@ -9,25 +9,20 @@ import useAddTask from "../hooks/useAddTask";
 
 const Home = () => {
   const [user] = useAuthState(auth);
-  const { tasks, completedCount, pendingCount, overdueCount } = useTasks(
-    db,
-    user
-  );
-  const { addTask } = useAddTask(db, user);
+  const { tasks, completedCount, pendingCount, overdueCount, addTaskToList } =
+    useTasks(db, user);
+  const { addTask } = useAddTask(db, user, addTaskToList); // Pasa el callback
 
-  console.log(tasks);
   return (
     <div>
       <header>
         <h1>Hola, {user?.displayName?.split(" ").slice(0, 2).join(" ")} </h1>
       </header>
-      {/* Resumen de tareas */}
       <TaskSummary
         completedCount={completedCount}
         pendingCount={pendingCount}
         overdueCount={overdueCount}
       />
-
       <section className="task-section">
         <h2>Tareas</h2>
         <div className="task-list">
@@ -37,7 +32,6 @@ const Home = () => {
             <p>No tienes tareas pendientes</p>
           )}
         </div>
-
         <AddTask addTask={addTask} />
       </section>
     </div>
