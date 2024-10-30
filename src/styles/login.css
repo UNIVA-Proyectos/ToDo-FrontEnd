@@ -3,7 +3,7 @@
 }
 
 .login-container {
-  background: #161616;
+  background: #fffdfd;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,12 +15,14 @@
 
 .login-container h1 {
   font-weight: bold;
-  color: #ffffff;
+  color: #25283d; /* Color del título h1 en modo claro */
   margin: 0;
 }
 
 .login-container h2 {
+  font-size: 24px; /* Tamaño específico para h2 */
   text-align: center;
+  color: #25283d; /* Color del título h2 en modo claro */
 }
 
 .login-container p {
@@ -51,6 +53,7 @@
   font-size: 12px;
   font-weight: bold;
   padding: 12px 45px;
+  margin-top: 18px;
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: background-color 0.3s ease, transform 80ms ease-in;
@@ -113,14 +116,14 @@
 }
 
 .container {
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 10px;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
   position: relative;
   overflow: hidden;
   width: 768px;
   max-width: 100%;
-  min-height: 480px;
+  min-height: 600px;
 }
 
 .form-container {
@@ -286,12 +289,89 @@
   color: #333;
 }
 
-.overlay {
-  background: #25283d;
+.overlay-right h1,
+.overlay-left h1 {
+  color: #fffdfd;
+}
+
+.account-option {
+  color: #333333 !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.message.error-message {
+  color: #ff0000;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  padding-right: 40px; /* Deja espacio para el ícono */
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.password-container {
+  position: relative;
+  width: 100%; /* Asegura que ocupe el ancho completo */
+}
+
+.password-container .password-toggle{
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #2c2c2c;
+  font-size: 18px; /* Tamaño del ícono */
+}
+
+.password-container .password-toggle:hover {
+  color: #ffc247;
+}
+
+.input-error {
+  border: 1px solid red;
+}
+
+.error-message {
+  color: red;
 }
 
 /* Dark Theme */
 @media (prefers-color-scheme: dark) {
+  .login-container {
+    background: #2c2c2c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: "Montserrat", sans-serif;
+    height: 100vh;
+    margin: 0;
+  }
+
+  .container {
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 600px;
+  }
+
+
+  .account-option {
+    color: #faf9f9 !important;
+    background-color: transparent !important;
+    border: none !important;
+  }
+
   .login-container body {
     background: #1e1e1e;
     color: #fff;
@@ -306,6 +386,20 @@
     color: #fff;
   }
 
+  .password-container .password-toggle{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #fffdfd;
+    font-size: 18px; /* Tamaño del ícono */
+  }
+
+  .password-container .password-toggle:hover {
+    color: #ffc247;
+  }
+
   .login-container button {
     background-color: #555;
     border-color: #777;
@@ -313,6 +407,10 @@
 
   .overlay {
     background: #222;
+  }
+
+  .login-container h1{
+    color: #f6f5f7;
   }
 
   .login-container a {
@@ -325,6 +423,7 @@
   }
 
   .login-container footer a {
-    color: #3c97bf;
+    color: #ff0000;
   }
+
 }
