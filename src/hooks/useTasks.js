@@ -1,4 +1,3 @@
-// useTasks.js
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { useState, useEffect } from "react";
 
@@ -31,7 +30,6 @@ const useTasks = (db, user) => {
 
       setTasks(fetchedTasks);
 
-      // Actualiza los contadores
       const completed = fetchedTasks.filter(
         (task) => task.estado === "Completada"
       );
@@ -39,15 +37,15 @@ const useTasks = (db, user) => {
 
       const overdue = fetchedTasks.filter((task) => {
         const dueDate = task.dueDate?.toDate();
-        return task.estado === "Pendiente" && dueDate && dueDate < new Date();
+        const isOverdue = dueDate && dueDate < new Date();
+        return task.estado === "Pendiente" && isOverdue;
       });
       setOverdueCount(overdue.length);
 
       const pending = fetchedTasks.filter((task) => {
         const dueDate = task.dueDate?.toDate();
-        return (
-          task.estado === "Pendiente" && (!dueDate || dueDate >= new Date())
-        );
+        const isNotOverdue = !dueDate || dueDate >= new Date();
+        return task.estado === "Pendiente" && isNotOverdue;
       });
       setPendingCount(pending.length);
     };
@@ -55,17 +53,11 @@ const useTasks = (db, user) => {
     fetchTasks();
   }, [db, user?.uid]);
 
-  // Función para añadir una nueva tarea directamente al estado
-  const addTaskToList = (newTask) => {
-    setTasks((prevTasks) => [...prevTasks, newTask]);
-  };
-
   return {
     tasks,
     completedCount,
     pendingCount,
     overdueCount,
-    addTaskToList, // Añadir el callback
   };
 };
 

@@ -1,0 +1,125 @@
+/* Estilos Usuario */
+* {
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Contenedor principal */
+.configuracion-usuario-container {
+    display: flex;
+    width: 100%;
+    border-radius: 15px;
+    background-color: #fdfbf7; /* Color de fondo principal */
+    overflow: hidden;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Contenido principal */
+.configuracion-content {
+    width: 100%;
+    padding: 40px;
+}
+
+h1 {
+    color: #22263d;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+/* Configuración de usuario */
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    background-color: transparent; /* Asegúrate de que el fondo sea transparente */
+}
+
+.profile-section {
+    display: flex;
+    align-items: center; /* Alinea la imagen y los botones verticalmente */
+    margin-right: 20px; /* Espacio a la derecha de la sección del perfil */
+}
+
+/* Asegúrate de que la imagen de perfil tenga fondo transparente */
+.user-info img {
+    width: 80px; /* Cambiado a 80px para alinearse con el diseño */
+    height: 80px; /* Cambiado a 80px para alinearse con el diseño */
+    border-radius: 50%; /* Imagen de perfil redondeada */
+    margin-right: 10px; /* Espacio entre la imagen y los botones */
+}
+
+/* Estilo para el hover del div en .user-info */
+.user-info div:hover {
+    background-color: transparent !important; /* Forzar el fondo transparente al hacer hover */
+}
+
+/* Estilos para los botones */
+.settings {
+    display: flex;
+    flex-direction: column;
+    background-color: transparent; /* Fondo transparente para la sección de configuración */
+}
+
+.settings .btn {
+    margin: 5px 0; /* Espaciado vertical entre botones */
+    padding: 10px;
+    border: none;
+    border-radius: 8px; /* Bordes redondeados para los botones */
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; /* Transición para fondo y color de texto */
+    background-color: #ffc247; /* Color de fondo de los botones */
+    color: #fff; /* Color de texto en los botones */
+}
+
+.settings .btn:hover {
+    background-color: #e6b640; /* Color de fondo al pasar el mouse */
+}
+
+.settings .delete-photo {
+    background-color: #ce2121; /* Color de fondo del botón de eliminar */
+}
+
+/* Estilo para el botón de eliminar al hacer hover */
+.settings .delete-photo:hover {
+    background-color: #b81c1c; /* Color al pasar el mouse sobre el botón de eliminar */
+}
+
+/* Estilo de las secciones de información */
+.info-section {
+    margin-top: 20px; /* Espacio superior para separar del perfil */
+}
+
+.info-section label {
+    display: block;
+    color: #333;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.info-section input {
+    min-width: 200px; /* Ancho mínimo para los campos de texto */
+    width: 250px; /* Establece un ancho fijo para todos los campos */
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px; /* Bordes redondeados para los campos de entrada */
+}
+
+/* Media Queries para Responsividad */
+@media (max-width: 992px) {
+    .configuracion-usuario-container {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .configuracion-content {
+        padding: 20px;
+    }
+
+    .user-info img {
+        width: 60px; /* Ajuste para dispositivos más pequeños */
+        height: 60px; /* Ajuste para dispositivos más pequeños */
+    }
+}
