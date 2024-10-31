@@ -11,7 +11,7 @@ import { auth, googleProvider, facebookProvider } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import { setDoc, doc } from "firebase/firestore";
-import "../styles/login.css"; // CSS global
+import "../styles/login.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
@@ -32,7 +32,7 @@ const AppLogin = () => {
       });
     });
 
-    // Recuperar el correo almacenado en localStorage
+    // Cargar el correo del último usuario desde localStorage
     const lastEmail = localStorage.getItem("lastEmail");
     if (lastEmail) {
       setCredentials((prev) => ({ ...prev, email: lastEmail }));
@@ -64,6 +64,7 @@ const AppLogin = () => {
       const result = await signInWithPopup(auth, provider);
       const { user } = result;
       await saveUser(user, provider.providerId);
+      localStorage.setItem("lastEmail", user.email); // Guardar el correo
       setMessage(`Inicio de sesión con ${provider.providerId} exitoso.`);
       navigate("/home");
     } catch (error) {
@@ -77,6 +78,7 @@ const AppLogin = () => {
       const authFunc = isSignUp ? createUserWithEmailAndPassword : signInWithEmailAndPassword;
       const { user } = await authFunc(auth, credentials.email, credentials.password);
       if (isSignUp) await saveUser(user, "email");
+      localStorage.setItem("lastEmail", credentials.email); // Guardar el correo
       setMessage(`${isSignUp ? "Registro" : "Inicio de sesión"} exitoso.`);
       navigate("/home");
     } catch (error) {

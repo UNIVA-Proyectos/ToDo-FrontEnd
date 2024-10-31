@@ -32,44 +32,48 @@ h1 {
     display: flex;
     align-items: center;
     margin-bottom: 40px;
-    background-color: transparent; /* Asegúrate de que el fondo sea transparente */
+    background-color: transparent !important; /* Fondo transparente garantizado */
+    border-radius: 8px;
+    padding: 10px;
 }
 
+/* Sección de perfil (imagen y botones) */
 .profile-section {
     display: flex;
     align-items: center; /* Alinea la imagen y los botones verticalmente */
     margin-right: 20px; /* Espacio a la derecha de la sección del perfil */
 }
 
-/* Asegúrate de que la imagen de perfil tenga fondo transparente */
+/* Imagen de perfil con fondo transparente */
 .user-info img {
-    width: 80px; /* Cambiado a 80px para alinearse con el diseño */
-    height: 80px; /* Cambiado a 80px para alinearse con el diseño */
-    border-radius: 50%; /* Imagen de perfil redondeada */
+    width: 80px; /* Tamaño de la imagen */
+    height: 80px;
+    border-radius: 50%;
     margin-right: 10px; /* Espacio entre la imagen y los botones */
+    background-color: transparent; /* Asegura que no tenga fondo */
 }
 
-/* Estilo para el hover del div en .user-info */
+/* Eliminar cualquier fondo al hacer hover en .user-info */
 .user-info div:hover {
-    background-color: transparent !important; /* Forzar el fondo transparente al hacer hover */
+    background-color: transparent !important; /* Fondo transparente forzado al hacer hover */
 }
 
-/* Estilos para los botones */
+/* Estilos para los botones en la sección de configuración */
 .settings {
     display: flex;
     flex-direction: column;
-    background-color: transparent; /* Fondo transparente para la sección de configuración */
+    background-color: transparent;
 }
 
 .settings .btn {
     margin: 5px 0; /* Espaciado vertical entre botones */
     padding: 10px;
     border: none;
-    border-radius: 8px; /* Bordes redondeados para los botones */
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s; /* Transición para fondo y color de texto */
+    transition: background-color 0.3s, color 0.3s;
     background-color: #ffc247; /* Color de fondo de los botones */
-    color: #fff; /* Color de texto en los botones */
+    color: #fff;
 }
 
 .settings .btn:hover {
@@ -80,7 +84,6 @@ h1 {
     background-color: #ce2121; /* Color de fondo del botón de eliminar */
 }
 
-/* Estilo para el botón de eliminar al hacer hover */
 .settings .delete-photo:hover {
     background-color: #b81c1c; /* Color al pasar el mouse sobre el botón de eliminar */
 }
@@ -98,12 +101,12 @@ h1 {
 }
 
 .info-section input {
-    min-width: 200px; /* Ancho mínimo para los campos de texto */
-    width: 250px; /* Establece un ancho fijo para todos los campos */
+    min-width: 200px;
+    width: 250px;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ddd;
-    border-radius: 8px; /* Bordes redondeados para los campos de entrada */
+    border-radius: 8px;
 }
 
 /* Media Queries para Responsividad */
@@ -120,6 +123,6 @@ h1 {
 
     .user-info img {
         width: 60px; /* Ajuste para dispositivos más pequeños */
-        height: 60px; /* Ajuste para dispositivos más pequeños */
+        height: 60px;
     }
 }

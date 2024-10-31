@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { useState, useEffect } from "react";
 
 const useTasks = (db, user) => {
@@ -16,48 +16,57 @@ const useTasks = (db, user) => {
       return;
     }
 
-    const fetchTasks = async () => {
-      const q = query(
+    // Crear una consulta
+    const q = query(
         collection(db, "tasks"),
         where("user_id", "==", user.uid)
-      );
-      const querySnapshot = await getDocs(q);
-      const fetchedTasks = [];
+    );
 
+    // Escuchar los cambios en tiempo real
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedTasks = [];
       querySnapshot.forEach((doc) => {
         fetchedTasks.push({ id: doc.id, ...doc.data() });
       });
 
       setTasks(fetchedTasks);
 
+      // Actualiza los contadores
       const completed = fetchedTasks.filter(
-        (task) => task.estado === "Completada"
+          (task) => task.estado === "Completada"
       );
       setCompletedCount(completed.length);
 
       const overdue = fetchedTasks.filter((task) => {
         const dueDate = task.dueDate?.toDate();
-        const isOverdue = dueDate && dueDate < new Date();
-        return task.estado === "Pendiente" && isOverdue;
+        return task.estado === "Pendiente" && dueDate && dueDate < new Date();
       });
       setOverdueCount(overdue.length);
 
       const pending = fetchedTasks.filter((task) => {
         const dueDate = task.dueDate?.toDate();
-        const isNotOverdue = !dueDate || dueDate >= new Date();
-        return task.estado === "Pendiente" && isNotOverdue;
+        return (
+            task.estado === "Pendiente" && (!dueDate || dueDate >= new Date())
+        );
       });
       setPendingCount(pending.length);
-    };
+    });
 
-    fetchTasks();
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [db, user?.uid]);
+
+  // Función para añadir una nueva tarea directamente al estado
+  const addTaskToList = (newTask) => {
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+  };
 
   return {
     tasks,
     completedCount,
     pendingCount,
     overdueCount,
+    addTaskToList, // Añadir el callback
   };
 };
 
