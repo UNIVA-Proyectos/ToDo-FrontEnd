@@ -8,10 +8,12 @@ const useDeleteTask = (db) => {
   const deleteTask = async (taskId) => {
     setLoading(true);
     setError(null);
+    console.log("Eliminando tarea con ID:", taskId); // Verificar el taskId
 
     try {
       const taskRef = doc(db, "tasks", taskId);
       await deleteDoc(taskRef);
+      console.log("Tarea eliminada con éxito");
     } catch (err) {
       console.error("Error al eliminar la tarea:", err);
       setError("Hubo un problema al eliminar la tarea.");

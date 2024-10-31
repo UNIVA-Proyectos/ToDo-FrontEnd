@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
 
-const TaskCard = ({ task }) => {
+const TaskCard = ({ task, deleteTask }) => { // Agregar deleteTask como prop
   const { titulo, descripcion, dueDate, estado } = task;
 
   // Verificar si dueDate es válido antes de convertirlo a fecha
@@ -37,6 +37,12 @@ const TaskCard = ({ task }) => {
     return null;
   };
 
+  const handleDelete = () => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar esta tarea?")) {
+      deleteTask(task.id); // Llamar a deleteTask con el ID de la tarea
+    }
+  };
+
   return (
       <div className="taskCard">
         <div className={`statusIcon ${getStatusClass()}`}>{getStatusIcon()}</div>
@@ -49,7 +55,7 @@ const TaskCard = ({ task }) => {
           <button className="btn btn-warning me-3" aria-label="Editar tarea">
             Editar
           </button>
-          <button className="btn btn-danger me-3" aria-label="Eliminar tarea">
+          <button className="btn btn-danger me-3" aria-label="Eliminar tarea" onClick={handleDelete}>
             Eliminar
           </button>
           <button
@@ -65,11 +71,13 @@ const TaskCard = ({ task }) => {
 
 TaskCard.propTypes = {
   task: PropTypes.shape({
+    id: PropTypes.string.isRequired, // Asegúrate de que id esté definido en la tarea
     titulo: PropTypes.string.isRequired,
     descripcion: PropTypes.string,
     dueDate: PropTypes.instanceOf(Timestamp), // Verifica si es de tipo Timestamp
     estado: PropTypes.string.isRequired,
   }).isRequired,
+  deleteTask: PropTypes.func.isRequired, // Asegúrate de que deleteTask sea una función requerida
 };
 
 export default TaskCard;
