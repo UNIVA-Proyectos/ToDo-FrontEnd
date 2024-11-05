@@ -8,14 +8,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
 
-const TaskCard = ({ task, deleteTask }) => { // Agregar deleteTask como prop
+const TaskCard = ({ task, deleteTask }) => {
+  // Agregar deleteTask como prop
   const { titulo, descripcion, dueDate, estado } = task;
 
   // Verificar si dueDate es válido antes de convertirlo a fecha
   const isDueDateValid = dueDate && dueDate instanceof Timestamp;
   const dueDateFormatted = isDueDateValid ? dueDate.toDate() : null;
   const isOverdue =
-      dueDateFormatted && dueDateFormatted < new Date() && estado === "Pendiente";
+    dueDateFormatted && dueDateFormatted < new Date() && estado === "Pendiente";
 
   const getStatusClass = () => {
     if (estado === "Completada") return "completed";
@@ -44,28 +45,18 @@ const TaskCard = ({ task, deleteTask }) => { // Agregar deleteTask como prop
   };
 
   return (
-      <div className="taskCard">
-        <div className={`statusIcon ${getStatusClass()}`}>{getStatusIcon()}</div>
-        <h3>{titulo}</h3>
-        <p>
-          Vencimiento:{" "}
-          {dueDateFormatted ? dueDateFormatted.toLocaleString() : "No disponible"}
-        </p>
-        <div className="actions">
-          <button className="btn btn-warning me-3" aria-label="Editar tarea">
-            Editar
-          </button>
-          <button className="btn btn-danger me-3" aria-label="Eliminar tarea" onClick={handleDelete}>
-            Eliminar
-          </button>
-          <button
-              className="btn btn-success me-3"
-              aria-label="Marcar tarea como completa"
-          >
-            Completar
-          </button>
+    <div className="progress-component p-3" style={{ cursor: "pointer" }}>
+      <div className="d-flex align-items-center">
+        <div className={`statusIcon ${getStatusClass()}`}>
+          {getStatusIcon()}
         </div>
+        <div className="ms-3 flex-grow-1">
+          <h6>{titulo}</h6>
+          <small>{dueDate.toDate().toLocaleString()}</small>
+        </div>
+        <span>90%</span>
       </div>
+    </div>
   );
 };
 

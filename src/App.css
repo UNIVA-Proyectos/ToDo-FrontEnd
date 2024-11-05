@@ -7,6 +7,7 @@
 @import "./styles/sidebar.css";
 @import "./styles/taskCard.css";
 @import "./styles/taskSummary.css";
+@import "./styles/datepicker.css";
 
 body {
   font-family: "Montserrat", sans-serif;

@@ -17,42 +17,41 @@ function Sidebar() {
   };
 
   return (
-      <div className="sidebar">
-        <div className="user-info">
-          <img src={user?.photoURL} alt="Foto de perfil" className="user-image" />
-          <span className="user-name">
+    <div className="sidebar">
+      <div className="user-info">
+        <img src={user?.photoURL} alt="Foto de perfil" className="user-image" />
+        <span className="user-name">
           {user?.displayName?.split(" ").slice(0, 2).join(" ")}
         </span>
-          <i className="fas fa-bell"></i>
-        </div>
-        <ul>
-          <li className={location.pathname === "/home" ? "active" : ""}>
-            <Link to="/home">
-              <i className="fas fa-list-check"></i> Tareas
-            </Link>
-          </li>
-          <li className={location.pathname === "/calendar" ? "active" : ""}>
-            <Link to="/calendar">
-              <i className="fas fa-calendar"></i> Calendario
-            </Link>
-          </li>
-          <li className={location.pathname === "/configuracion" ? "active" : ""}>
-            <Link to="/configuracion">
-              <i className="fas fa-gear"></i> Configuración
-            </Link>
-          </li>
-          <li className={location.pathname === "/soporte" ? "active" : ""}>
-            <Link to="/soporte">
-              <i className="fas fa-question-circle"></i> Soporte y ayuda
-            </Link>
-          </li>
-          <li onClick={handleLogout}>
-            <Link to="#">
-              <i className="fas fa-sign-out-alt"></i> Cerrar sesión
-            </Link>
-          </li>
-        </ul>
       </div>
+      <ul>
+        <li className={location.pathname === "/home" ? "active" : ""}>
+          <Link to="/home">
+            <i className="fas fa-list-check"></i> Tareas
+          </Link>
+        </li>
+        <li className={location.pathname === "/calendar" ? "active" : ""}>
+          <Link to="/calendar">
+            <i className="fas fa-calendar"></i> Calendario
+          </Link>
+        </li>
+        <li className={location.pathname === "/configuracion" ? "active" : ""}>
+          <Link to="/configuracion">
+            <i className="fas fa-gear"></i> Configuración
+          </Link>
+        </li>
+        <li className={location.pathname === "/soporte" ? "active" : ""}>
+          <Link to="/soporte">
+            <i className="fas fa-question-circle"></i> Soporte y ayuda
+          </Link>
+        </li>
+        <li onClick={handleLogout}>
+          <Link to="#">
+            <i className="fas fa-sign-out-alt"></i> Cerrar sesión
+          </Link>
+        </li>
+      </ul>
+    </div>
   );
 }
 
