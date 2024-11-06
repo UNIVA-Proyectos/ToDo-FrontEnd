@@ -1,11 +1,11 @@
 import TaskCard from "../components/tasks/TaskCard";
 import TaskSummary from "../components/tasks/taskSummary";
 import AddTask from "../components/tasks/AddTask";
-import useTasks from "../hooks/useTasks";
+import useTasks from "../hooks/tasks/useTasks";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
-import useAddTask from "../hooks/useAddTask";
-import useDeleteTask from "../hooks/useDeleteTask"; // Importa el hook
+import useAddTask from "../hooks/tasks/useAddTask";
+import useDeleteTask from "../hooks/tasks/useDeleteTask"; // Importa el hook
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";

@@ -1,11 +1,11 @@
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
-const SelectLabels = () => {
+const SelectLabels = ({ selectedLabels, setSelectedLabels }) => {
   const options = [
     { value: "Importante", label: "Importante" },
     { value: "Urgente", label: "Urgente" },
-    { value: "Prioridad", label: "Prioridad" },
+    { value: "Escuela", label: "Escuela" },
     { value: "Bajo", label: "Bajo" },
   ];
 
@@ -65,6 +65,8 @@ const SelectLabels = () => {
       components={animatedComponents}
       isMulti
       options={options}
+      value={selectedLabels}
+      onChange={setSelectedLabels}
       styles={customStyles}
       className="basic-multi-select"
       classNamePrefix="select"

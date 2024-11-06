@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import DatePickerBtn from "../inputs/DatePickerBtn";
-import { Select } from "@mui/material";
 import SelectLabels from "../inputs/SelectLabels";
 
 const AddTask = ({ addTask, closeAddTask }) => {
   const [taskName, setTaskName] = useState("");
   const [taskDate, setTaskDate] = useState(new Date());
   const [taskDescription, setTaskDescription] = useState("");
+  const [selectedTags, setSelectedTags] = useState([
+    { value: "Importante", label: "Importante" },
+  ]);
 
   const onSelectDate = (date) => {
     setTaskDate(new Date(date));
-    console.log(taskDate);
   };
 
   const handleAddTask = () => {
@@ -18,19 +19,22 @@ const AddTask = ({ addTask, closeAddTask }) => {
       alert("Por favor, ingresa un nombre para la tarea");
       return;
     }
+    console.log("selectedTags:", selectedTags);
 
-    const newTask = {
+    const taskWithTags = {
       titulo: taskName,
       descripcion: taskDescription,
-      estado: "Pendiente", // Estado inicial
+      estado: "Pendiente",
       fechaCreacion: new Date(),
       dueDate: taskDate,
       complete: false,
+      tags: selectedTags ? selectedTags.map((label) => label.value) : [], // Verifica que selectedTags no sea undefined
     };
 
-    addTask(newTask);
+    addTask(taskWithTags, selectedTags); // Pasa las etiquetas seleccionadas al hook
     setTaskName("");
     setTaskDescription("");
+    setSelectedTags([]); // Limpiar las etiquetas después de agregar la tarea
     closeAddTask();
   };
 
@@ -60,7 +64,10 @@ const AddTask = ({ addTask, closeAddTask }) => {
         <div className="me-3">
           <DatePickerBtn handleSelectDate={onSelectDate} />
         </div>
-        <SelectLabels />
+        <SelectLabels
+          selectedTags={selectedTags}
+          setSelectedTags={setSelectedTags} // Actualiza las etiquetas seleccionadas
+        />
       </div>
       <div className="d-flex justify-content-end">
         <button
