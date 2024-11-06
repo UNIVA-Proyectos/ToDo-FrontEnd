@@ -12,25 +12,37 @@ const DatePickerBtn = ({ handleSelectDate }) => {
     palette: {
       primary: {
         main: "#ffc247",
-        contrastText: "#ffffff", // Texto blanco para mayor legibilidad
       },
       secondary: {
-        main: "#ffc247", // Un color secundario complementario
+        main: "#ffc247",
+      },
+      text: {
+        primary: "#fff",
+        secondary: "#ffc247",
       },
     },
     components: {
-      MuiPickersDay: {
-        // Estilos para los días del calendario
+      MuiDateCalendar: {
         styleOverrides: {
           root: {
+            color: "#fff",
+            borderRadius: "16px",
+            backgroundColor: "#25283d",
+          },
+        },
+      },
+      MuiPickersDay: {
+        styleOverrides: {
+          root: {
+            color: "#fff",
             "&:hover": {
-              backgroundColor: "#ffc247", // Color al pasar el ratón
+              backgroundColor: "#ffc247",
             },
             "&.Mui-selected": {
-              backgroundColor: "#ffc247", // Color cuando el día está seleccionado
-              color: "#ffffff",
+              backgroundColor: "#ffc247",
+              color: "#000",
               "&:hover": {
-                backgroundColor: "#ffc247", // Al pasar el ratón en un día seleccionado
+                backgroundColor: "#ffc247",
               },
             },
           },
@@ -39,21 +51,27 @@ const DatePickerBtn = ({ handleSelectDate }) => {
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            borderRadius: "8px", // Bordes más redondeados
+            borderRadius: "8px",
+            backgroundColor: "transparent",
             "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#25283d",
+              borderColor: "#ffc247",
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: "#EBECEC", // Color de borde al enfocar
+              borderColor: "#EBECEC",
             },
+          },
+          input: {
+            color: "#000",
           },
         },
       },
       MuiDialog: {
         styleOverrides: {
           paper: {
-            border: "1px solid #ffc247", // Borde del calendario
-            borderRadius: "16px", // Bordes redondeados
+            color: "#fff",
+            border: "1px solid #fff",
+            borderRadius: "16px",
+            backgroundColor: "#25283d",
           },
         },
       },
@@ -61,6 +79,29 @@ const DatePickerBtn = ({ handleSelectDate }) => {
         styleOverrides: {
           root: {
             color: "#ffc247",
+          },
+          textPrimary: {
+            color: "#ffc247",
+          },
+          textSecondary: {
+            color: "#ffc247",
+          },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            color: "#ffc247",
+            "&:hover": {
+              backgroundColor: "rgba(255, 194, 71, 0.1)",
+            },
+          },
+        },
+      },
+      MuiTypography: {
+        styleOverrides: {
+          root: {
+            color: "#fff",
           },
         },
       },
