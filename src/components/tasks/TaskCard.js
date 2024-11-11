@@ -54,7 +54,6 @@ const TaskCard = ({ task, deleteTask }) => {
           <h6>{titulo}</h6>
           <small>{dueDate.toDate().toLocaleString()}</small>
         </div>
-        <span>90%</span>
       </div>
     </div>
   );
