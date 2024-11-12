@@ -9,18 +9,26 @@ import useDeleteTask from "../hooks/tasks/useDeleteTask"; // Importa el hook
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import useUserData from "../hooks/user/useUserData";
 const Home = () => {
   const [user] = useAuthState(auth);
+  const { userData, loading } = useUserData();
   const { tasks, completedCount, pendingCount, overdueCount, addTaskToList } =
     useTasks(db, user);
   const { addTask } = useAddTask(db, user, addTaskToList); // Pasa el callback
   const { deleteTask } = useDeleteTask(db); // Usa el hook para eliminar tareas
   const [openAddTask, setOpenAddTask] = useState(false);
+  const displayName = userData?.name || user?.displayName || "Usuario";
 
   return (
     <div>
       <header>
-        <h1>Hola, {user?.displayName?.split(" ").slice(0, 2).join(" ")} </h1>
+        <h1>
+          Hola,{" "}
+          {loading
+            ? "Cargando..."
+            : displayName.split(" ").slice(0, 2).join(" ")}{" "}
+        </h1>
       </header>
       <TaskSummary
         completedCount={completedCount}

@@ -27,6 +27,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
 import LogoutIcon from "@mui/icons-material/Logout";
+import useUserData from "../hooks/user/useUserData";
 
 const drawerWidth = 300;
 
@@ -70,6 +71,9 @@ export default function Sidebar({ open, toggleDrawer }) {
     await auth.signOut();
     navigate("/");
   };
+
+  const { userData, loading } = useUserData();
+  const displayName = userData?.name || user?.displayName || "Usuario";
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -120,12 +124,12 @@ export default function Sidebar({ open, toggleDrawer }) {
         {user && (
           <Box sx={{ padding: 2, display: "flex", alignItems: "center" }}>
             <Avatar
-              alt={user.displayName || "User"}
+              alt={displayName || "User"}
               src={user.photoURL || ""}
               sx={{ width: 50, height: 50, marginRight: 2 }}
             />
             <Typography variant="h6" sx={{ color: "white" }}>
-              {user.displayName || "Nombre de usuario"}
+              {loading ? "Cargando..." : displayName}
             </Typography>
           </Box>
         )}
