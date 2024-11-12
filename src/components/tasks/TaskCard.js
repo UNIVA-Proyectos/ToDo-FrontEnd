@@ -7,10 +7,13 @@ import {
   faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
+import TaskDetailDialog from "../dialog/TaskDetailDialog";
 
 const TaskCard = ({ task, deleteTask }) => {
   // Agregar deleteTask como prop
   const { titulo, descripcion, dueDate, estado } = task;
+
+  const [open, setOpen] = React.useState(false);
 
   // Verificar si dueDate es válido antes de convertirlo a fecha
   const isDueDateValid = dueDate && dueDate instanceof Timestamp;
@@ -45,17 +48,28 @@ const TaskCard = ({ task, deleteTask }) => {
   };
 
   return (
-    <div className="progress-component p-3" style={{ cursor: "pointer" }}>
-      <div className="d-flex align-items-center">
-        <div className={`statusIcon ${getStatusClass()}`}>
-          {getStatusIcon()}
-        </div>
-        <div className="ms-3 flex-grow-1">
-          <h6>{titulo}</h6>
-          <small>{dueDate.toDate().toLocaleString()}</small>
+    <>
+      <div
+        onClick={() => setOpen(true)}
+        className="progress-component p-3"
+        style={{ cursor: "pointer" }}
+      >
+        <div className="d-flex align-items-center">
+          <div className={`statusIcon ${getStatusClass()}`}>
+            {getStatusIcon()}
+          </div>
+          <div className="ms-3 flex-grow-1">
+            <h6>{titulo}</h6>
+            <small>{dueDate.toDate().toLocaleString()}</small>
+          </div>
         </div>
       </div>
-    </div>
+      <TaskDetailDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        task={task}
+      />
+    </>
   );
 };
 
