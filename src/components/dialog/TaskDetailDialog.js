@@ -53,17 +53,16 @@ const TaskDetailDialog = ({ open, handleClose, task }) => {
             <FontAwesomeIcon icon={faFolderOpen} />
           </div>
           <Typography variant="h6" component="div">
-            Diseñar el dashboard para el usuario
+            {task.titulo}
           </Typography>
         </Box>
       </DialogTitle>
 
       <DialogContent>
         <Box display="flex" className="content-wrapper">
-          {/* Left Column: Task Editing */}
           <Box flex={2} className="left-column">
-            <Typography variant="subtitle1" color="textSecondary">
-              Descripción
+            <Typography variant="body1">
+              {task.descripcion || "No hay descripción"}
             </Typography>
 
             <Box display="flex" alignItems="center" gap={1} my={2}>
@@ -111,14 +110,23 @@ const TaskDetailDialog = ({ open, handleClose, task }) => {
             <Divider />
             <Box my={2}>
               <Typography variant="body2" color="textSecondary">
-                Fecha de vencimiento
+                {task.dueDate
+                  ? task.dueDate.toDate().toLocaleDateString()
+                  : "Sin fecha"}
               </Typography>
               <Box display="flex" alignItems="center" gap={1}>
                 <FontAwesomeIcon
                   icon={faCalendarAlt}
                   style={{ color: "#ffc107" }}
                 />
-                <Typography variant="body1">Nov 21</Typography>
+                <Typography variant="body1">
+                  {task.dueDate
+                    ? task.dueDate.toDate().toLocaleDateString("es-ES", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "Sin fecha"}
+                </Typography>
               </Box>
             </Box>
             <Divider />

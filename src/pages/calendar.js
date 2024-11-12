@@ -93,7 +93,7 @@ const Calendar = () => {
         {tasksForSelectedDate.length > 0 ? (
           <ul>
             {tasksForSelectedDate.map((task) => (
-              <li key={task.id}>{task.descripcion}</li>
+              <li key={task.id}>{task.titulo}</li>
             ))}
           </ul>
         ) : (
