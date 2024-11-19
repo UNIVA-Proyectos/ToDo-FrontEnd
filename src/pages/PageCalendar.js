@@ -5,7 +5,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "../styles/calendar.css"; // Importar el CSS personalizado
+import "../styles/calendar.css";
 import { CardContent, Box } from "@mui/material";
 import moment from "moment";
 import TaskDetailDialog from "../components/dialog/TaskDetailDialog";
@@ -14,8 +14,6 @@ moment.locale("en-GB");
 const localizer = momentLocalizer(moment);
 
 const PageCalendar = () => {
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [user] = useAuthState(auth);
   const { tasks } = useTasks(db, user);
   const [open, setOpen] = useState(false);
@@ -76,11 +74,13 @@ const PageCalendar = () => {
           />
         </CardContent>
       </Box>
-      <TaskDetailDialog
-        open={open}
-        handleClose={() => setOpen(false)}
-        task={selectedTask}
-      />
+      {selectedTask && (
+        <TaskDetailDialog
+          open={open}
+          handleClose={() => setOpen(false)}
+          task={selectedTask}
+        />
+      )}
     </>
   );
 };
