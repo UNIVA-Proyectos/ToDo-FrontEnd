@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import dayjs from "dayjs";
 import useTasks from "../hooks/tasks/useTasks";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
@@ -18,8 +17,6 @@ const PageCalendar = () => {
   const { tasks } = useTasks(db, user);
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-
-  console.log(tasks);
 
   const events = tasks.map((task) => ({
     title: task.titulo,
@@ -49,13 +46,18 @@ const PageCalendar = () => {
     };
   };
 
+  const handleEventSelect = (event) => {
+    setSelectedTask(event); // Asigna la tarea seleccionada
+    setOpen(true); // Abre el modal de detalles de la tarea
+  };
+
   console.log(events);
 
   return (
     <>
       <Box
         className="calendar-container"
-        sx={{ height: "80vh", padding: 2, margin: 0 }}
+        sx={{ height: "80vh", padding: 1.5, margin: 0 }}
       >
         <CardContent sx={{ height: "100%", padding: 2 }}>
           <BigCalendar
@@ -67,10 +69,7 @@ const PageCalendar = () => {
             localizer={localizer}
             style={{ height: "100%", width: "100%" }}
             eventPropGetter={(event) => eventColors(event)}
-            onSelectEvent={(event) => {
-              setOpen(true);
-              setSelectedTask(event);
-            }}
+            onSelectEvent={handleEventSelect}
           />
         </CardContent>
       </Box>
