@@ -18,17 +18,48 @@ import {
   faCalendarAlt,
   faFolderOpen,
   faXmark,
+  faCheckCircle,
+  faExclamationCircle,
+  faClock,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../config/firebase";
 import Slide from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
+import { Timestamp } from "firebase/firestore";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
 const TaskDetailDialog = ({ open, handleClose, task }) => {
   const [user] = useAuthState(auth);
+  const isDueDateValid = task.dueDate && task.dueDate instanceof Timestamp;
+  const dueDateFormatted = isDueDateValid ? task.dueDate.toDate() : null;
+  const isOverdue =
+    dueDateFormatted &&
+    dueDateFormatted < new Date() &&
+    task.estado === "Pendiente";
+
+  const getStatusIcon = () => {
+    // Determinar el icono dependiendo del estado y si está vencida
+    switch (task.estado) {
+      case "Completada":
+        return (
+          <FontAwesomeIcon icon={faCheckCircle} style={{ color: "green" }} />
+        );
+      case "Pendiente":
+        if (isOverdue) {
+          return (
+            <FontAwesomeIcon
+              icon={faExclamationCircle}
+              style={{ color: "red" }}
+            />
+          );
+        }
+        return <FontAwesomeIcon icon={faClock} style={{ color: "orange" }} />;
+      default:
+        return <FontAwesomeIcon icon={faFolderOpen} />;
+    }
+  };
 
   return (
     <Dialog
@@ -49,8 +80,13 @@ const TaskDetailDialog = ({ open, handleClose, task }) => {
       </DialogActions>
       <DialogTitle>
         <Box display="flex" alignItems="center" gap={1}>
-          <div className={`statusIcon pending   `}>
-            <FontAwesomeIcon icon={faFolderOpen} />
+          <div
+            className={`statusIcon ${
+              task.estado === "Pendiente" && isOverdue ? "overdue" : ""
+            }`}
+          >
+            {getStatusIcon()}{" "}
+            {/* Aquí usamos el icono que devuelve la función */}
           </div>
           <Typography variant="h6" component="div">
             {task.titulo}
@@ -143,8 +179,20 @@ const TaskDetailDialog = ({ open, handleClose, task }) => {
               </Typography>
 
               <Box display="flex" alignItems="center" gap={1}>
-                <Chip label="Prioridad" size="small" color="success" />
-                <Chip label="Matematicas" size="small" color="warning" />
+                {task.etiquetas && task.etiquetas.length > 0 ? (
+                  task.etiquetas.map((etiqueta, index) => (
+                    <Chip
+                      key={index}
+                      label={etiqueta}
+                      size="small"
+                      color="success"
+                    />
+                  ))
+                ) : (
+                  <Typography variant="body2" color="textSecondary">
+                    No hay etiquetas
+                  </Typography>
+                )}
               </Box>
             </Box>
           </Box>

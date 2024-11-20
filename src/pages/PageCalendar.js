@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import dayjs from "dayjs";
 import useTasks from "../hooks/tasks/useTasks";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
@@ -14,14 +13,10 @@ moment.locale("en-GB");
 const localizer = momentLocalizer(moment);
 
 const PageCalendar = () => {
-  const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [currentMonth, setCurrentMonth] = useState(dayjs());
   const [user] = useAuthState(auth);
   const { tasks } = useTasks(db, user);
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-
-  console.log(tasks);
 
   const events = tasks.map((task) => ({
     title: task.titulo,
@@ -51,6 +46,11 @@ const PageCalendar = () => {
     };
   };
 
+  const handleEventSelect = (event) => {
+    setSelectedTask(event); // Asigna la tarea seleccionada
+    setOpen(true); // Abre el modal de detalles de la tarea
+  };
+
   console.log(events);
 
   return (
@@ -69,10 +69,7 @@ const PageCalendar = () => {
             localizer={localizer}
             style={{ height: "100%", width: "100%" }}
             eventPropGetter={(event) => eventColors(event)}
-            onSelectEvent={(event) => {
-              setOpen(true);
-              setSelectedTask(event);
-            }}
+            onSelectEvent={handleEventSelect}
           />
         </CardContent>
       </Box>
