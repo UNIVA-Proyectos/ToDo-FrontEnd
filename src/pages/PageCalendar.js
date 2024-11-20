@@ -22,7 +22,7 @@ const PageCalendar = () => {
   console.log(tasks);
 
   const events = tasks.map((task) => ({
-    title: task.descripcion,
+    title: task.titulo,
     allDay: true,
     start: new Date(task.dueDate.toDate()),
     end: new Date(task.dueDate.toDate()),
@@ -74,13 +74,11 @@ const PageCalendar = () => {
           />
         </CardContent>
       </Box>
-      {selectedTask && (
-        <TaskDetailDialog
-          open={open}
-          handleClose={() => setOpen(false)}
-          task={selectedTask}
-        />
-      )}
+      <TaskDetailDialog
+        open={open}
+        handleClose={() => setOpen(false)}
+        task={selectedTask}
+      />
     </>
   );
 };
