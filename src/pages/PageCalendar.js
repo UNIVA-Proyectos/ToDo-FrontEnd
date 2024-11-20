@@ -57,7 +57,7 @@ const PageCalendar = () => {
     <>
       <Box
         className="calendar-container"
-        sx={{ height: "80vh", padding: 2, margin: 0 }}
+        sx={{ height: "80vh", padding: 1.5, margin: 0 }}
       >
         <CardContent sx={{ height: "100%", padding: 2 }}>
           <BigCalendar

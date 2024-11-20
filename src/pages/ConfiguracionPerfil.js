@@ -1,209 +1,160 @@
 import React, { useState, useEffect } from "react";
-import { auth, db } from "../config/firebase";
 import "../styles/configUsuario.css"; // CSS global
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { updateDoc, doc } from "firebase/firestore";
+import { storage } from "../config/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import useUserData from "../hooks/user/useUserData";
+import useUpdateUserData from "../hooks/user/useUpdateUserData";
+import NoImage from "../assets/no-profile-image.webp";
 
 function ConfiguracionPerfil() {
-  const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
-  const [photoURL, setPhotoURL] = useState(""); // Para almacenar la URL de la foto de perfil
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isSocialLogin, setIsSocialLogin] = useState(false); // Para determinar si el usuario inició sesión con Google o Facebook
-  const [fechaNacimiento, setFechaNacimiento] = useState("No disponible");
-  const [genero, setGenero] = useState("No disponible");
+  const { userData, loading } = useUserData();
+  const { updateUserData } = useUpdateUserData();
 
-  // Cargar datos del usuario al montar el componente
+  const [name, setNombre] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState("");
+  const [genero, setGenero] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
-    if (auth.currentUser) {
-      setNombre(auth.currentUser.displayName || "Usuario"); // Nombre del usuario
-      setEmail(auth.currentUser.email); // Correo electrónico del usuario
-      setPhotoURL(
-        auth.currentUser.photoURL || "https://via.placeholder.com/80"
-      ); // URL de la foto
-
-      // Verificar si el usuario inició sesión con Google o Facebook
-      const providerData = auth.currentUser.providerData;
-      if (
-        providerData.some(
-          (provider) =>
-            provider.providerId === "google.com" ||
-            provider.providerId === "facebook.com"
-        )
-      ) {
-        setIsSocialLogin(true);
-      }
-
-      // Extraer fecha de nacimiento y género (si están disponibles)
-      const birthDate =
-        auth.currentUser.providerData.find(
-          (provider) =>
-            provider.providerId === "google.com" ||
-            provider.providerId === "facebook.com"
-        )?.userInfo?.birthdate || "No disponible";
-      const gender =
-        auth.currentUser.providerData.find(
-          (provider) =>
-            provider.providerId === "google.com" ||
-            provider.providerId === "facebook.com"
-        )?.userInfo?.gender || "No disponible";
-
-      setFechaNacimiento(birthDate);
-      setGenero(gender);
+    if (!loading && userData) {
+      setNombre(userData.name || "");
+      setPhotoURL(userData.photoURL || NoImage);
+      setFechaNacimiento(userData.fechaNacimiento || "");
+      setGenero(userData.genero || "");
+      setTelefono(userData.telefono || "");
     }
-  }, []);
+  }, [userData, loading]);
 
-  const handleChangePhoto = () => {
-    const uploadPhotoInput = document.getElementById("uploadPhoto");
-    uploadPhotoInput.click(); // Abrir el selector de archivos
+  const handleSaveChanges = async () => {
+    const updatedData = {
+      name,
+      photoURL,
+      fechaNacimiento,
+      genero,
+      telefono,
+    };
+    await updateUserData(updatedData);
+    alert("Datos actualizados con éxito.");
   };
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        // Referencia al Storage
-        const storage = getStorage();
-        const storageRef = ref(
-          storage,
-          `profilePictures/${auth.currentUser.uid}/${file.name}`
-        );
-
-        // Subir el archivo al Storage
-        await uploadBytes(storageRef, file);
-
-        // Obtener la URL de descarga
-        const downloadURL = await getDownloadURL(storageRef);
-
-        // Actualizar la foto de perfil en Auth
-        await auth.currentUser.updateProfile({ photoURL: downloadURL });
-        setPhotoURL(downloadURL);
-
-        // Actualizar la URL de la foto en Firestore
-        const userDocRef = doc(db, "users", auth.currentUser.uid);
-        await updateDoc(userDocRef, { photoURL: downloadURL });
-
-        alert("Foto de perfil actualizada exitosamente.");
-      } catch (error) {
-        console.error("Error al subir la foto:", error);
-        alert("Hubo un error al actualizar la foto de perfil.");
-      }
-    }
-  };
-
-  const handleDeletePhoto = () => {
-    console.log("Eliminando foto");
-    // Aquí puedes implementar la lógica para eliminar la foto de perfil
-  };
-
-  const handleChangePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      alert("Las contraseñas no coinciden.");
+  const handleChangePhoto = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !file.type.startsWith("image/")) {
+      alert("Por favor selecciona una imagen válida.");
       return;
     }
+    if (!userData?.uid) {
+      alert("Usuario no encontrado. Inténtalo de nuevo.");
+      return;
+    }
+
+    setIsUploading(true);
     try {
-      await auth.currentUser.updatePassword(newPassword);
-      alert("Contraseña cambiada con éxito.");
+      // Subir la imagen a Firebase Storage
+      const storageRef = ref(storage, `profilePictures/${userData.uid}`);
+      await uploadBytes(storageRef, file);
+
+      // Obtener la URL de descarga
+      const downloadURL = await getDownloadURL(storageRef);
+      setPhotoURL(downloadURL);
+
+      // Actualizar en Firestore
+      await updateUserData({ photoURL: downloadURL });
+      alert("Foto de perfil actualizada con éxito.");
     } catch (error) {
-      alert(`Error al cambiar la contraseña: ${error.message}`);
+      console.error("Error al subir la imagen:", error);
+      alert("Hubo un error al subir la imagen. Inténtalo de nuevo.");
+    } finally {
+      setIsUploading(false);
     }
   };
+
+  const handleDeletePhoto = async () => {
+    try {
+      await updateUserData({ photoURL: "" });
+      setPhotoURL(NoImage);
+      alert("Foto de perfil eliminada.");
+    } catch (error) {
+      console.error("Error al eliminar la foto:", error);
+      alert("Hubo un error al eliminar la foto.");
+    }
+  };
+
+  if (loading) {
+    return <p>Cargando...</p>;
+  }
 
   return (
     <div className="configuracion-usuario-container">
       <div className="configuracion-content">
         <h1>Configuración de Perfil</h1>
         <div className="user-info">
-          <div className="profile-section">
-            <img id="profileImagePreview" src={photoURL} alt="Foto de perfil" />
-            <div className="settings">
-              <input
-                type="file"
-                id="uploadPhoto"
-                style={{ display: "none" }}
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-              <button className="btn change-photo" onClick={handleChangePhoto}>
-                Cambiar foto
-              </button>
-              <button className="btn delete-photo" onClick={handleDeletePhoto}>
-                Eliminar foto
-              </button>
-            </div>
+          <img src={photoURL} alt="Foto de perfil" className="profile-photo" />
+          <div className="settings">
+            <input
+              type="file"
+              id="uploadPhoto"
+              style={{ display: "none" }}
+              onChange={handleChangePhoto}
+            />
+            <button
+              className="btn change-photo"
+              onClick={() => document.getElementById("uploadPhoto").click()}
+              disabled={isUploading}
+            >
+              {isUploading ? "Subiendo..." : "Cambiar foto"}
+            </button>
+            <button
+              className="btn delete-photo"
+              onClick={handleDeletePhoto}
+              disabled={isUploading}
+            >
+              Eliminar foto
+            </button>
           </div>
         </div>
 
-        {/* Sección 1: Información básica */}
         <div className="basic-info-section info-section">
           <h2>Información Básica</h2>
           <label>Nombre</label>
-          <input type="text" value={nombre} readOnly className="input-field" />
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setNombre(e.target.value)}
+            className="input-field"
+          />
           <label>Fecha de nacimiento</label>
           <input
             type="date"
-            value={fechaNacimiento === "No disponible" ? "" : fechaNacimiento} // Deja vacío si es "No disponible"
+            value={fechaNacimiento}
             onChange={(e) => setFechaNacimiento(e.target.value)}
             className="input-field"
-            readOnly={fechaNacimiento === "No disponible"} // No editable si no hay fecha
           />
           <label>Género</label>
-          <input
-            type="text"
+          <select
             value={genero}
             onChange={(e) => setGenero(e.target.value)}
             className="input-field"
-            readOnly={genero === "No disponible"} // No editable si no hay género
-          />
-        </div>
-
-        {/* Sección 2: Información de contacto y contraseña */}
-        <div className="contact-info-section info-section">
-          <h2>Información de Contacto y Contraseña</h2>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            readOnly // No permitimos modificar el correo
-            className="input-field"
-          />
+          >
+            <option value="">Selecciona tu género</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+            <option value="No Binario">No Binario</option>
+            <option value="Otro">Otro</option>
+            <option value="prefiero-no-decirlo">Prefiero no decirlo</option>
+          </select>
           <label>Teléfono</label>
           <input
             type="tel"
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
             className="input-field"
-            // lógica para manejar el teléfono aquí
           />
-          {!isSocialLogin && (
-            <>
-              <label>Nueva Contraseña</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="input-field"
-              />
-              <label>Confirmar Contraseña</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input-field"
-              />
-              <button
-                className="btn change-password"
-                onClick={handleChangePassword}
-              >
-                Cambiar contraseña
-              </button>
-            </>
-          )}
-          {isSocialLogin && (
-            <p className="info-message">
-              No puedes cambiar la contraseña, ya que iniciaste sesión con
-              Google o Facebook.
-            </p>
-          )}
+          <button onClick={handleSaveChanges} className="btn save-changes">
+            Guardar Cambios
+          </button>
         </div>
       </div>
     </div>
