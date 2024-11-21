@@ -4,7 +4,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../config/firebase";
 import { Calendar as BigCalendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "../styles/calendar.css"; // Importar el CSS personalizado
+import "../styles/calendar.css";
 import { CardContent, Box } from "@mui/material";
 import moment from "moment";
 import TaskDetailDialog from "../components/dialog/TaskDetailDialog";
@@ -76,7 +76,7 @@ const PageCalendar = () => {
       <TaskDetailDialog
         open={open}
         handleClose={() => setOpen(false)}
-        task={selectedTask || {}}
+        task={selectedTask}
       />
     </>
   );
