@@ -5,6 +5,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import useUserData from "../hooks/user/useUserData";
 import useUpdateUserData from "../hooks/user/useUpdateUserData";
 import NoImage from "../assets/no-profile-image.webp";
+import DatePickerBtn from "../components/inputs/DatePickerBtn";
+import dayjs from "dayjs";
 
 function ConfiguracionPerfil() {
   const { userData, loading } = useUserData();
@@ -12,7 +14,7 @@ function ConfiguracionPerfil() {
 
   const [name, setNombre] = useState("");
   const [photoURL, setPhotoURL] = useState("");
-  const [fechaNacimiento, setFechaNacimiento] = useState("");
+  const [fechaNacimiento, setFechaNacimiento] = useState(new Date());
   const [genero, setGenero] = useState("");
   const [telefono, setTelefono] = useState("");
   const [isUploading, setIsUploading] = useState(false);
@@ -81,6 +83,9 @@ function ConfiguracionPerfil() {
       alert("Hubo un error al eliminar la foto.");
     }
   };
+  const handleSelectDate = (date) => {
+    setFechaNacimiento(new Date(date));
+  };
 
   if (loading) {
     return <p>Cargando...</p>;
@@ -116,7 +121,7 @@ function ConfiguracionPerfil() {
           </div>
         </div>
 
-        <div className="basic-info-section info-section">
+        <div className="info-section">
           <h2>Información Básica</h2>
           <label>Nombre</label>
           <input
@@ -126,12 +131,9 @@ function ConfiguracionPerfil() {
             className="input-field"
           />
           <label>Fecha de nacimiento</label>
-          <input
-            type="date"
-            value={fechaNacimiento}
-            onChange={(e) => setFechaNacimiento(e.target.value)}
-            className="input-field"
-          />
+          <div className="me-3">
+            <DatePickerBtn handleSelectDate={handleSelectDate} />
+          </div>
           <label>Género</label>
           <select
             value={genero}
