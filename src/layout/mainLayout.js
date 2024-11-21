@@ -15,7 +15,7 @@ const MainLayout = () => {
       <Sidebar open={open} toggleDrawer={toggleDrawer} />
       <div
         style={{
-          marginLeft: open ? 10 : -40,
+          marginLeft: open ? 10 : 40,
           marginRight: open ? "10%" : "10%",
           marginTop: "7%",
           transition: "margin-left 0.3s ease",

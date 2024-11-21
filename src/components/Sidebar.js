@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../config/firebase";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -6,7 +6,6 @@ import {
   styled,
   useTheme,
   Box,
-  Drawer,
   CssBaseline,
   Toolbar,
   IconButton,
@@ -18,6 +17,7 @@ import {
   ListItemText,
   Avatar,
 } from "@mui/material";
+import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -29,21 +29,22 @@ import HelpIcon from "@mui/icons-material/Help";
 import LogoutIcon from "@mui/icons-material/Logout";
 import useUserData from "../hooks/user/useUserData";
 
-const drawerWidth = 300;
+const drawerWidth = 240;
 
-// Estilo para el AppBar
+// Estilos para el AppBar
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
+    marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
@@ -52,40 +53,91 @@ const AppBar = styled(MuiAppBar, {
   color: "#25283d",
 }));
 
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...{
+      width: drawerWidth,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      overflowX: "hidden",
+    },
+    "& .MuiDrawer-paper": {
+      width: drawerWidth,
+      backgroundColor: "#25283d",
+    },
+  }),
+  ...(!open && {
+    ...{
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      overflowX: "hidden",
+      width: `calc(${theme.spacing(7)} + 1px)`,
+      [theme.breakpoints.up("sm")]: {
+        width: `calc(${theme.spacing(8)} + 1px)`,
+      },
+    },
+    "& .MuiDrawer-paper": {
+      width: `calc(${theme.spacing(7)} + 1px)`,
+      backgroundColor: "#25283d",
+    },
+  }),
+}));
+
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
+  justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
 }));
 
-export default function Sidebar({ open, toggleDrawer }) {
+export default function Sidebar() {
   const theme = useTheme();
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const location = useLocation();
-
-  const handleLogout = async () => {
-    localStorage.setItem("lastEmail", user?.email);
-    await auth.signOut();
-    navigate("/");
-  };
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const { userData, loading } = useUserData();
   const displayName = userData?.name || user?.displayName || "Usuario";
 
+  const handleDrawerOpen = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
+
+  const handleLogout = async () => {
+    if (user?.email) {
+      localStorage.setItem("lastEmail", user.email);
+    }
+    await auth.signOut();
+    navigate("/");
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={drawerOpen}>
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={toggleDrawer}
+            onClick={handleDrawerOpen}
             edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
+            sx={{ marginRight: 5, ...(drawerOpen && { display: "none" }) }}
           >
             <MenuIcon />
           </IconButton>
@@ -94,24 +146,10 @@ export default function Sidebar({ open, toggleDrawer }) {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            backgroundColor: "#25283d", // Fondo blanco
-            boxShadow: "none", // Sin sombra
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
+      <Drawer variant="permanent" open={drawerOpen}>
         <DrawerHeader>
-          <IconButton onClick={toggleDrawer}>
-            {theme.direction === "ltr" ? (
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === "rtl" ? (
               <ChevronLeftIcon sx={{ color: "white" }} />
             ) : (
               <ChevronRightIcon sx={{ color: "white" }} />
@@ -119,115 +157,106 @@ export default function Sidebar({ open, toggleDrawer }) {
           </IconButton>
         </DrawerHeader>
         <Divider />
-
         {/* Perfil del usuario */}
         {user && (
-          <Box sx={{ padding: 2, display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              padding: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: drawerOpen ? "flex-start" : "center",
+              flexDirection: drawerOpen ? "row" : "column", // Alineación vertical cuando está cerrado
+            }}
+          >
             <Avatar
               alt={displayName || "User"}
-              src={user.photoURL || ""}
-              sx={{ width: 50, height: 50, marginRight: 2 }}
+              src={user?.photoURL || ""}
+              sx={{
+                width: 50,
+                height: 50,
+                marginRight: drawerOpen ? 2 : 0,
+                marginBottom: drawerOpen ? 0 : 1, // Espaciado debajo cuando está cerrado
+              }}
             />
-            <Typography variant="h6" sx={{ color: "white" }}>
-              {loading ? "Cargando..." : displayName}
-            </Typography>
+            {drawerOpen && (
+              <Typography
+                variant="h6"
+                sx={{
+                  color: "white",
+                  whiteSpace: "normal", // Permite texto multilinea
+                  overflowWrap: "break-word", // Rompe palabras largas si es necesario
+                }}
+              >
+                {loading ? "Cargando..." : displayName}
+              </Typography>
+            )}
           </Box>
         )}
+
         <List>
-          <ListItem
-            button
-            component={Link}
-            to="/home"
-            selected={location.pathname === "/home"}
-            sx={{
-              margin: "5px 0",
-              padding: "5px 20px",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/home" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "rgba(255, 194, 71, 0.7)", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <TaskIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Tareas" sx={{ color: "white" }} />
-          </ListItem>
-          <ListItem
-            button
-            component={Link}
-            to="/calendar"
-            selected={location.pathname === "/calendar"}
-            sx={{
-              margin: "5px 0",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/calendar" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "rgba(255, 194, 71, 0.7)", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <CalendarMonthIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Calendario" sx={{ color: "white" }} />
-          </ListItem>
-          <ListItem
-            button
-            component={Link}
-            to="/configuracion"
-            selected={location.pathname === "/configuracion"}
-            sx={{
-              margin: "5px 0",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/configuracion" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "#ffc247", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <SettingsIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Configuración" sx={{ color: "white" }} />
-          </ListItem>
-          <ListItem
-            button
-            component={Link}
-            to="/soporte"
-            selected={location.pathname === "/soporte"}
-            sx={{
-              margin: "5px 0",
-              "&:hover": {
-                backgroundColor: "rgba(255, 194, 71, 0.5)", // Color de hover
-              },
-              ...(location.pathname === "/soporte" && {
-                border: "2px solid #ffc247", // Borde amarillo
-                borderRadius: "5px",
-                backgroundColor: "#ffc247", // Color al estar en la sección
-              }),
-            }}
-          >
-            <ListItemIcon>
-              <HelpIcon sx={{ color: "white" }} />
-            </ListItemIcon>
-            <ListItemText primary="Soporte y ayuda" sx={{ color: "white" }} />
-          </ListItem>
+          {[
+            { text: "Tareas", icon: <TaskIcon />, to: "/home" },
+            {
+              text: "Calendario",
+              icon: <CalendarMonthIcon />,
+              to: "/calendar",
+            },
+            {
+              text: "Configuración",
+              icon: <SettingsIcon />,
+              to: "/configuracion",
+            },
+            { text: "Soporte y ayuda", icon: <HelpIcon />, to: "/soporte" },
+          ].map(({ text, icon, to }) => (
+            <ListItem
+              button
+              key={text}
+              component={Link}
+              to={to}
+              selected={location.pathname === to}
+              sx={{
+                justifyContent: drawerOpen ? "initial" : "center",
+                px: 2.5,
+                margin: "5px 0",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 194, 71, 0.5)",
+                },
+                ...(location.pathname === to && {
+                  border: "2px solid #ffc247",
+                  borderRadius: "5px",
+                  backgroundColor: "rgba(255, 194, 71, 0.7)",
+                }),
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: drawerOpen ? 3 : "auto",
+                  justifyContent: "center",
+                  color: "white",
+                }}
+              >
+                {icon}
+              </ListItemIcon>
+              {drawerOpen && (
+                <ListItemText primary={text} sx={{ color: "white" }} />
+              )}
+            </ListItem>
+          ))}
           <ListItem button onClick={handleLogout}>
-            <ListItemIcon>
-              <LogoutIcon sx={{ color: "#CE2121" }} />
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: drawerOpen ? 3 : "auto",
+                justifyContent: "center",
+                color: "#CE2121",
+              }}
+            >
+              <LogoutIcon />
             </ListItemIcon>
-            <ListItemText primary="Cerrar sesión" sx={{ color: "#CE2121" }} />
+            {drawerOpen && (
+              <ListItemText primary="Cerrar sesión" sx={{ color: "#CE2121" }} />
+            )}
           </ListItem>
         </List>
       </Drawer>
