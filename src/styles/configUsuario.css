@@ -114,6 +114,65 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 8px;
 }
+.save-changes {
+  display: flex;
+  margin: 7px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espaciado entre el icono y el texto */
+  background-color: #28a745; /* Verde llamativo */
+  color: white; /* Texto blanco */
+  border: none; /* Sin bordes */
+  padding: 10px 20px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados */
+  font-size: 16px; /* Tamaño de la fuente */
+  cursor: pointer; /* Cursor de mano */
+  transition: all 0.3s ease; /* Animación suave */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra inicial */
+}
+
+.save-changes:hover {
+  background-color: #218838; /* Verde más oscuro al pasar el cursor */
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada */
+}
+
+.save-changes:active {
+  background-color: #1e7e34; /* Verde más oscuro al hacer clic */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más pequeña */
+  transform: scale(0.98); /* Efecto de presión */
+}
+
+.save-changes:disabled {
+  background-color: #d3d3d3; /* Color gris cuando está deshabilitado */
+  color: #a9a9a9; /* Texto gris claro */
+  cursor: not-allowed; /* Cursor prohibido */
+  box-shadow: none; /* Sin sombra */
+}
+.logout-button {
+  display: flex;
+  margin-top: 30px;
+  margin-left: 7px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espaciado entre ícono y texto */
+  background-color: #ce2121; /* Color de fondo */
+  color: white; /* Color del texto */
+  border: none; /* Sin bordes */
+  padding: 10px 20px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados */
+  font-size: 16px; /* Tamaño de la fuente */
+  cursor: pointer; /* Cursor de mano */
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #a91818; /* Cambio de color al pasar el mouse */
+}
+
+.logout-button:disabled {
+  background-color: #d3d3d3; /* Color gris cuando está deshabilitado */
+  cursor: not-allowed; /* Cursor prohibido */
+}
 
 /* Media Queries para Responsividad */
 @media (max-width: 992px) {

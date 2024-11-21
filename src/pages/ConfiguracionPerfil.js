@@ -1,23 +1,36 @@
 import React, { useState, useEffect } from "react";
 import "../styles/configUsuario.css"; // CSS global
-import { storage } from "../config/firebase";
+import { storage, auth } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import useUserData from "../hooks/user/useUserData";
+import { useAuthState } from "react-firebase-hooks/auth";
 import useUpdateUserData from "../hooks/user/useUpdateUserData";
 import NoImage from "../assets/no-profile-image.webp";
 import DatePickerBtn from "../components/inputs/DatePickerBtn";
-import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SaveIcon from "@mui/icons-material/Save";
 
 function ConfiguracionPerfil() {
   const { userData, loading } = useUserData();
   const { updateUserData } = useUpdateUserData();
 
   const [name, setNombre] = useState("");
+  const [user] = useAuthState(auth);
   const [photoURL, setPhotoURL] = useState("");
   const [fechaNacimiento, setFechaNacimiento] = useState(new Date());
   const [genero, setGenero] = useState("");
   const [telefono, setTelefono] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    if (user?.email) {
+      localStorage.setItem("lastEmail", user.email);
+    }
+    await auth.signOut();
+    navigate("/");
+  };
 
   useEffect(() => {
     if (!loading && userData) {
@@ -154,8 +167,13 @@ function ConfiguracionPerfil() {
             onChange={(e) => setTelefono(e.target.value)}
             className="input-field"
           />
-          <button onClick={handleSaveChanges} className="btn save-changes">
+          <button onClick={handleSaveChanges} className="save-changes">
+            <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
             Guardar Cambios
+          </button>
+          <button onClick={handleLogout} className="logout-button">
+            <LogoutIcon style={{ marginRight: "8px", fontSize: "20px" }} />
+            Cerrar sesión
           </button>
         </div>
       </div>

@@ -25,6 +25,7 @@ const MainLayout = () => {
           marginLeft: open ? 10 : 40,
           marginRight: open ? "10%" : "10%",
           marginTop: "7%",
+          marginBottom: "5%",
           transition: "margin-left 0.3s ease",
           width: "95%",
         }}
