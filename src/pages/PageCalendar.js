@@ -76,7 +76,7 @@ const PageCalendar = () => {
       <TaskDetailDialog
         open={open}
         handleClose={() => setOpen(false)}
-        task={selectedTask}
+        task={selectedTask || {}}
       />
     </>
   );
