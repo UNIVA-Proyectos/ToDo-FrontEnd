@@ -26,6 +26,7 @@ import TaskIcon from "@mui/icons-material/Task";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
+import LogoutIcon from "@mui/icons-material/Logout";
 import useUserData from "../hooks/user/useUserData";
 
 const drawerWidth = 240;
@@ -93,6 +94,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 export default function Sidebar() {
   const theme = useTheme();
   const [user] = useAuthState(auth);
+  const navigate = useNavigate();
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
@@ -105,6 +107,14 @@ export default function Sidebar() {
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
+  };
+
+  const handleLogout = async () => {
+    if (user?.email) {
+      localStorage.setItem("lastEmail", user.email);
+    }
+    await auth.signOut();
+    navigate("/");
   };
 
   return (
@@ -234,6 +244,7 @@ export default function Sidebar() {
                 mr: drawerOpen ? 3 : "auto",
                 justifyContent: "center",
                 color: "#CE2121",
+                transition: "color 0.3s ease", // Transición suave para el ícono de logout
               }}
             >
               <LogoutIcon />
