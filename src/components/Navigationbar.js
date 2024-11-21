@@ -32,25 +32,37 @@ export default function MobileNavigation() {
         label="Tareas"
         value="/home"
         icon={<TaskIcon />}
-        sx={{ color: value === "/home" ? "#ffc247" : "white" }}
+        sx={{
+          color: value === "/home" ? "#ffc247" : "white",
+          "&.Mui-selected": { color: "#ffc247" },
+        }}
       />
       <BottomNavigationAction
         label="Calendario"
         value="/calendar"
         icon={<CalendarMonthIcon />}
-        sx={{ color: value === "/calendar" ? "#ffc247" : "white" }}
+        sx={{
+          color: value === "/calendar" ? "#ffc247" : "white",
+          "&.Mui-selected": { color: "#ffc247" },
+        }}
       />
       <BottomNavigationAction
         label="Configuración"
         value="/configuracion"
         icon={<SettingsIcon />}
-        sx={{ color: value === "/configuracion" ? "#ffc247" : "white" }}
+        sx={{
+          color: value === "/configuracion" ? "#ffc247" : "white",
+          "&.Mui-selected": { color: "#ffc247" },
+        }}
       />
       <BottomNavigationAction
         label="Soporte"
         value="/soporte"
         icon={<HelpIcon />}
-        sx={{ color: value === "/soporte" ? "#ffc247" : "white" }}
+        sx={{
+          color: value === "/soporte" ? "ffc247" : "white",
+          "&.Mui-selected": { color: "#ffc247" },
+        }}
       />
     </BottomNavigation>
   );

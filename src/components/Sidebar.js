@@ -60,35 +60,25 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
+  transition: "all 0.3s ease-in-out", // Transición suave
   ...(open && {
-    ...{
-      width: drawerWidth,
-      transition: theme.transitions.create("width", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      overflowX: "hidden",
-    },
+    width: drawerWidth,
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
     "& .MuiDrawer-paper": {
       width: drawerWidth,
       backgroundColor: "#25283d",
+      transition: "all 0.3s ease-in-out", // Transición suave
     },
   }),
   ...(!open && {
-    ...{
-      transition: theme.transitions.create("width", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-      overflowX: "hidden",
-      width: `calc(${theme.spacing(7)} + 1px)`,
-      [theme.breakpoints.up("sm")]: {
-        width: `calc(${theme.spacing(8)} + 1px)`,
-      },
-    },
+    width: `calc(${theme.spacing(7)} + 1px)`,
     "& .MuiDrawer-paper": {
       width: `calc(${theme.spacing(7)} + 1px)`,
       backgroundColor: "#25283d",
+      transition: "all 0.3s ease-in-out", // Transición suave
     },
   }),
 }));
@@ -166,6 +156,7 @@ export default function Sidebar() {
               alignItems: "center",
               justifyContent: drawerOpen ? "flex-start" : "center",
               flexDirection: drawerOpen ? "row" : "column", // Alineación vertical cuando está cerrado
+              transition: "all 0.3s ease-in-out", // Transición suave para el perfil
             }}
           >
             <Avatar
@@ -185,6 +176,7 @@ export default function Sidebar() {
                   color: "white",
                   whiteSpace: "normal", // Permite texto multilinea
                   overflowWrap: "break-word", // Rompe palabras largas si es necesario
+                  transition: "all 0.3s ease-in-out", // Transición suave para el nombre
                 }}
               >
                 {loading ? "Cargando..." : displayName}
@@ -218,6 +210,7 @@ export default function Sidebar() {
                 justifyContent: drawerOpen ? "initial" : "center",
                 px: 2.5,
                 margin: "5px 0",
+                transition: "background-color 0.3s ease", // Transición suave al pasar el ratón
                 "&:hover": {
                   backgroundColor: "rgba(255, 194, 71, 0.5)",
                 },
@@ -234,6 +227,7 @@ export default function Sidebar() {
                   mr: drawerOpen ? 3 : "auto",
                   justifyContent: "center",
                   color: "white",
+                  transition: "color 0.3s ease", // Transición suave para los íconos
                 }}
               >
                 {icon}
@@ -250,6 +244,7 @@ export default function Sidebar() {
                 mr: drawerOpen ? 3 : "auto",
                 justifyContent: "center",
                 color: "#CE2121",
+                transition: "color 0.3s ease", // Transición suave para el ícono de logout
               }}
             >
               <LogoutIcon />
