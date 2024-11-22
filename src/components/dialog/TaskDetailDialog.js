@@ -13,6 +13,9 @@ import {
     DialogActions,
     Slide,
     Snackbar,
+    DialogContentText,
+    IconButton,
+    Zoom,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,7 +27,9 @@ import {
     faExclamationCircle,
     faClock,
     faBars,
-    faCircleArrowUp,  // Importando el icono 'circle-arrow-up'
+    faCircleArrowUp,
+    faTrash,
+    faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../config/firebase";
@@ -40,6 +45,8 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
     const { deleteTask: deleteTaskHook, loading, error } = useDeleteTask(db);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [deleteButtonState, setDeleteButtonState] = useState('initial'); // 'initial', 'confirm', 'success'
 
     const parseDueDate = (dueDate) =>
         dueDate && dueDate instanceof Timestamp ? dueDate.toDate() : null;
@@ -61,6 +68,18 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
         return <FontAwesomeIcon icon={faFolderOpen} />;
     };
 
+    // Función para manejar la apertura del diálogo de confirmación
+    const handleDeleteClick = () => {
+        setConfirmDialogOpen(true);
+        setDeleteButtonState('confirm');
+    };
+
+    // Función para cancelar la eliminación
+    const handleCancelDelete = () => {
+        setConfirmDialogOpen(false);
+        setDeleteButtonState('initial');
+    };
+
     const handleDelete = async () => {
         if (!task.id) {
             setSnackbarMessage("ID de tarea no válido");
@@ -70,19 +89,22 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
 
         try {
             await deleteTaskHook(task.id);
+            setDeleteButtonState('success');
             setSnackbarMessage("Tarea eliminada con éxito");
             setSnackbarOpen(true);
-            // Esperar un momento antes de cerrar para que el usuario vea el mensaje
+            
+            // Esperar un momento antes de cerrar para mostrar la animación
             setTimeout(() => {
                 handleClose();
                 if (deleteTask) {
                     deleteTask(task.id);
                 }
-            }, 1000);
+            }, 1500);
         } catch (err) {
             console.error("Error al eliminar la tarea:", err);
             setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea.");
             setSnackbarOpen(true);
+            setDeleteButtonState('initial');
         }
     };
 
@@ -281,18 +303,65 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                             </Box>
                         </Box>
                         <Box sx={{ mt: 37, display: "flex", justifyContent: "left" }}>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                size="small"
-                                onClick={handleDelete}
-                                disabled={loading}
-                            >
-                                {loading ? "Eliminando..." : "Eliminar"}
-                            </Button>
+                            <Zoom in={true}>
+                                <Button
+                                    variant="contained"
+                                    color={deleteButtonState === 'success' ? 'success' : 'error'}
+                                    size="small"
+                                    onClick={handleDeleteClick}
+                                    disabled={loading}
+                                    sx={{
+                                        transition: 'all 0.3s ease-in-out',
+                                        transform: deleteButtonState === 'confirm' ? 'scale(1.1)' : 'none',
+                                    }}
+                                    startIcon={
+                                        deleteButtonState === 'success' ? 
+                                        <FontAwesomeIcon icon={faCheck} /> : 
+                                        <FontAwesomeIcon icon={faXmark} />
+                                    }
+                                >
+                                    {loading ? "Eliminando..." : 
+                                     deleteButtonState === 'success' ? "¡Eliminado!" : "Eliminar"}
+                                </Button>
+                            </Zoom>
                         </Box>
                     </Box>
                 </DialogContent>
+            </Dialog>
+
+            {/* Diálogo de confirmación */}
+            <Dialog
+                open={confirmDialogOpen}
+                onClose={handleCancelDelete}
+                TransitionComponent={Slide}
+                TransitionProps={{ direction: "up" }}
+            >
+                <DialogTitle>
+                    {"¿Estás seguro de que quieres eliminar esta tarea?"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Esta acción no se puede deshacer.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button 
+                        onClick={handleCancelDelete}
+                        color="primary"
+                        variant="outlined"
+                    >
+                        No, Cancelar
+                    </Button>
+                    <Button 
+                        onClick={handleDelete}
+                        color="error"
+                        variant="contained"
+                        disabled={loading}
+                        autoFocus
+                    >
+                        Sí, Eliminar
+                    </Button>
+                </DialogActions>
             </Dialog>
 
             <Snackbar
