@@ -111,8 +111,8 @@ const TaskDetailDialog = ({ open, handleClose, task, db, updateTaskList }) => {
                         alignItems: "center",
                     }}
                 >
-                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        Detalles de la tarea
+                    <Typography variant="h6" sx={{ fontWeight: "Light" }}>
+                        Detalles de la tarea:
                     </Typography>
                     <Button
                         onClick={handleClose}
