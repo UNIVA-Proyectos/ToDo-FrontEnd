@@ -681,9 +681,13 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
             {/* Diálogo de confirmación para eliminar comentario */}
             <Dialog
                 open={confirmCommentDialogOpen}
-                onClose={handleCancelDeleteComment}
+                onClose={() => {
+                    setConfirmCommentDialogOpen(false);
+                    setCommentDeleteState('initial');
+                }}
                 aria-labelledby="alert-dialog-title-comment"
                 aria-describedby="alert-dialog-description-comment"
+                TransitionComponent={Transition}
                 PaperProps={{
                     sx: {
                         borderRadius: 3,
@@ -693,7 +697,9 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                     }
                 }}
             >
-                <Box sx={{ p: 2, pb: 3 }}>
+                <Box sx={{ 
+                    p: 2 
+                }}>
                     <Fade in={true} timeout={300}>
                         <Alert 
                             severity={commentDeleteState === 'success' ? "success" : "warning"}
@@ -725,108 +731,86 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                             }}>
                                 {commentDeleteState === 'success' ? (
                                     <Fade in={true} timeout={400}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <CheckIcon sx={{ fontSize: '1.3rem' }}/>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                             ¡Operación Exitosa!
                                         </Box>
                                     </Fade>
                                 ) : (
                                     <Fade in={true} timeout={400}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <WarningIcon sx={{ fontSize: '1.3rem' }}/>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                             ¡Atención!
                                         </Box>
                                     </Fade>
                                 )}
                             </AlertTitle>
-                            <Fade in={true} timeout={500}>
+                            <Fade in={commentDeleteState !== 'success'} timeout={500}>
                                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
                                     {commentDeleteState === 'success' 
-                                        ? "El comentario ha sido eliminado exitosamente."
-                                        : "Estás a punto de eliminar este comentario."
-                                    }
+                                        ? null
+                                        : "Esta acción no se puede deshacer. ¿Estás seguro de que deseas continuar?"}
                                 </Typography>
                             </Fade>
                         </Alert>
                     </Fade>
 
-                    <Fade in={true} timeout={600}>
-                        <DialogContent sx={{ 
-                            pt: 3,
-                            px: 0.5
-                        }}>
-                            <DialogContentText 
-                                id="alert-dialog-description-comment"
-                                sx={{
-                                    color: 'text.secondary',
-                                    transition: 'all 0.3s ease',
-                                    textAlign: 'center',
-                                    fontSize: '0.95rem'
-                                }}
-                            >
-                                {commentDeleteState === 'success' 
-                                    ? "Puedes cerrar esta ventana."
-                                    : "Esta acción no se puede deshacer. ¿Estás seguro de que deseas continuar?"
-                                }
-                            </DialogContentText>
-                        </DialogContent>
-                    </Fade>
-
-                    <Fade in={commentDeleteState !== 'success'} timeout={700}>
+                    <Fade in={commentDeleteState !== 'success'} timeout={600}>
                         <DialogActions sx={{ 
                             px: 0.5,
-                            mt: 2,
-                            justifyContent: 'center'
+                            pt: 2,
+                            pb: 0,
+                            justifyContent: 'center',
+                            '& .MuiButton-root': {
+                                minHeight: 0,
+                                py: 1
+                            }
                         }}>
-                            {commentDeleteState !== 'success' && (
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button 
-                                        onClick={handleCancelDeleteComment}
-                                        disabled={loadingDeleteComment}
-                                        sx={{
-                                            px: 3,
-                                            borderRadius: 2,
-                                            color: 'text.secondary',
-                                            '&:hover': {
-                                                backgroundColor: 'grey.100'
-                                            }
-                                        }}
-                                    >
-                                        Cancelar
-                                    </Button>
-                                    <Button 
-                                        onClick={handleConfirmDeleteComment}
-                                        color="error"
-                                        variant="contained"
-                                        disabled={loadingDeleteComment}
-                                        autoFocus
-                                        sx={{
-                                            px: 3,
-                                            borderRadius: 2,
-                                            position: 'relative',
-                                            backgroundColor: 'error.main',
-                                            '&:hover': {
-                                                backgroundColor: 'error.dark'
-                                            }
-                                        }}
-                                    >
-                                        {loadingDeleteComment ? (
-                                            <CircularProgress size={24} color="inherit" />
-                                        ) : (
-                                            <>
-                                                <FontAwesomeIcon 
-                                                    icon={faTrash} 
-                                                    style={{ 
-                                                        marginRight: '8px',
-                                                        fontSize: '0.9rem'
-                                                    }} 
-                                                />
-                                                Eliminar
-                                            </>
-                                        )}
-                                    </Button>
-                                </Box>
-                            )}
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Button 
+                                    onClick={handleCancelDeleteComment}
+                                    disabled={loadingDeleteComment}
+                                    sx={{
+                                        px: 3,
+                                        borderRadius: 2,
+                                        color: 'text.secondary',
+                                        '&:hover': {
+                                            backgroundColor: 'grey.100'
+                                        }
+                                    }}
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button 
+                                    onClick={handleConfirmDeleteComment}
+                                    color="error"
+                                    variant="contained"
+                                    disabled={loadingDeleteComment}
+                                    autoFocus
+                                    sx={{
+                                        px: 3,
+                                        borderRadius: 2,
+                                        position: 'relative',
+                                        backgroundColor: 'error.main',
+                                        '&:hover': {
+                                            backgroundColor: 'error.dark'
+                                        }
+                                    }}
+                                >
+                                    {loadingDeleteComment ? (
+                                        <CircularProgress size={24} color="inherit" />
+                                    ) : (
+                                        <>
+                                            <FontAwesomeIcon 
+                                                icon={faTrash} 
+                                                style={{ 
+                                                    marginRight: '8px',
+                                                    fontSize: '0.9rem'
+                                                }} 
+                                            />
+                                            Eliminar
+                                        </>
+                                    )}
+                                </Button>
+                            </Box>
                         </DialogActions>
                     </Fade>
                 </Box>
