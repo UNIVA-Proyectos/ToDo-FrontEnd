@@ -47,7 +47,7 @@ const useTasks = (db, user) => {
           descripcion: taskData.descripcion || '',
           titulo: taskData.titulo || '',
           estado: taskData.estado || 'Pendiente',
-          etiquetas: Array.isArray(taskData.etiquetas) ? taskData.etiquetas : [],
+          tags: Array.isArray(taskData.tags) ? taskData.tags : [],
           dueDate: taskData.dueDate || null,
           user_id: taskData.user_id,
         };
