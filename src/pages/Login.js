@@ -162,9 +162,7 @@ const AppLogin = () => {
             {message && (
               <p
                 className={`message ${
-                  message === "*Por favor, completa todos los campos."
-                    ? "error-message"
-                    : ""
+                  message.toLowerCase().includes('error') ? 'error-message' : ''
                 }`}
               >
                 {message}
@@ -223,9 +221,7 @@ const AppLogin = () => {
             {message && (
               <p
                 className={`message ${
-                  message === "*Por favor, completa todos los campos."
-                    ? "error-message"
-                    : ""
+                  message.toLowerCase().includes('error') ? 'error-message' : ''
                 }`}
               >
                 {message}

@@ -83,19 +83,33 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
     };
 
     const handleDelete = async () => {
-        if (!task.id) {
-            setSnackbarMessage("ID de tarea no válido");
-            setSnackbarOpen(true);
-            return;
-        }
-
         try {
+            console.log('Intentando eliminar tarea:', task);
+            
+            if (!task) {
+                throw new Error("No se ha seleccionado ninguna tarea");
+            }
+            
+            // Verificar que task.id sea un string válido
+            if (!task.id || typeof task.id !== 'string') {
+                console.error('ID de tarea inválido:', task.id);
+                throw new Error("La tarea no tiene un ID válido");
+            }
+
+            if (!db) {
+                throw new Error("No hay conexión con la base de datos");
+            }
+
+            // Intentar eliminar la tarea
+            console.log('Eliminando tarea con ID:', task.id);
             await deleteTaskHook(task.id);
+            
+            // Si la eliminación fue exitosa
             setDeleteButtonState('success');
             setSnackbarMessage("Tarea eliminada con éxito");
             setSnackbarOpen(true);
             
-            // Esperar un momento antes de cerrar para mostrar la animación
+            // Cerrar el diálogo después de un breve delay
             setTimeout(() => {
                 handleClose();
                 if (deleteTask) {
@@ -104,7 +118,7 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
             }, 1500);
         } catch (err) {
             console.error("Error al eliminar la tarea:", err);
-            setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea.");
+            setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea");
             setSnackbarOpen(true);
             setDeleteButtonState('initial');
         }

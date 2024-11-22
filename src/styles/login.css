@@ -31,7 +31,7 @@
   line-height: 20px;
   letter-spacing: 0.5px;
   margin: 20px 0 30px;
-  color: #ffffff;
+  color: #25283d;
 }
 
 .login-container span {
@@ -110,9 +110,17 @@
 }
 
 .message {
-  color: #e74c3c; /* Mantener el color para el texto de error */
+  color: #e74c3c;
   font-size: 14px;
   margin-top: 5px;
+}
+
+.error-message {
+  color: #ff0000 !important;
+}
+
+.message.error-message {
+  color: #ff0000 !important;
 }
 
 .container {
@@ -202,6 +210,15 @@
 
 .container.right-panel-active .overlay {
   transform: translateX(50%);
+}
+
+.overlay p {
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: 100;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  margin: 20px 0 30px;
 }
 
 .overlay-panel {
@@ -300,10 +317,6 @@
   border: none !important;
 }
 
-.message.error-message {
-  color: #ff0000;
-}
-
 .input {
   width: 100%;
   padding: 10px;
@@ -335,10 +348,6 @@
 
 .input-error {
   border: 1px solid red;
-}
-
-.error-message {
-  color: red;
 }
 
 /* Dark Theme */
