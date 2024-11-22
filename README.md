@@ -9,7 +9,7 @@
 
 *Una aplicación moderna para la gestión eficiente de tareas y tiempo*
 
-[Ver Demo][(https://silly-semifreddo-4709e3.netlify.app/](https://dotime.app))
+[Ver Demo][(DoTime](https://dotime.app))
 
 </div>
 
