@@ -202,18 +202,17 @@ const TaskDetailDialog = ({ open, handleClose, task, db, updateTaskList }) => {
               <Divider />
               <Box sx={{ my: 1 }}>
                 <Typography variant="body2" color="textSecondary">
-                  {task.dueDate
-                      ? task.dueDate.toDate().toLocaleDateString()
-                      : "Sin fecha"}
+                  Fecha de vencimiento:
                 </Typography>
                 <Box display="flex" alignItems="center" gap={1}>
                   <FontAwesomeIcon
                       icon={faCalendarAlt}
-                      style={{ color: "#ffc107" }}
+                      style={{ color: "#CE2121" }}
                   />
                   <Typography variant="body1">
                     {task.dueDate
                         ? task.dueDate.toDate().toLocaleDateString("es-ES", {
+                          year: "numeric",
                           month: "short",
                           day: "numeric",
                         })
