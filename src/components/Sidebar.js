@@ -30,6 +30,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import useUserData from "../hooks/user/useUserData";
 import Badge from "@mui/material/Badge";
 import Tooltip from "@mui/material/Tooltip";
+import { db } from "../config/firebase";
+import useNotifications from "../hooks/notifications/useNotifications";
 
 const drawerWidth = 240;
 
@@ -100,8 +102,8 @@ export default function Sidebar() {
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const { userData, loading } = useUserData();
-  const displayName = userData?.name || user?.displayName || "Usuario";
+  const { displayName, loading } = useUserData();
+  const notifications = useNotifications(db, user);
 
   // Manejo responsivo automático
   useEffect(() => {
@@ -224,14 +226,14 @@ export default function Sidebar() {
               text: "Tareas",
               icon: <TaskIcon />,
               to: "/home",
-              badge: 5,
+              badge: notifications.tasks,
               tooltip: "Ver todas tus tareas",
             },
             {
               text: "Calendario",
               icon: <CalendarMonthIcon />,
               to: "/calendar",
-              badge: 2,
+              badge: notifications.calendar,
               tooltip: "Ver calendario de tareas",
             },
             {
@@ -246,17 +248,24 @@ export default function Sidebar() {
               to: "/soporte",
               tooltip: "Obtener ayuda",
             },
-          ].map(({ text, icon, to, badge, tooltip }) => (
+            {
+              text: "Cerrar sesión",
+              icon: <LogoutIcon sx={{ color: "#dc3545" }} />,
+              onClick: handleLogout,
+              tooltip: "Cerrar sesión",
+            },
+          ].map(({ text, icon, to, badge, tooltip, onClick }) => (
             <Tooltip key={text} title={tooltip} placement="right" arrow>
               <ListItem
                 button
-                component={Link}
+                component={onClick ? "div" : Link}
                 to={to}
+                onClick={onClick}
                 selected={location.pathname === to}
                 sx={{
+                  margin: "5px 0",
                   justifyContent: drawerOpen ? "initial" : "center",
                   px: 2.5,
-                  margin: "5px 0",
                   transition: "background-color 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(255, 194, 71, 0.5)",
@@ -277,7 +286,7 @@ export default function Sidebar() {
                     transition: "color 0.3s ease",
                   }}
                 >
-                  {badge ? (
+                  {badge > 0 ? (
                     <Badge badgeContent={badge} color="error">
                       {icon}
                     </Badge>

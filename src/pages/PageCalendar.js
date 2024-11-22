@@ -60,8 +60,9 @@ const PageCalendar = () => {
       start: fecha,
       end: fecha,
       color: task.estado,
-      resource: index + 1, // Para mostrar el orden en la vista de agenda
-      estado: task.estado // Agregamos el estado para mostrarlo en la vista
+      resource: index + 1,
+      estado: task.estado,
+      task: task // Guardamos la tarea completa
     };
   });
 
@@ -85,7 +86,7 @@ const PageCalendar = () => {
   };
 
   const handleEventSelect = (event) => {
-    setSelectedTask(event);
+    setSelectedTask(event.task); // Pasamos la tarea completa
     setOpen(true);
   };
 
@@ -147,6 +148,7 @@ const PageCalendar = () => {
         open={open}
         handleClose={() => setOpen(false)}
         task={selectedTask || {}}
+        db={db}
       />
     </>
   );

@@ -51,7 +51,8 @@ import {
     getDocs, 
     orderBy,
     deleteDoc,
-    doc 
+    doc,
+    updateDoc 
 } from "firebase/firestore";
 import useDeleteTask from "../../hooks/tasks/useDeleteTask";
 import useComments from "../../hooks/comments/useComments";
@@ -64,6 +65,9 @@ import SchoolIcon from '@mui/icons-material/School';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import Fade from '@mui/material/Fade';
 import WarningIcon from '@mui/icons-material/Warning';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -94,6 +98,10 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
     const [confirmDeleteCommentId, setConfirmDeleteCommentId] = useState(null);
     const [confirmCommentDialogOpen, setConfirmCommentDialogOpen] = useState(false);
     const [commentDeleteState, setCommentDeleteState] = useState('initial'); // 'initial', 'confirm', 'success'
+
+    const [isEditingDescription, setIsEditingDescription] = useState(false);
+    const [editedDescription, setEditedDescription] = useState("");
+    const [savingDescription, setSavingDescription] = useState(false);
 
     const parseDueDate = (dueDate) =>
         dueDate && dueDate instanceof Timestamp ? dueDate.toDate() : null;
@@ -138,10 +146,11 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
             await deleteTask(task.id);
             
             setDeleteButtonState('success');
+            setConfirmDialogOpen(false); // Cerramos el diálogo de confirmación
             setSnackbarMessage("Tarea eliminada con éxito");
             setSnackbarOpen(true);
             
-            // Cerrar el diálogo después de un breve delay
+            // Cerrar el diálogo principal después de un breve delay
             setTimeout(() => {
                 handleClose();
                 if (deleteTaskFromParent) {
@@ -153,6 +162,7 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
             setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea");
             setSnackbarOpen(true);
             setDeleteButtonState('initial');
+            setConfirmDialogOpen(false); // Cerramos el diálogo de confirmación en caso de error
         }
     };
 
@@ -161,6 +171,50 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
             cargarComentarios(task.id);
         }
     }, [task?.id, cargarComentarios]);
+
+    useEffect(() => {
+        if (task) {
+            setEditedDescription(task.descripcion || "");
+        }
+    }, [task]);
+
+    const handleEditDescription = () => {
+        setIsEditingDescription(true);
+    };
+
+    const handleSaveDescription = async () => {
+        try {
+            setSavingDescription(true);
+            // Verificar que tengamos un ID válido
+            if (!task.docId) {
+                throw new Error("ID de tarea no válido");
+            }
+            
+            const taskRef = doc(db, "tasks", task.docId); 
+            await updateDoc(taskRef, {
+                descripcion: editedDescription,
+                updatedAt: Timestamp.now()
+            });
+            
+            // Actualizar la UI inmediatamente
+            task.descripcion = editedDescription;
+            
+            setIsEditingDescription(false);
+            setSnackbarMessage("Descripción actualizada correctamente");
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error("Error al actualizar la descripción:", error);
+            setSnackbarMessage(error.message || "Error al actualizar la descripción");
+            setSnackbarOpen(true);
+        } finally {
+            setSavingDescription(false);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditingDescription(false);
+        setEditedDescription(task.descripcion || "");
+    };
 
     const handleEnviarComentario = async () => {
         if (!comentario.trim()) return;
@@ -240,54 +294,72 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                     },
                 }}
             >
-                <DialogActions
+                <Box
                     sx={{
-                        backgroundColor: "#f8f9fa",
-                        padding: "12px 24px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        borderBottom: "1px solid #e9ecef",
+                        backgroundColor: '#25283d',
+                        p: 2,
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderTopLeftRadius: 12,
+                        borderTopRightRadius: 12
                     }}
                 >
-                    <Typography 
-                        variant="h6" 
-                        sx={{ 
-                            fontWeight: 500,
-                            color: "#2c3e50",
-                            fontSize: "1.1rem",
-                            letterSpacing: "0.5px"
-                        }}
-                    >
-                        Detalles de la tarea:
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <AssignmentIcon sx={{ fontSize: 24 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: 0.5 }}>
+                            Detalles de tarea
+                        </Typography>
+                    </Box>
                     <IconButton
                         onClick={handleClose}
-                        size="small"
                         sx={{
-                            color: "#6c757d",
+                            color: 'white',
                             '&:hover': {
-                                color: "#dc3545",
-                                backgroundColor: "rgba(220, 53, 69, 0.1)",
-                            },
-                            transition: "all 0.2s ease-in-out",
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                            }
                         }}
                     >
-                        <FontAwesomeIcon icon={faXmark} />
+                        <CloseIcon />
                     </IconButton>
-                </DialogActions>
+                </Box>
 
-                <DialogTitle>
+                <DialogTitle sx={{ px: 3 }}>
                     <Box display="flex" alignItems="center" gap={2}>
+                        <Typography 
+                            variant="subtitle1"
+                            sx={{
+                                fontWeight: 600,
+                                color: '#25283d',
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1
+                            }}
+                        >
+                            Título:
+                        </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={1} sx={{ mt: 1 }}>
                         <Box
                             sx={{
                                 fontSize: "1.5rem",
                                 color: isOverdue ? "error.main" : "text.primary",
+                                display: "flex",
+                                alignItems: "center"
                             }}
                         >
                             {getStatusIcon()}
                         </Box>
-                        <Typography variant="h6" component="div">
+                        <Typography 
+                            variant="h6" 
+                            component="div" 
+                            sx={{ 
+                                display: "flex", 
+                                alignItems: "center",
+                                minHeight: "32px"
+                            }}
+                        >
                             {task.titulo}
                         </Typography>
                     </Box>
@@ -295,11 +367,10 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
 
                 <DialogContent sx={{ 
                     display: "flex", 
-                    p: 2, 
+                    p: 3,  
                     height: "100%",
                     position: "relative"
                 }}>
-                    {/* Columna Izquierda */}
                     <Box
                         flex={2}
                         sx={{
@@ -308,23 +379,80 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                             display: "flex",
                             flexDirection: "column",
                             height: "100%",
-                            justifyContent: "space-between",
-                            overflowY: "auto"
+                            position: "relative"
                         }}
                     >
-                        {/* Contenedor scrolleable para la descripción */}
-                        <Box sx={{ flex: 1 }}>
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    whiteSpace: "pre-wrap",
-                                    wordBreak: "break-word"
-                                }}
-                            >
-                                {task.descripcion || "Sin descripción"}
-                            </Typography>
+                        {/* Contenedor scrolleable */}
+                        <Box sx={{ 
+                            flex: 1, 
+                            overflowY: "auto",
+                            pb: "80px" // Espacio para el campo de comentarios
+                        }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        fontWeight: 600,
+                                        color: '#25283d'
+                                    }}
+                                >
+                                    Descripción:
+                                </Typography>
+                                {!isEditingDescription && (
+                                    <Button
+                                        size="small"
+                                        onClick={handleEditDescription}
+                                        startIcon={<EditIcon />}
+                                        sx={{ color: '#25283d' }}
+                                    >
+                                        Editar
+                                    </Button>
+                                )}
+                            </Box>
 
-                            {/* Lista de comentarios */}
+                            {isEditingDescription ? (
+                                <Box sx={{ mt: 1 }}>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        rows={4}
+                                        value={editedDescription}
+                                        onChange={(e) => setEditedDescription(e.target.value)}
+                                        variant="outlined"
+                                        placeholder="Escribe la descripción de la tarea..."
+                                        sx={{ mb: 2 }}
+                                    />
+                                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                        <Button
+                                            onClick={handleCancelEdit}
+                                            disabled={savingDescription}
+                                            color="inherit"
+                                        >
+                                            Cancelar
+                                        </Button>
+                                        <Button
+                                            onClick={handleSaveDescription}
+                                            disabled={savingDescription}
+                                            variant="contained"
+                                            color="primary"
+                                            startIcon={savingDescription ? <CircularProgress size={20} /> : <SaveIcon />}
+                                        >
+                                            Guardar
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            ) : (
+                                <Typography
+                                    variant="body1"
+                                    sx={{
+                                        whiteSpace: "pre-wrap",
+                                        wordBreak: "break-word"
+                                    }}
+                                >
+                                    {task.descripcion || "Sin descripción"}
+                                </Typography>
+                            )}
+
                             <Box sx={{ mt: 3 }}>
                                 <Typography variant="subtitle1" gutterBottom>
                                     Comentarios ({comentarios.length})
@@ -421,8 +549,19 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                             </Box>
                         </Box>
 
-                        {/* Campo de comentarios */}
-                        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                        {/* Campo de comentarios fijo */}
+                        <Box 
+                            sx={{ 
+                                position: "absolute",
+                                bottom: 0,
+                                left: 0,
+                                right: "16px", // Compensar el pr: 2 del contenedor padre
+                                backgroundColor: "#F9F7F3",
+                                pt: 2,
+                                display: "flex",
+                                gap: 2
+                            }}
+                        >
                             <TextField
                                 fullWidth
                                 variant="outlined"
@@ -464,7 +603,6 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                         </Box>
                     </Box>
 
-                    {/* Columna Derecha */}
                     <Box
                         flex={1}
                         sx={{
@@ -477,7 +615,6 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                             borderLeft: "1px solid #d0d0d0",
                         }}
                     >
-                        {/* Contenedor scrolleable para el contenido */}
                         <Box sx={{ 
                             overflowY: "auto", 
                             flex: 1,
@@ -523,11 +660,11 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                                     {task.tags && task.tags.length > 0 ? (
                                         task.tags.map((tag, index) => {
                                             const tagConfigs = {
-                                                "Importante": { 
+                                                "Importante": {
                                                     color: "#dc3545",
                                                     icon: <PriorityHighIcon sx={{ fontSize: 20, color: 'white' }} />
                                                 },
-                                                "Urgente": { 
+                                                "Urgente": {
                                                     color: "#fd7e14",
                                                     icon: <NotificationsActiveIcon sx={{ fontSize: 20, color: 'white' }} />
                                                 },
@@ -563,8 +700,10 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                                                             paddingLeft: '8px'
                                                         },
                                                         '&:hover': {
-                                                            backgroundColor: tagConfig.color,
-                                                            opacity: 0.8
+                                                            backgroundColor: `${tagConfig.color}cc`,
+                                                            '& .MuiChip-icon, & svg': {
+                                                                color: 'white !important'
+                                                            }
                                                         }
                                                     }}
                                                 />
@@ -579,11 +718,10 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                             </Box>
                         </Box>
 
-                        {/* Botón de eliminar */}
                         <Box
                             sx={{
                                 position: "absolute",
-                                bottom: 0,
+                                bottom: -8,
                                 left: 0,
                                 right: 0,
                                 padding: "16px",
@@ -609,10 +747,6 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask: deleteTaskF
                                             <FontAwesomeIcon icon={faTrash} />
                                         )
                                     }
-                                    sx={{
-                                        transition: 'all 0.3s ease-in-out',
-                                        transform: deleteButtonState === 'success' ? 'scale(1.1)' : 'scale(1)',
-                                    }}
                                 >
                                     {deleteButtonState === 'success'
                                         ? 'Eliminado'
