@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Este repositorio contiene el código fuente del **front-end** de la aplicación web **To-Do**, diseñada para gestionar y organizar tareas de manera eficiente. La aplicación ofrece una interfaz intuitiva y minimalista, donde los usuarios pueden:
+Este repositorio contiene el código fuente de la aplicación web **To-Do**, diseñada para gestionar y organizar tareas de manera eficiente. La aplicación ofrece una interfaz intuitiva y minimalista, donde los usuarios pueden:
 
 - Crear, editar, y eliminar tareas.
 - Establecer recordatorios y plazos.
