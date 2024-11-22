@@ -105,79 +105,79 @@ function ConfiguracionPerfil() {
   }
 
   return (
-    <div className="configuracion-usuario-container">
-      <div className="configuracion-content">
-        <h1>Configuración de Perfil</h1>
-        <div className="user-info">
-          <img src={photoURL} alt="Foto de perfil" className="profile-photo" />
-          <div className="settings">
-            <input
-              type="file"
-              id="uploadPhoto"
-              style={{ display: "none" }}
-              onChange={handleChangePhoto}
-            />
-            <button
-              className="btn change-photo"
-              onClick={() => document.getElementById("uploadPhoto").click()}
-              disabled={isUploading}
-            >
-              {isUploading ? "Subiendo..." : "Cambiar foto"}
-            </button>
-            <button
-              className="btn delete-photo"
-              onClick={handleDeletePhoto}
-              disabled={isUploading}
-            >
-              Eliminar foto
-            </button>
+      <div className="configuracion-usuario-container">
+        <div className="configuracion-content">
+          <h1>Configuración de Perfil</h1>
+          <div className="user-info">
+            <img src={photoURL} alt="Foto de perfil" className="profile-photo" />
+            <div className="settings">
+              <input
+                  type="file"
+                  id="uploadPhoto"
+                  style={{ display: "none" }}
+                  onChange={handleChangePhoto}
+              />
+              <button
+                  className="btn change-photo"
+                  onClick={() => document.getElementById("uploadPhoto").click()}
+                  disabled={isUploading}
+              >
+                {isUploading ? "Subiendo..." : "Cambiar foto"}
+              </button>
+              <button
+                  className="btn delete-photo"
+                  onClick={handleDeletePhoto}
+                  disabled={isUploading}
+              >
+                Eliminar foto
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="info-section">
-          <h2>Información Básica</h2>
-          <label>Nombre</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setNombre(e.target.value)}
-            className="input-field"
-          />
-          <label>Fecha de nacimiento</label>
-          <div className="me-3">
-            <DatePickerBtn handleSelectDate={handleSelectDate} />
+          <div className="info-section">
+            <h2>Información Básica</h2>
+            <label>Nombre</label>
+            <input
+                type="text"
+                value={name}
+                onChange={(e) => setNombre(e.target.value)}
+                className="input-field"
+            />
+            <label>Fecha de nacimiento</label>
+            <div className="me-3">
+              <DatePickerBtn handleSelectDate={handleSelectDate} />
+            </div>
+            <label>Género</label>
+            <select
+                value={genero}
+                onChange={(e) => setGenero(e.target.value)}
+                className="input-field"
+            >
+              <option value="">Selecciona tu género</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+              <option value="No Binario">No Binario</option>
+              <option value="Otro">Otro</option>
+              <option value="prefiero-no-decirlo">Prefiero no decirlo</option>
+            </select>
+            <label>Teléfono</label>
+            <input
+                type="tel"
+                value={telefono}
+                onChange={(e) => setTelefono(e.target.value)}
+                className="input-field"
+            />
+            <button onClick={handleSaveChanges} className="save-changes">
+              <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
+              Guardar Cambios
+            </button>
+            <button onClick={handleLogout} className="logout-button">
+              <LogoutIcon style={{ marginRight: "8px", fontSize: "20px" }} />
+              Cerrar sesión
+            </button>
           </div>
-          <label>Género</label>
-          <select
-            value={genero}
-            onChange={(e) => setGenero(e.target.value)}
-            className="input-field"
-          >
-            <option value="">Selecciona tu género</option>
-            <option value="masculino">Masculino</option>
-            <option value="femenino">Femenino</option>
-            <option value="No Binario">No Binario</option>
-            <option value="Otro">Otro</option>
-            <option value="prefiero-no-decirlo">Prefiero no decirlo</option>
-          </select>
-          <label>Teléfono</label>
-          <input
-            type="tel"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-            className="input-field"
-          />
-          <button onClick={handleSaveChanges} className="save-changes">
-            <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
-            Guardar Cambios
-          </button>
-          <button onClick={handleLogout} className="logout-button">
-            <LogoutIcon style={{ marginRight: "8px", fontSize: "20px" }} />
-            Cerrar sesión
-          </button>
         </div>
       </div>
-    </div>
   );
 }
 

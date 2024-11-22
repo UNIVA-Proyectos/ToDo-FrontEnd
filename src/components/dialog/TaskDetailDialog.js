@@ -35,6 +35,8 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../config/firebase";
 import { Timestamp } from "firebase/firestore";
 import useDeleteTask from "../../hooks/tasks/useDeleteTask";
+import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -290,10 +292,22 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                             <Typography variant="body2" color="textSecondary">
                                 Etiquetas:
                             </Typography>
-                            <Box display="flex" alignItems="center" gap={1}>
-                                {task.etiquetas && task.etiquetas.length > 0 ? (
-                                    task.etiquetas.map((etiqueta, index) => (
-                                        <Chip key={index} label={etiqueta} size="small" color="success" />
+                            <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
+                                {task.tags && task.tags.length > 0 ? (
+                                    task.tags.map((tag, index) => (
+                                        <Chip 
+                                            key={index} 
+                                            label={tag} 
+                                            size="small" 
+                                            color="primary"
+                                            sx={{
+                                                backgroundColor: '#4caf50',
+                                                color: 'white',
+                                                '&:hover': {
+                                                    backgroundColor: '#388e3c'
+                                                }
+                                            }}
+                                        />
                                     ))
                                 ) : (
                                     <Typography variant="body2" color="textSecondary">
@@ -302,26 +316,33 @@ const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
                                 )}
                             </Box>
                         </Box>
-                        <Box sx={{ mt: 37, display: "flex", justifyContent: "left" }}>
+                        <Box sx={{ mt: 36.5, display: "flex", justifyContent: "left" }}>
                             <Zoom in={true}>
                                 <Button
                                     variant="contained"
                                     color={deleteButtonState === 'success' ? 'success' : 'error'}
                                     size="small"
                                     onClick={handleDeleteClick}
-                                    disabled={loading}
+                                    disabled={deleteButtonState === 'success'}
+                                    startIcon={
+                                        deleteButtonState === 'success' ? (
+                                            <CheckIcon />
+                                        ) : deleteButtonState === 'confirm' ? (
+                                            <CloseIcon />
+                                        ) : (
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        )
+                                    }
                                     sx={{
                                         transition: 'all 0.3s ease-in-out',
-                                        transform: deleteButtonState === 'confirm' ? 'scale(1.1)' : 'none',
+                                        transform: deleteButtonState === 'success' ? 'scale(1.1)' : 'scale(1)',
                                     }}
-                                    startIcon={
-                                        deleteButtonState === 'success' ? 
-                                        <FontAwesomeIcon icon={faCheck} /> : 
-                                        <FontAwesomeIcon icon={faXmark} />
-                                    }
                                 >
-                                    {loading ? "Eliminando..." : 
-                                     deleteButtonState === 'success' ? "¡Eliminado!" : "Eliminar"}
+                                    {deleteButtonState === 'success'
+                                        ? 'Eliminado'
+                                        : deleteButtonState === 'confirm'
+                                        ? '¿Confirmar?'
+                                        : 'Eliminar'}
                                 </Button>
                             </Zoom>
                         </Box>

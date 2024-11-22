@@ -1,0 +1,108 @@
+/* Estilos generales del calendario */
+.rbc-calendar {
+  font-family: 'Roboto', sans-serif;
+  background-color: white;
+}
+
+/* Cabecera del calendario */
+.rbc-toolbar {
+  margin-bottom: 0;
+}
+
+.rbc-toolbar button {
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 12px;
+  transition: all 0.3s ease;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: #ffc247;
+  color: white;
+  border-color: #ffc247;
+}
+
+/* Celdas del calendario */
+.rbc-month-view {
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.rbc-date-cell {
+  padding: 4px;
+  font-size: 14px;
+  color: #666;
+}
+
+.rbc-off-range-bg {
+  background-color: #f9f9f9;
+}
+
+.rbc-today {
+  background-color: rgba(255, 194, 71, 0.1);
+}
+
+/* Eventos */
+.rbc-event {
+  border: none;
+  padding: 2px 5px;
+  margin: 1px 0;
+  transition: transform 0.2s ease;
+}
+
+.rbc-event:hover {
+  transform: scale(1.02);
+}
+
+.rbc-event.rbc-selected {
+  background-color: #ffc247 !important;
+}
+
+/* Vista de agenda */
+.rbc-agenda-view table {
+  border: none;
+}
+
+.rbc-agenda-view table thead {
+  background-color: #f5f5f5;
+}
+
+.rbc-agenda-view table.rbc-agenda-table tbody > tr > td {
+  padding: 10px;
+}
+
+/* Vista de semana y día */
+.rbc-time-view {
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.rbc-time-header {
+  background-color: #f5f5f5;
+}
+
+.rbc-timeslot-group {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rbc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .rbc-toolbar-label {
+    margin: 10px 0;
+  }
+  
+  .rbc-btn-group {
+    margin: 5px 0;
+  }
+}

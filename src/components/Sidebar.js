@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../config/firebase";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -28,6 +28,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
 import LogoutIcon from "@mui/icons-material/Logout";
 import useUserData from "../hooks/user/useUserData";
+import Badge from "@mui/material/Badge";
+import Tooltip from "@mui/material/Tooltip";
 
 const drawerWidth = 240;
 
@@ -96,10 +98,23 @@ export default function Sidebar() {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
   const location = useLocation();
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { userData, loading } = useUserData();
   const displayName = userData?.name || user?.displayName || "Usuario";
+
+  // Manejo responsivo automático
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      if (window.innerWidth < 600) {
+        setDrawerOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleDrawerOpen = () => {
     setDrawerOpen(true);
@@ -107,6 +122,9 @@ export default function Sidebar() {
 
   const handleDrawerClose = () => {
     setDrawerOpen(false);
+    if (windowWidth < 600) {
+      setDrawerOpen(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -124,19 +142,34 @@ export default function Sidebar() {
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            aria-label={drawerOpen ? "cerrar menú" : "abrir menú"}
+            onClick={drawerOpen ? handleDrawerClose : handleDrawerOpen}
             edge="start"
             sx={{ marginRight: 5, ...(drawerOpen && { display: "none" }) }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography 
+            variant="h6" 
+            noWrap 
+            component="div"
+            sx={{
+              flexGrow: 1,
+              fontWeight: 'bold',
+              letterSpacing: '.1rem',
+              color: theme.palette.primary.main
+            }}
+          >
             DoTime
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer variant="permanent" open={drawerOpen}>
+
+      <Drawer 
+        variant={windowWidth < 600 ? "temporary" : "permanent"} 
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+      >
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (
@@ -147,7 +180,7 @@ export default function Sidebar() {
           </IconButton>
         </DrawerHeader>
         <Divider />
-        {/* Perfil del usuario */}
+        
         {user && (
           <Box
             sx={{
@@ -155,18 +188,18 @@ export default function Sidebar() {
               display: "flex",
               alignItems: "center",
               justifyContent: drawerOpen ? "flex-start" : "center",
-              flexDirection: drawerOpen ? "row" : "column", // Alineación vertical cuando está cerrado
+              flexDirection: drawerOpen ? "row" : "column",
               transition: "all 0.3s ease-in-out", // Transición suave para el perfil
             }}
           >
             <Avatar
-              alt={displayName || "User"}
+              alt={displayName}
               src={user?.photoURL || ""}
               sx={{
                 width: 50,
                 height: 50,
                 marginRight: drawerOpen ? 2 : 0,
-                marginBottom: drawerOpen ? 0 : 1, // Espaciado debajo cuando está cerrado
+                marginBottom: drawerOpen ? 0 : 1,
               }}
             />
             {drawerOpen && (
@@ -174,8 +207,8 @@ export default function Sidebar() {
                 variant="h6"
                 sx={{
                   color: "white",
-                  whiteSpace: "normal", // Permite texto multilinea
-                  overflowWrap: "break-word", // Rompe palabras largas si es necesario
+                  whiteSpace: "normal",
+                  overflowWrap: "break-word",
                   transition: "all 0.3s ease-in-out", // Transición suave para el nombre
                 }}
               >
@@ -187,38 +220,94 @@ export default function Sidebar() {
 
         <List>
           {[
-            { text: "Tareas", icon: <TaskIcon />, to: "/home" },
+            { 
+              text: "Tareas", 
+              icon: <TaskIcon />, 
+              to: "/home",
+              badge: 5,
+              tooltip: "Ver todas tus tareas"
+            },
             {
               text: "Calendario",
               icon: <CalendarMonthIcon />,
               to: "/calendar",
+              badge: 2,
+              tooltip: "Ver calendario de tareas"
             },
             {
               text: "Configuración",
               icon: <SettingsIcon />,
               to: "/configuracion",
+              tooltip: "Ajustes de la aplicación"
             },
-            { text: "Soporte y ayuda", icon: <HelpIcon />, to: "/soporte" },
-          ].map(({ text, icon, to }) => (
-            <ListItem
-              button
+            { 
+              text: "Soporte y ayuda", 
+              icon: <HelpIcon />, 
+              to: "/soporte",
+              tooltip: "Obtener ayuda"
+            },
+          ].map(({ text, icon, to, badge, tooltip }) => (
+            <Tooltip 
               key={text}
-              component={Link}
-              to={to}
-              selected={location.pathname === to}
+              title={tooltip}
+              placement="right"
+              arrow
+            >
+              <ListItem
+                button
+                component={Link}
+                to={to}
+                selected={location.pathname === to}
+                sx={{
+                  justifyContent: drawerOpen ? "initial" : "center",
+                  px: 2.5,
+                  margin: "5px 0",
+                  transition: "background-color 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 194, 71, 0.5)",
+                  },
+                  ...(location.pathname === to && {
+                    border: "2px solid #ffc247",
+                    borderRadius: "5px",
+                    backgroundColor: "rgba(255, 194, 71, 0.7)",
+                  }),
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: drawerOpen ? 3 : "auto",
+                    justifyContent: "center",
+                    color: "white",
+                    transition: "color 0.3s ease",
+                  }}
+                >
+                  {badge ? (
+                    <Badge badgeContent={badge} color="error">
+                      {icon}
+                    </Badge>
+                  ) : (
+                    icon
+                  )}
+                </ListItemIcon>
+                {drawerOpen && (
+                  <ListItemText primary={text} sx={{ color: "white" }} />
+                )}
+              </ListItem>
+            </Tooltip>
+          ))}
+          
+          <Tooltip title="Cerrar sesión" placement="right" arrow>
+            <ListItem 
+              button 
+              onClick={handleLogout}
               sx={{
                 justifyContent: drawerOpen ? "initial" : "center",
                 px: 2.5,
                 margin: "5px 0",
-                transition: "background-color 0.3s ease", // Transición suave al pasar el ratón
                 "&:hover": {
-                  backgroundColor: "rgba(255, 194, 71, 0.5)",
-                },
-                ...(location.pathname === to && {
-                  border: "2px solid #ffc247",
-                  borderRadius: "5px",
-                  backgroundColor: "rgba(255, 194, 71, 0.7)",
-                }),
+                  backgroundColor: "rgba(206, 33, 33, 0.2)",
+                }
               }}
             >
               <ListItemIcon
@@ -226,33 +315,17 @@ export default function Sidebar() {
                   minWidth: 0,
                   mr: drawerOpen ? 3 : "auto",
                   justifyContent: "center",
-                  color: "white",
-                  transition: "color 0.3s ease", // Transición suave para los íconos
+                  color: "#CE2121",
+                  transition: "color 0.3s ease",
                 }}
               >
-                {icon}
+                <LogoutIcon />
               </ListItemIcon>
               {drawerOpen && (
-                <ListItemText primary={text} sx={{ color: "white" }} />
+                <ListItemText primary="Cerrar sesión" sx={{ color: "#CE2121" }} />
               )}
             </ListItem>
-          ))}
-          <ListItem button onClick={handleLogout}>
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                mr: drawerOpen ? 3 : "auto",
-                justifyContent: "center",
-                color: "#CE2121",
-                transition: "color 0.3s ease", // Transición suave para el ícono de logout
-              }}
-            >
-              <LogoutIcon />
-            </ListItemIcon>
-            {drawerOpen && (
-              <ListItemText primary="Cerrar sesión" sx={{ color: "#CE2121" }} />
-            )}
-          </ListItem>
+          </Tooltip>
         </List>
       </Drawer>
     </Box>
