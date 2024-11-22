@@ -35,9 +35,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const TaskDetailDialog = ({ open, handleClose, task, db, updateTaskList }) => {
+const TaskDetailDialog = ({ open, handleClose, task, db, deleteTask }) => {
     const [user] = useAuthState(auth);
-    const { deleteTask, loading, error } = useDeleteTask(db);
+    const { deleteTask: deleteTaskHook, loading, error } = useDeleteTask(db);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -69,14 +69,19 @@ const TaskDetailDialog = ({ open, handleClose, task, db, updateTaskList }) => {
         }
 
         try {
-            await deleteTask(task.id);
-            updateTaskList(task.id);
-            handleClose();
+            await deleteTaskHook(task.id);
             setSnackbarMessage("Tarea eliminada con éxito");
             setSnackbarOpen(true);
+            // Esperar un momento antes de cerrar para que el usuario vea el mensaje
+            setTimeout(() => {
+                handleClose();
+                if (deleteTask) {
+                    deleteTask(task.id);
+                }
+            }, 1000);
         } catch (err) {
             console.error("Error al eliminar la tarea:", err);
-            setSnackbarMessage("Hubo un problema al eliminar la tarea.");
+            setSnackbarMessage(err.message || "Hubo un problema al eliminar la tarea.");
             setSnackbarOpen(true);
         }
     };
