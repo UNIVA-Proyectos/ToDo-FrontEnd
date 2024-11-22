@@ -102,7 +102,15 @@ export default function Sidebar() {
   const location = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const { displayName, loading } = useUserData();
+
+  useEffect(() => {
+    if (user) {
+      console.log("Usuario autenticado:", user);
+      console.log("Nombre del usuario:", user.displayName);
+    }
+  }, [user]);
+
+  const { userData, loading } = useUserData();
   const notifications = useNotifications(db, user);
 
   // Manejo responsivo automático
@@ -195,7 +203,7 @@ export default function Sidebar() {
             }}
           >
             <Avatar
-              alt={displayName}
+              alt={user?.displayName}
               src={user?.photoURL || ""}
               sx={{
                 width: 50,
@@ -214,7 +222,7 @@ export default function Sidebar() {
                   transition: "all 0.3s ease-in-out", // Transición suave para el nombre
                 }}
               >
-                {loading ? "Cargando..." : displayName}
+                {user?.displayName || "Usuario"}
               </Typography>
             )}
           </Box>
