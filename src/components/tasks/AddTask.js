@@ -46,38 +46,7 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
 
     // Detectar cuando el usuario escribe '/'
     if (value.endsWith('/')) {
-      setShowAIHelper(true);
-      setIsAILoading(true);
-      try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.REACT_APP_CLAUDE_API_KEY,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: 'claude-3-opus-20240229',
-            max_tokens: 1000,
-            messages: [{
-              role: 'user',
-              content: `Actúa como un asistente de tareas. Basado en esta descripción parcial de tarea: "${value.slice(0, -1)}", sugiere una descripción más detallada y estructurada.`
-            }]
-          })
-        });
-
-        if (!response.ok) throw new Error('Error al obtener sugerencia');
-        
-        const data = await response.json();
-        setTaskDescription(data.content[0].text);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setIsAILoading(false);
-        setShowAIHelper(false);
-      }
-    } else {
-      setShowAIHelper(false);
+      return;
     }
   };
 
@@ -207,13 +176,6 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
                 color: 'rgba(255, 255, 255, 0.7)',
                 '&.Mui-focused': { color: '#FFC247' },
               },
-            }}
-            InputProps={{
-              endAdornment: isAILoading && (
-                <Box sx={{ color: '#FFC247', p: 1 }}>
-                  <CircularProgress size={20} sx={{ color: 'inherit' }} />
-                </Box>
-              )
             }}
           />
 
