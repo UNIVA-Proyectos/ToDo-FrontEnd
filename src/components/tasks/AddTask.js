@@ -164,17 +164,25 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
             rows={4}
             value={taskDescription}
             onChange={handleDescriptionChange}
-            placeholder="Escribe '/' para recibir ayuda de Checkmate"
+            placeholder="Escribe una descripción detallada de la tarea"
+            variant="outlined"
             sx={{
               '& .MuiOutlinedInput-root': {
                 color: 'white',
-                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
+                '& fieldset': { 
+                  borderColor: 'rgba(255, 255, 255, 0.23)',
+                },
                 '&:hover fieldset': { borderColor: '#FFC247' },
                 '&.Mui-focused fieldset': { borderColor: '#FFC247' },
               },
               '& .MuiInputLabel-root': {
                 color: 'rgba(255, 255, 255, 0.7)',
                 '&.Mui-focused': { color: '#FFC247' },
+              },
+              '& .MuiInputLabel-outlined': {
+                backgroundColor: '#25283D',
+                paddingLeft: '4px',
+                paddingRight: '4px',
               },
             }}
           />
