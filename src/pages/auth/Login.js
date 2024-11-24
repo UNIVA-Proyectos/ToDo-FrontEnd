@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
-import {
+import { 
+  auth, 
+  db, 
+  googleProvider, 
+  facebookProvider 
+} from "../../config/firebase";
+import { 
+  signInWithEmailAndPassword,
   signInWithPopup,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   onAuthStateChanged,
   setPersistence,
-  browserSessionPersistence,
+  browserSessionPersistence
 } from "firebase/auth";
-import { auth, googleProvider, facebookProvider } from "../config/firebase";
-import { useNavigate } from "react-router-dom";
-import { db } from "../config/firebase";
 import { setDoc, doc } from "firebase/firestore";
-import "../styles/login.css";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import "../../styles/login.css";
 
 const AppLogin = () => {
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
@@ -50,12 +54,10 @@ const AppLogin = () => {
   };
 
   useEffect(() => {
-    setPersistence(auth, browserSessionPersistence).then(() => {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          navigate("/home");
-        }
-      });
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        navigate("/home");
+      }
     });
 
     // Cargar el correo del último usuario desde localStorage

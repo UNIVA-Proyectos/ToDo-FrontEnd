@@ -2,13 +2,13 @@
 @import "~@fortawesome/fontawesome-free/css/all.css";
 
 /* importa los archivos css */
-@import "./styles/home.css";
-@import "./styles/login.css";
-@import "./styles/sidebar.css";
-@import "./styles/taskCard.css";
-@import "./styles/taskSummary.css";
-@import "./styles/datepicker.css";
-@import "./styles/taskDialog.css";
+@import "./home.css";
+@import "./login.css";
+@import "./sidebar.css";
+@import "./taskCard.css";
+@import "./taskSummary.css";
+@import "./datepicker.css";
+@import "./taskDialog.css";
 
 body {
   font-family: "Montserrat", sans-serif;

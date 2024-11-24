@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import "../styles/configUsuario.css"; // CSS global
-import { storage, auth } from "../config/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import useUserData from "../hooks/user/useUserData";
 import { useAuthState } from "react-firebase-hooks/auth";
-import useUpdateUserData from "../hooks/user/useUpdateUserData";
-import NoImage from "../assets/no-profile-image.webp";
-import DatePickerBtn from "../components/inputs/DatePickerBtn";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../config/firebase";
+import { auth } from "../../config/firebase";
+import "../../styles/configUsuario.css"; // CSS global
+import useUserData from "../../hooks/user/useUserData";
 import { useNavigate } from "react-router-dom";
+import useUpdateUserData from "../../hooks/user/useUpdateUserData";
+import noProfileImage from "../../assets/no-profile-image.webp";
+import DatePickerBtn from "../../components/inputs/DatePickerBtn";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SaveIcon from "@mui/icons-material/Save";
 
@@ -35,7 +36,7 @@ function ConfiguracionPerfil() {
   useEffect(() => {
     if (!loading && userData) {
       setNombre(userData.name || "");
-      setPhotoURL(userData.photoURL || NoImage);
+      setPhotoURL(userData.photoURL || noProfileImage);
       setFechaNacimiento(userData.fechaNacimiento || "");
       setGenero(userData.genero || "");
       setTelefono(userData.telefono || "");
@@ -89,7 +90,7 @@ function ConfiguracionPerfil() {
   const handleDeletePhoto = async () => {
     try {
       await updateUserData({ photoURL: "" });
-      setPhotoURL(NoImage);
+      setPhotoURL(noProfileImage);
       alert("Foto de perfil eliminada.");
     } catch (error) {
       console.error("Error al eliminar la foto:", error);

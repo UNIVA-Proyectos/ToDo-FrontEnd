@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../config/firebase";
+import { auth } from "../../config/firebase";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   styled,
@@ -32,11 +32,11 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SettingsIcon from "@mui/icons-material/Settings";
 import HelpIcon from "@mui/icons-material/Help";
 import LogoutIcon from "@mui/icons-material/Logout";
-import useUserData from "../hooks/user/useUserData";
-import { db } from "../config/firebase";
-import useNotifications from "../hooks/notifications/useNotifications";
+import useUserData from "../../hooks/user/useUserData";
+import { db } from "../../config/firebase";
+import useNotifications from "../../hooks/notifications/useNotifications";
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import Logo from '../assets/To-Do-Logo.png';
+import Logo from '../../assets/To-Do-Logo.png';
 
 const drawerWidth = 240;
 
@@ -196,14 +196,14 @@ export default function Sidebar() {
     {
       text: "Configuración",
       icon: <SettingsIcon />,
-      path: "/configuracion",
+      path: "/settings",
       tooltip: "Ajustes de la aplicación",
     },
     {
-      text: "Soporte y ayuda",
+      text: "Ayuda",
       icon: <HelpIcon />,
-      path: "/soporte",
-      tooltip: "Obtener ayuda",
+      path: "/help",
+      tooltip: "Centro de ayuda",
     },
   ];
 

@@ -1,41 +1,22 @@
-import React, { useState } from "react";
-import TaskCard from "../components/tasks/TaskCard";
-import TaskSummary from "../components/tasks/taskSummary";
-import AddTask from "../components/tasks/AddTask";
-import useTasks from "../hooks/tasks/useTasks";
+import React, { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, db } from "../config/firebase";
-import useAddTask from "../hooks/tasks/useAddTask";
-import useDeleteTask from "../hooks/tasks/useDeleteTask";
+import { Box, Grid, Container, Typography, Paper, TextField, InputAdornment, IconButton, Menu, Divider, Tooltip, Fade, CircularProgress, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import TaskCard from "../../components/tasks/TaskCard";
+import TaskSummary from "../../components/tasks/taskSummary";
+import AddTask from "../../components/tasks/AddTask";
+import useTasks from "../../hooks/tasks/useTasks";
+import { auth, db } from "../../config/firebase";
+import useAddTask from "../../hooks/tasks/useAddTask";
+import useDeleteTask from "../../hooks/tasks/useDeleteTask";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faFilter, faTags, faXmark } from "@fortawesome/free-solid-svg-icons";
-import useUserData from "../hooks/user/useUserData";
-import {
-  Box,
-  Typography,
-  Container,
-  Grid,
-  Paper,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Menu,
-  Divider,
-  Tooltip,
-  Fade,
-  CircularProgress,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
+import useUserData from "../../hooks/user/useUserData";
 
 const Home = () => {
   const [user] = useAuthState(auth);
-  const { userData, loading } = useUserData();
-  const { tasks, completedCount, pendingCount, overdueCount, addTaskToList, updateTask } =
-    useTasks(db, user);
-  const { addTask } = useAddTask(db, user, addTaskToList);
+  const { userData, loading: userLoading } = useUserData();
+  const { tasks, completedCount, pendingCount, overdueCount } = useTasks(db, user);
+  const { addTask } = useAddTask(db, user);
   const { deleteTask } = useDeleteTask(db);
   const [openAddTask, setOpenAddTask] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -163,7 +144,7 @@ const Home = () => {
             fontSize: { xs: '1.75rem', sm: '2.125rem' }
           }}
         >
-          {loading ? (
+          {userLoading ? (
             <CircularProgress size={24} sx={{ mr: 2 }} />
           ) : (
             <>Hola, {displayName.split(" ").slice(0, 2).join(" ")}</>
