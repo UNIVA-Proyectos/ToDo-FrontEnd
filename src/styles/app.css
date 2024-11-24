@@ -10,8 +10,22 @@
 @import "./datepicker.css";
 @import "./taskDialog.css";
 
+/* Reset global */
+html, body {
+  height: initial !important;
+  min-height: initial !important;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  height: initial !important;
+  min-height: initial !important;
+}
+
 body {
   font-family: "Montserrat", sans-serif;
+  background: #fffdfd;
 }
 
 .task-form .custom-input {
