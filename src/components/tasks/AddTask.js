@@ -23,6 +23,7 @@ import {
   faTags,
   faPlus
 } from "@fortawesome/free-solid-svg-icons";
+import { generateTaskDescription } from "../../services/aiService";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -46,7 +47,16 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
 
     // Detectar cuando el usuario escribe '/'
     if (value.endsWith('/')) {
-      return;
+      setIsAILoading(true);
+      try {
+        const aiDescription = await generateTaskDescription(taskName);
+        setTaskDescription(aiDescription);
+      } catch (error) {
+        console.error('Error al generar la descripción:', error);
+        // Opcional: Mostrar un mensaje de error al usuario
+      } finally {
+        setIsAILoading(false);
+      }
     }
   };
 
@@ -164,8 +174,22 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
             rows={4}
             value={taskDescription}
             onChange={handleDescriptionChange}
-            placeholder="Escribe una descripción detallada de la tarea"
+            placeholder="Escribe una descripción detallada de la tarea (usa '/' para generar una descripción con IA)"
             variant="outlined"
+            InputProps={{
+              endAdornment: isAILoading && (
+                <CircularProgress 
+                  size={20} 
+                  sx={{ 
+                    color: '#FFC247',
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)'
+                  }} 
+                />
+              )
+            }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 color: 'white',
