@@ -33,7 +33,7 @@ const PageCalendar = () => {
   const [selectedTask, setSelectedTask] = useState(null);
 
   const getEventClassName = (task) => {
-    if (task.prioridad === "Alta") return "task-high-priority";
+    if (task.priority === "Alta") return "task-high-priority";
     switch (task.estado) {
       case "Completada":
         return "task-completed";
@@ -80,7 +80,7 @@ const PageCalendar = () => {
                 }}
               />
             </Box>
-            {task.prioridad === "Alta" && (
+            {task.priority === "Alta" && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                 <PriorityHighIcon fontSize="small" />
                 <Typography variant="body2" component="span">
@@ -103,7 +103,7 @@ const PageCalendar = () => {
             {task.titulo}
           </div>
           <div className="event-meta">
-            {task.prioridad === "Alta" && <PriorityHighIcon fontSize="small" />}
+            {task.priority === "Alta" && <PriorityHighIcon fontSize="small" />}
             {getStatusIcon(task.estado)}
           </div>
         </div>

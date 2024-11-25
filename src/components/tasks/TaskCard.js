@@ -39,7 +39,7 @@ import {
 } from "@mui/material";
 
 const TaskCard = React.memo(({ task, deleteTask }) => {
-  const { titulo, descripcion, dueDate, estado, id, prioridad } = task;
+  const { titulo, descripcion, dueDate, estado, id, priority } = task;
   const [open, setOpen] = React.useState(false);
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -63,7 +63,7 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
     }
   };
 
-  const priorityInfo = getPriorityIcon(prioridad);
+  const priorityInfo = getPriorityIcon(priority);
 
   const handleClick = useCallback((event) => {
     event.stopPropagation();
@@ -392,7 +392,8 @@ TaskCard.propTypes = {
     descripcion: PropTypes.string,
     dueDate: PropTypes.object,
     estado: PropTypes.string.isRequired,
-    prioridad: PropTypes.string.isRequired,
+    priority: PropTypes.string.isRequired,
+    tags: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   deleteTask: PropTypes.func.isRequired,
 };
