@@ -9,6 +9,7 @@ import {
   faEllipsisV,
   faCheck,
   faShare,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
 import TaskDetailDialog from "../dialog/TaskDetailDialog";
@@ -27,12 +28,18 @@ import {
   Fade,
   Avatar,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 
 const TaskCard = React.memo(({ task, deleteTask }) => {
   const { titulo, descripcion, dueDate, estado, id } = task;
   const [open, setOpen] = React.useState(false);
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const { updateTaskStatus } = useUpdateTaskStatus(db);
@@ -53,11 +60,20 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
 
   const handleDelete = useCallback((event) => {
     event.stopPropagation();
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta tarea?")) {
-      deleteTask(task.id);
-    }
+    setDeleteDialogOpen(true);
     handleClose();
-  }, [deleteTask, task.id, handleClose]);
+  }, [handleClose]);
+
+  const handleConfirmDelete = useCallback((event) => {
+    event.stopPropagation();
+    deleteTask(task.id);
+    setDeleteDialogOpen(false);
+  }, [deleteTask, task.id]);
+
+  const handleCancelDelete = useCallback((event) => {
+    event.stopPropagation();
+    setDeleteDialogOpen(false);
+  }, []);
 
   const handleToggleComplete = useCallback(async (event) => {
     event.stopPropagation();
@@ -110,25 +126,25 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
         }}
       >
         <CardContent sx={{ pb: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}>
             <Avatar
               sx={{
                 width: 32,
                 height: 32,
                 bgcolor: (theme) => theme.palette[getStatusColor].light,
                 color: (theme) => theme.palette[getStatusColor].main,
-                mr: 1.5,
+                mr: 2,
               }}
             >
               <FontAwesomeIcon icon={getStatusIcon} />
             </Avatar>
-            <Box sx={{ flex: 1 }}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography 
                 variant="h6" 
                 sx={{ 
                   fontSize: "1rem",
                   fontWeight: 600,
-                  mb: 0.5,
+                  mb: 1,
                   lineHeight: 1.2,
                   textDecoration: estado === "Completada" ? "line-through" : "none",
                   color: estado === "Completada" ? "text.disabled" : "text.primary"
@@ -141,7 +157,7 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
                   variant="body2"
                   color="text.secondary"
                   sx={{
-                    mb: 1,
+                    mb: 1.5,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     display: "-webkit-box",
@@ -196,7 +212,13 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
             </Box>
           </Box>
           
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 2 }}>
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between", 
+            mt: 2,
+            gap: 2 
+          }}>
             <Chip
               size="small"
               icon={<FontAwesomeIcon icon={getStatusIcon} />}
@@ -253,6 +275,86 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
         task={task}
         db={db}
       />
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        onClick={(e) => e.stopPropagation()}
+        PaperProps={{
+          sx: {
+            backgroundColor: '#25283D',
+            borderRadius: 2,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            maxWidth: '400px',
+            width: '100%',
+            '& .MuiDialogTitle-root': {
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: 2,
+            },
+            '& .MuiDialogContent-root': {
+              padding: 3,
+            },
+            '& .MuiDialogActions-root': {
+              padding: 2,
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            },
+          },
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1.5,
+          color: '#FF6B6B',
+          fontWeight: 600,
+        }}>
+          <FontAwesomeIcon icon={faTrash} />
+          Eliminar Tarea
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ mb: 2 }}>
+            ¿Estás seguro de que quieres eliminar esta tarea?
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              p: 1.5,
+              borderRadius: 1,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            {titulo}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={handleCancelDelete}
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleConfirmDelete}
+            sx={{
+              backgroundColor: '#FF6B6B',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#ff5252',
+              }
+            }}
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 });
