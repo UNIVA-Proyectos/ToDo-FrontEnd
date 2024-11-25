@@ -38,7 +38,13 @@ import {
     faCircleArrowUp,
     faTrash,
     faCheck,
-    faExclamation
+    faExclamation,
+    faEdit,
+    faArrowDown,
+    faMinus,
+    faShare,
+    faEllipsisV,
+    faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../config/firebase";
@@ -648,7 +654,25 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
                                 <Typography variant="body2" color="textSecondary">
                                     Prioridad:
                                 </Typography>
-                                <Typography variant="body1">Media</Typography>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <FontAwesomeIcon 
+                                        icon={
+                                            task?.priority === "alta" ? faExclamation :
+                                            task?.priority === "baja" ? faArrowDown :
+                                            faMinus
+                                        } 
+                                        style={{ 
+                                            color: task?.priority === "alta" ? "#f44336" :
+                                                   task?.priority === "baja" ? "#4CAF50" :
+                                                   "#FFC247"
+                                        }} 
+                                    />
+                                    <Typography variant="body1">
+                                        {task?.priority === "alta" ? "Alta" :
+                                         task?.priority === "baja" ? "Baja" : 
+                                         "Normal"}
+                                    </Typography>
+                                </Box>
                             </Box>
                             <Divider />
                             <Box sx={{ mt: 1 }}>

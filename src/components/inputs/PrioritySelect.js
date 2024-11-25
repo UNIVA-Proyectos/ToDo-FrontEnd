@@ -9,7 +9,7 @@ import {
 
 const priorities = [
   {
-    value: "high",
+    value: "alta",
     label: "Alta",
     icon: <FontAwesomeIcon icon={faExclamation} style={{ color: "#f44336" }} />,
     color: "#f44336"
@@ -21,7 +21,7 @@ const priorities = [
     color: "#FFC247"
   },
   {
-    value: "low",
+    value: "baja",
     label: "Baja",
     icon: <FontAwesomeIcon icon={faArrowDown} style={{ color: "#4CAF50" }} />,
     color: "#4CAF50"
