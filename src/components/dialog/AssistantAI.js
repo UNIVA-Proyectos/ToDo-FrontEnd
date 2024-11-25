@@ -72,157 +72,232 @@ const AssistantAI = ({ open, onClose, TaskInfo }) => {
       sx={{
         "& .MuiDialog-paper": {
           borderRadius: 3,
-          background: "linear-gradient(145deg, #ffffff, #f0f0f0)",
+          backgroundColor: "#ffffff",
           boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
           backdropFilter: "blur(4px)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
           height: "80vh",
+          border: "1px solid rgba(255, 255, 255, 0.18)",
         },
       }}
     >
       <DialogTitle
         sx={{
-          background: "linear-gradient(90deg, #25283d 0%, #464966 100%)",
+          backgroundColor: "#25283d",
           color: "white",
           display: "flex",
           alignItems: "center",
           gap: 1,
           py: 2,
+          position: "relative",
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "2px",
+            backgroundColor: "#FFC247",
+          },
         }}
       >
-        <SmartToyIcon sx={{ fontSize: 28 }} />
-        <Typography variant="h6" sx={{ fontWeight: "bold", flexGrow: 1 }}>
-          CheckMate - Asistente Virtual
-        </Typography>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: 1,
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          padding: "4px 12px",
+          borderRadius: "20px",
+        }}>
+          <SmartToyIcon sx={{ fontSize: 24 }} />
+          <Typography variant="h6" sx={{ 
+            fontWeight: "600",
+            fontSize: "1.1rem",
+            letterSpacing: "0.5px",
+          }}>
+            CheckMate - Asistente Virtual
+          </Typography>
+        </Box>
         <IconButton
           onClick={onClose}
           sx={{
             color: "white",
+            marginLeft: "auto",
             "&:hover": {
-              background: "rgba(255, 255, 255, 0.1)",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              transform: "rotate(90deg)",
+              transition: "all 0.3s ease-in-out",
             },
           }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent 
+        sx={{ 
+          p: 2,
+          pb: 1,
+          backgroundColor: "#f8f9fa",
+          display: 'flex',
+          flexDirection: 'column',
+          height: 'calc(100% - 64px)', // Altura total menos el header
+        }}
+      >
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             gap: 2,
-            maxHeight: "400px",
+            flex: 1,
             overflowY: "auto",
-            padding: 2,
-            background: "#f9f9f9",
-            borderRadius: "8px",
-            minHeight: "400px",
+            p: 2,
+            backgroundColor: "#ffffff",
+            borderRadius: "12px",
+            boxShadow: "inset 0 2px 4px rgba(0, 0, 0, 0.05)",
+            "&::-webkit-scrollbar": {
+              width: "8px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "#f1f1f1",
+              borderRadius: "4px",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#FFC247",
+              borderRadius: "4px",
+              "&:hover": {
+                backgroundColor: "#FFD47F",
+              },
+            },
           }}
         >
           {messages.map((message, index) => (
             <Box
               key={index}
               sx={{
-                alignSelf:
-                  message.sender === "user" ? "flex-end" : "flex-start",
+                alignSelf: message.sender === "user" ? "flex-end" : "flex-start",
                 maxWidth: "70%",
-                background: message.sender === "user" ? "#ffffff" : "#FFC247",
-                color: message.sender === "user" ? "#25283d" : "#000000",
-                padding: 1.5,
-                borderRadius: "8px",
-                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                textAlign: message.sender === "user" ? "right" : "left",
+                backgroundColor: message.sender === "user" ? "#25283d" : "#FFC247",
+                color: message.sender === "user" ? "#ffffff" : "#000000",
+                padding: "12px 16px",
+                borderRadius: "16px",
+                borderTopRightRadius: message.sender === "user" ? "4px" : "16px",
+                borderTopLeftRadius: message.sender === "user" ? "16px" : "4px",
+                boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                position: "relative",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  [message.sender === "user" ? "right" : "left"]: "-8px",
+                  borderStyle: "solid",
+                  borderWidth: "8px 8px 0 0",
+                  borderColor: message.sender === "user" 
+                    ? "#25283d transparent transparent transparent"
+                    : "#FFC247 transparent transparent transparent",
+                },
               }}
             >
-              {message.sender === "user" ? (
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#25283d",
-                  }}
-                >
-                  Tú
-                </Typography>
-              ) : (
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                    color: "#25283d",
-                  }}
-                >
-                  🤖CheckMate
-                </Typography>
-              )}
+              <Typography
+                sx={{
+                  fontWeight: "600",
+                  color: message.sender === "user" ? "#ffffff" : "#25283d",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  marginBottom: "4px",
+                }}
+              >
+                {message.sender === "user" ? (
+                  <>
+                    <PersonIcon sx={{ fontSize: 18 }} />
+                    Tú
+                  </>
+                ) : (
+                  <>
+                    <SmartToyIcon sx={{ fontSize: 18 }} />
+                    CheckMate
+                  </>
+                )}
+              </Typography>
 
-              {isTyping &&
-              message.sender != "user" &&
-              messages.length - 1 === index ? (
-                <Typography
-                  sx={{
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-word",
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: typewrittenResponse
-                      .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") 
-                      .replace(/\n/g, "<br>"), 
-                  }}
-                ></Typography>
-              ) : (
-                <Typography
-                  sx={{
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-word",
-                  }}
-                  dangerouslySetInnerHTML={{
-                    __html: message.text
-                      .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") 
-                      .replace(/\n/g, "<br>"), 
-                  }}
-                ></Typography>
-              )}
+              <Typography
+                sx={{
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  lineHeight: 1.5,
+                  "& b": {
+                    color: message.sender === "user" ? "#FFC247" : "#25283d",
+                  },
+                }}
+                dangerouslySetInnerHTML={{
+                  __html: (isTyping && message.sender !== "user" && messages.length - 1 === index
+                    ? typewrittenResponse
+                    : message.text
+                  ).replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+                   .replace(/\n/g, "<br>"),
+                }}
+              />
             </Box>
           ))}
           <div ref={messagesEndRef} />
         </Box>
 
-        {/* Campo de entrada y botón */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 1,
-            marginTop: 2,
+            mt: 2,
+            mb: 0,
           }}
         >
           <TextField
             fullWidth
-            variant="outlined"
-            placeholder="Escribe tu mensaje aquí..."
+            multiline
+            maxRows={4}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            sx={{ borderRadius: "8px" }}
-          />
-          <Button
-            variant="contained"
+            placeholder="Escribe tu mensaje aquí..."
             sx={{
-              background: "#25283D",
-              color: "white",
-              fontWeight: "bold",
-              textTransform: "none",
-              px: 3,
-              py: 1,
-              "&:hover": {
-                background: "linear-gradient(to left, #2196f3, #e91e63)",
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "#ffffff",
+                borderRadius: "12px",
+                "& fieldset": {
+                  borderColor: "rgba(0, 0, 0, 0.1)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "#FFC247",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#FFC247",
+                },
               },
             }}
+          />
+          <Button
             onClick={handleSend}
+            disabled={!input.trim() || isTyping}
+            sx={{
+              minWidth: "50px",
+              height: "50px",
+              borderRadius: "12px",
+              backgroundColor: "#FFC247",
+              color: "#25283d",
+              "&:hover": {
+                backgroundColor: "#FFD47F",
+                transform: "translateY(-2px)",
+                transition: "all 0.2s ease-in-out",
+              },
+              "&:disabled": {
+                backgroundColor: "#e0e0e0",
+                color: "#9e9e9e",
+              },
+            }}
           >
-            Enviar
+            <SendIcon />
           </Button>
         </Box>
       </DialogContent>
