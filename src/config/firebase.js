@@ -17,9 +17,6 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
-console.log("API Key:", process.env.REACT_APP_FIREBASE_API_KEY);
-console.log("Auth Domain:", process.env.REACT_APP_AUTH_DOMAIN);
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
