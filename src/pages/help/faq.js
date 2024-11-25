@@ -217,26 +217,26 @@ const FAQ = () => {
               <SearchIcon sx={{ color: "rgba(255, 255, 255, 0.7)", mr: 1 }} />
             ),
             sx: {
-              color: '#ffffff',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(255, 255, 255, 0.2)',
+              color: "#ffffff",
+              backgroundColor: "rgba(255, 255, 255, 0.05)",
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(255, 255, 255, 0.2)",
               },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(255, 255, 255, 0.3)',
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(255, 255, 255, 0.3)",
               },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(255, 255, 255, 0.5)',
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "rgba(255, 255, 255, 0.5)",
               },
-            }
+            },
           }}
-          sx={{ 
-            width: "100%", 
+          sx={{
+            width: "100%",
             maxWidth: 500,
-            '& .MuiInputBase-input': {
-              color: '#ffffff',
-              '&::placeholder': {
-                color: 'rgba(255, 255, 255, 0.5)',
+            "& .MuiInputBase-input": {
+              color: "#ffffff",
+              "&::placeholder": {
+                color: "rgba(255, 255, 255, 0.5)",
                 opacity: 1,
               },
             },
@@ -261,26 +261,27 @@ const FAQ = () => {
                 sx={{
                   mb: 2,
                   border: 1,
-                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  borderColor: "rgba(255, 255, 255, 0.1)",
                   borderRadius: 1,
-                  overflow: 'hidden',
-                  bgcolor: 'rgba(255, 255, 255, 0.05)',
+                  overflow: "hidden",
+                  bgcolor: "rgba(255, 255, 255, 0.05)",
                 }}
               >
                 <Box
                   onClick={() => toggleRespuesta(categoryIndex, questionIndex)}
                   sx={{
                     p: 2,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    bgcolor: activeIndex === `${categoryIndex}-${questionIndex}`
-                      ? 'rgba(255, 255, 255, 0.1)'
-                      : 'rgba(255, 255, 255, 0.05)',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.15)',
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    bgcolor:
+                      activeIndex === `${categoryIndex}-${questionIndex}`
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(255, 255, 255, 0.05)",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      bgcolor: "rgba(255, 255, 255, 0.15)",
                     },
                   }}
                 >
@@ -288,21 +289,22 @@ const FAQ = () => {
                     variant="subtitle1"
                     component="div"
                     sx={{
-                      fontWeight: 'medium',
-                      color: '#ffffff',
+                      fontWeight: "medium",
+                      color: "#ffffff",
                     }}
                   >
                     {faq.pregunta}
                   </Typography>
                   <IconButton
                     sx={{
-                      transform: activeIndex === `${categoryIndex}-${questionIndex}`
-                        ? 'rotate(180deg)'
-                        : 'rotate(0)',
-                      transition: 'transform 0.3s, color 0.3s',
-                      color: '#ffc247',
-                      '&:hover': {
-                        color: '#ffd47f',
+                      transform:
+                        activeIndex === `${categoryIndex}-${questionIndex}`
+                          ? "rotate(180deg)"
+                          : "rotate(0)",
+                      transition: "transform 0.3s, color 0.3s",
+                      color: "#ffc247",
+                      "&:hover": {
+                        color: "#ffd47f",
                       },
                     }}
                     aria-label={
@@ -317,16 +319,18 @@ const FAQ = () => {
                 <Collapse
                   in={activeIndex === `${categoryIndex}-${questionIndex}`}
                 >
-                  <Box sx={{
-                    p: 2,
-                    bgcolor: 'rgba(255, 255, 255, 0.02)',
-                    borderTop: 1,
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                  }}>
+                  <Box
+                    sx={{
+                      p: 2,
+                      bgcolor: "rgba(255, 255, 255, 0.02)",
+                      borderTop: 1,
+                      borderColor: "rgba(255, 255, 255, 0.1)",
+                    }}
+                  >
                     <Typography
                       variant="body1"
                       sx={{
-                        color: 'rgba(255, 255, 255, 0.9)',
+                        color: "rgba(255, 255, 255, 0.9)",
                         lineHeight: 1.6,
                       }}
                     >
@@ -362,5 +366,41 @@ const FAQ = () => {
     </div>
   );
 };
+
+document.addEventListener("DOMContentLoaded", () => {
+  const faqQuestions = document.querySelectorAll(".faq-question");
+
+  // Detectar si es una pantalla táctil
+  const isTouchScreen =
+    "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+  faqQuestions.forEach((question) => {
+    question.addEventListener(
+      isTouchScreen ? "touchstart" : "click",
+      (event) => {
+        const answer = question.nextElementSibling;
+
+        // Alternar clases para animaciones
+        question.classList.toggle("active");
+        if (answer.style.maxHeight) {
+          answer.style.maxHeight = null;
+        } else {
+          answer.style.maxHeight = `${answer.scrollHeight}px`;
+        }
+
+        // Cerrar otros abiertos (opcional)
+        faqQuestions.forEach((otherQuestion) => {
+          if (
+            otherQuestion !== question &&
+            otherQuestion.classList.contains("active")
+          ) {
+            otherQuestion.classList.remove("active");
+            otherQuestion.nextElementSibling.style.maxHeight = null;
+          }
+        });
+      }
+    );
+  });
+});
 
 export default FAQ;

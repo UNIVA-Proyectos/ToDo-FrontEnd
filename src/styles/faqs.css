@@ -1,3 +1,12 @@
+:root {
+  --primary-color: #1d2142;
+  --secondary-color: #ffc247;
+  --background-color: #fdfbf7;
+  --faq-bg: #25283d;
+  --text-light: rgba(255, 255, 255, 0.8);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,12 +15,15 @@
 
 body {
   font-family: "Montserrat", sans-serif;
-  background-color: #fdfbf7;
-  color: #1d2142;
+  background-color: var(#fdfbf7);
+  color: var(#1d2142);
+  margin: 0;
 }
 
 .container {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   min-height: 100vh;
 }
 
@@ -31,19 +43,14 @@ body {
 }
 
 .faq-container {
+  width: 90%;
   max-width: 1200px;
   margin: 2rem auto;
   padding: 2rem;
-  min-height: calc(100vh - 4rem);
-  background-color: #25283D;
+  background-color: var(--faq-bg);
   color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px var(--shadow-color);
 }
 
 .faq-container .MuiTypography-root {
@@ -65,19 +72,18 @@ body {
 }
 
 .faq-container .faq-question {
-  padding: 1rem;
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 500;
-  color: #ffffff;
+  padding: 1rem;
+  font-size: 1rem;
+  cursor: pointer;
 }
 
 .faq-container .faq-answer {
-  padding: 0 1rem 1rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
   line-height: 1.6;
+  padding: 0 1rem;
 }
 
 .faq-container .faq-icon {
@@ -139,7 +145,10 @@ body {
   border-color: rgba(255, 194, 71, 0.5);
 }
 
-.faq-container .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+.faq-container
+  .MuiTextField-root
+  .MuiOutlinedInput-root.Mui-focused
+  .MuiOutlinedInput-notchedOutline {
   border-color: #ffc247;
 }
 
@@ -228,11 +237,25 @@ body {
   .container {
     flex-direction: column;
   }
+
   .content {
     padding: 20px;
   }
+
   .faq-list {
     max-width: 100%;
+  }
+
+  .faq-container {
+    padding: 1.5rem;
+  }
+
+  .faq-container .faq-question {
+    font-size: 0.9rem;
+  }
+
+  .faq-container .faq-answer {
+    font-size: 0.8rem;
   }
 }
 
@@ -243,6 +266,12 @@ body {
 
   .faq-image {
     max-width: 250px;
+  }
+
+  .faq-container .faq-question {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.85rem;
   }
 }
 
