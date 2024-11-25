@@ -91,21 +91,74 @@ function ConfiguracionPerfil() {
     }
 
     setIsUploading(true);
+
     try {
-      // Subir la imagen a Firebase Storage
-      const storageRef = ref(storage, `profilePictures/${userData.uid}`);
-      await uploadBytes(storageRef, file);
+      // Validar el tamaño del archivo (máximo 5MB)
+      const MAX_SIZE = 5 * 1024 * 1024; // 5MB en bytes
+      if (file.size > MAX_SIZE) {
+        throw new Error("El archivo es demasiado grande. El tamaño máximo es 5MB.");
+      }
+
+      // Validar el tipo de archivo
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      
+      if (!allowedExtensions.includes(fileExtension)) {
+        throw new Error("Formato de archivo no válido. Use: JPG, PNG, GIF o WEBP.");
+      }
+
+      // Crear nombre de archivo seguro
+      const safeFileName = `${userData.uid.replace(/[^a-zA-Z0-9]/g, '')}_${Date.now()}.${fileExtension}`;
+      const filePath = `profilePictures/${safeFileName}`;
+      
+      console.log('Creando referencia de storage para:', filePath);
+      const storageRef = ref(storage, filePath);
+
+      // Configurar los metadatos
+      const metadata = {
+        contentType: file.type,
+        cacheControl: 'public,max-age=7200',
+        customMetadata: {
+          'uploadedBy': userData.uid,
+          'uploadTime': new Date().toISOString()
+        }
+      };
+
+      // Subir el archivo
+      console.log('Iniciando subida de archivo...');
+      const uploadTask = await uploadBytes(storageRef, file, metadata);
+      console.log('Archivo subido exitosamente:', uploadTask);
+
+      // Esperar un momento antes de obtener la URL
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Obtener la URL de descarga
-      const downloadURL = await getDownloadURL(storageRef);
-      setPhotoURL(downloadURL);
+      console.log('Obteniendo URL de descarga...');
+      const downloadURL = await getDownloadURL(uploadTask.ref);
+      console.log('URL de descarga obtenida:', downloadURL);
 
-      // Actualizar en Firestore
-      await updateUserData({ photoURL: downloadURL });
+      // Actualizar el estado y Firestore
+      setPhotoURL(downloadURL);
+      await updateUserData({
+        photoURL: downloadURL,
+        lastPhotoUpdate: Date.now()
+      });
+
       alert("Foto de perfil actualizada con éxito.");
     } catch (error) {
-      console.error("Error al subir la imagen:", error);
-      alert("Hubo un error al subir la imagen. Inténtalo de nuevo.");
+      console.error("Error detallado:", error);
+      
+      if (error.message) {
+        alert(error.message);
+      } else if (error.code === 'storage/unauthorized') {
+        alert("No tienes permiso para realizar esta acción. Por favor, inicia sesión nuevamente.");
+      } else if (error.code === 'storage/canceled') {
+        alert("La subida fue cancelada.");
+      } else if (error.code === 'storage/unknown') {
+        alert("Ocurrió un error desconocido. Por favor, intenta de nuevo.");
+      } else {
+        alert("Error al subir la imagen. Por favor, intenta de nuevo.");
+      }
     } finally {
       setIsUploading(false);
     }
