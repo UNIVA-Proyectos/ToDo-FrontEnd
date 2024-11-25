@@ -12,7 +12,7 @@ import Calendar from "./pages/calendar/calendar.js";
 import ProfileSettings from "./pages/settings/ConfiguracionPerfil.js";
 import BlankLayout from "./layout/blankLayout.js";
 import MainLayout from "./layout/mainLayout.js";
-import FAQ from "./pages/help/FAQ.js";
+import FAQ from "./pages/help/faq.js";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./config/firebase.js";
 

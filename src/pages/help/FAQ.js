@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/faqs.css";
-import FAQsImage from "../../assets/FAQs.jpg";
+import faqs_image from "../../assets/FAQs.jpg";
 import { TextField, IconButton, Collapse, Typography, Box, Chip } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -144,7 +144,7 @@ const FAQ = () => {
         <Typography variant="h2" component="h1" gutterBottom>
           Preguntas Frecuentes
         </Typography>
-        <img src={FAQsImage} alt="FAQ Imagen" className="faq-image" />
+        <img src={faqs_image} alt="FAQ Imagen" className="faq-image" />
       </Box>
 
       <Box sx={{ mb: 4, display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap" }}>
