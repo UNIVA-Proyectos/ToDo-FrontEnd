@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../config/firebase";
@@ -24,6 +24,30 @@ function ConfiguracionPerfil() {
   const [telefono, setTelefono] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const opcionesGenero = [
+    { value: "", label: "Selecciona una opción" },
+    { value: "masculino", label: "Masculino" },
+    { value: "femenino", label: "Femenino" },
+    { value: "no-binario", label: "No Binario" },
+    { value: "genero-fluido", label: "Género Fluido" },
+    { value: "transgenero", label: "Transgénero" },
+    { value: "agender", label: "Agénero" },
+    { value: "otro", label: "Otro" },
+    { value: "prefiero-no-decirlo", label: "Prefiero no especificar" }
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     if (user?.email) {
@@ -106,79 +130,109 @@ function ConfiguracionPerfil() {
   }
 
   return (
-      <div className="configuracion-usuario-container">
-        <div className="configuracion-content">
-          <h1>Configuración de Perfil</h1>
-          <div className="user-info">
-            <img src={photoURL} alt="Foto de perfil" className="profile-photo" />
-            <div className="settings">
-              <input
+    <div className="configuracion-usuario-container">
+      <div className="configuracion-content">
+        <h1>Configuración de Perfil</h1>
+        
+        <div className="profile-section">
+          {/* Columna Izquierda */}
+          <div className="left-column">
+            <div className="user-info">
+              <img src={photoURL} alt="Foto de perfil" className="profile-photo" />
+              <div className="settings">
+                <input
                   type="file"
                   id="uploadPhoto"
                   style={{ display: "none" }}
                   onChange={handleChangePhoto}
-              />
-              <button
+                />
+                <button
                   className="btn change-photo"
                   onClick={() => document.getElementById("uploadPhoto").click()}
                   disabled={isUploading}
-              >
-                {isUploading ? "Subiendo..." : "Cambiar foto"}
-              </button>
-              <button
+                >
+                  {isUploading ? "Subiendo..." : "Cambiar foto"}
+                </button>
+                <button
                   className="btn delete-photo"
                   onClick={handleDeletePhoto}
                   disabled={isUploading}
-              >
-                Eliminar foto
-              </button>
+                >
+                  Eliminar foto
+                </button>
+              </div>
+            </div>
+
+            <div className="info-section">
+              <div className="form-group">
+                <label>Nombre</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setNombre(e.target.value)}
+                  className="input-field"
+                />
+              </div>
+              <div className="form-group">
+                <label>Teléfono</label>
+                <input
+                  type="tel"
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  className="input-field"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="info-section">
-            <h2>Información Básica</h2>
-            <label>Nombre</label>
-            <input
-                type="text"
-                value={name}
-                onChange={(e) => setNombre(e.target.value)}
-                className="input-field"
-            />
-            <label>Fecha de nacimiento</label>
-            <div className="me-3">
-              <DatePickerBtn handleSelectDate={handleSelectDate} />
+          {/* Columna Derecha */}
+          <div className="right-column">
+            <div className="info-section">
+              <div className="form-group">
+                <label>Fecha de nacimiento</label>
+                <DatePickerBtn handleSelectDate={handleSelectDate} />
+              </div>
+              <div className="form-group">
+                <label>Género</label>
+                <div className="custom-select" ref={dropdownRef}>
+                  <div 
+                    className="select-selected"
+                    onClick={() => setIsOpen(!isOpen)}
+                  >
+                    {opcionesGenero.find(opt => opt.value === genero)?.label || "Selecciona una opción"}
+                    <span className="select-arrow"></span>
+                  </div>
+                  {isOpen && (
+                    <div className="select-items">
+                      {opcionesGenero.map((option) => (
+                        <div
+                          key={option.value}
+                          className={`select-item ${genero === option.value ? 'selected' : ''}`}
+                          onClick={() => {
+                            setGenero(option.value);
+                            setIsOpen(false);
+                          }}
+                        >
+                          {option.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <button onClick={handleSaveChanges} className="save-changes">
+                <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
+                Guardar Cambios
+              </button>
+              <button onClick={handleLogout} className="logout-button">
+                <LogoutIcon style={{ marginRight: "8px", fontSize: "20px" }} />
+                Cerrar sesión
+              </button>
             </div>
-            <label>Género</label>
-            <select
-                value={genero}
-                onChange={(e) => setGenero(e.target.value)}
-                className="input-field"
-            >
-              <option value="">Selecciona tu género</option>
-              <option value="masculino">Masculino</option>
-              <option value="femenino">Femenino</option>
-              <option value="No Binario">No Binario</option>
-              <option value="Otro">Otro</option>
-              <option value="prefiero-no-decirlo">Prefiero no decirlo</option>
-            </select>
-            <label>Teléfono</label>
-            <input
-                type="tel"
-                value={telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                className="input-field"
-            />
-            <button onClick={handleSaveChanges} className="save-changes">
-              <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
-              Guardar Cambios
-            </button>
-            <button onClick={handleLogout} className="logout-button">
-              <LogoutIcon style={{ marginRight: "8px", fontSize: "20px" }} />
-              Cerrar sesión
-            </button>
           </div>
         </div>
       </div>
+    </div>
   );
 }
 
