@@ -32,13 +32,106 @@ body {
 
 .faq-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 2rem auto;
   padding: 2rem;
-  min-height: 100vh;
-  background-color: #ffffff;
+  min-height: calc(100vh - 4rem);
+  background-color: #25283D;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.faq-container .MuiTypography-root {
+  color: #ffffff !important;
+}
+
+.faq-container .MuiTypography-subtitle1 {
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.faq-container .MuiTypography-body2 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.faq-container .faq-question {
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.faq-container .faq-answer {
+  padding: 0 1rem 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+}
+
+.faq-container .faq-icon {
+  transition: transform 0.3s ease;
+  color: #ffc247;
+}
+
+.faq-container .faq-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.faq-container .faq-accordion {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-bottom: 1rem !important;
+}
+
+.faq-container .faq-accordion:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-2px);
+}
+
+.faq-container .MuiChip-root {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.faq-container .MuiChip-root:hover {
+  background-color: rgba(255, 194, 71, 0.1) !important;
+  border-color: rgba(255, 194, 71, 0.5) !important;
+}
+
+.faq-container .MuiChip-root.Mui-selected {
+  background-color: rgba(255, 194, 71, 0.2) !important;
+  color: #ffc247 !important;
+  border-color: #ffc247 !important;
+}
+
+.faq-container .MuiTextField-root {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.faq-container .MuiTextField-root .MuiOutlinedInput-root {
+  color: #ffffff;
+}
+
+.faq-container .MuiTextField-root .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.faq-container .MuiTextField-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255, 194, 71, 0.5);
+}
+
+.faq-container .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #ffc247;
 }
 
 .contact {
@@ -56,12 +149,14 @@ body {
   margin: 2rem auto;
   display: block;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
+  opacity: 0.9;
 }
 
 .faq-image:hover {
-  transform: scale(1.02);
+  transform: scale(1.03);
+  opacity: 1;
 }
 
 .faq-list {
@@ -72,8 +167,6 @@ body {
   color: #1d2142;
   margin-bottom: 20px;
 }
-
-/* Estilos previos... */
 
 .faq-list li {
   margin-bottom: 15px;
@@ -94,12 +187,10 @@ body {
   max-height: 150px; /* Ajusta el valor según la altura esperada de la respuesta */
 }
 
-/* Estilo para resaltar la pregunta seleccionada */
 .faq-list li.active strong {
   color: #ffce47;
 }
 
-/* Animaciones */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -111,7 +202,6 @@ body {
   }
 }
 
-/* Estilos responsivos */
 @media (max-width: 768px) {
   .container {
     flex-direction: column;
@@ -134,7 +224,6 @@ body {
   }
 }
 
-/* Estilos para accesibilidad */
 @media (prefers-reduced-motion: reduce) {
   .faq-image,
   .MuiCollapse-root {
@@ -142,10 +231,34 @@ body {
   }
 }
 
-/* Alto contraste */
 @media (prefers-contrast: high) {
   .faq-container {
     background-color: white;
     color: black;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.faq-answer-enter {
+  animation: slideDown 0.3s ease forwards;
+}
+
+@media (max-width: 768px) {
+  .faq-container {
+    padding: 1rem;
+  }
+
+  .faq-image {
+    max-width: 200px;
   }
 }

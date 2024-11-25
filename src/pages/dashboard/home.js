@@ -135,30 +135,39 @@ const Home = () => {
   const groups = filteredAndGroupedTasks();
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 } }}>
-      <Box sx={{ mb: { xs: 2, sm: 4 } }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 }, px: 0 }}>
+      <Box sx={{ mb: { xs: 2, sm: 4 }, pl: 0 }}>
         <Typography 
           variant="h4" 
           component="h1" 
           gutterBottom 
           sx={{ 
-            fontWeight: 'bold',
-            color: '#2C2C2C',
-            fontSize: { xs: '1.75rem', sm: '2.125rem' }
+            fontWeight: '800',
+            color: '#25283D',
+            fontSize: { xs: '1.75rem', sm: '2rem' },
+            textAlign: 'left',
+            width: '100%',
+            pl: 0,
+            ml: 0,
+            mb: 1,
+            letterSpacing: '-0.5px'
           }}
         >
           {userLoading ? (
             <CircularProgress size={24} sx={{ mr: 2 }} />
           ) : (
-            <>Hola, {displayName.split(" ").slice(0, 2).join(" ")}</>
+            <>¡Hola, {displayName}!</>
           )}
         </Typography>
         <Typography 
-          variant="subtitle1" 
-          gutterBottom
+          variant="h6" 
           sx={{ 
-            color: '#424242',
-            fontSize: { xs: '0.875rem', sm: '1rem' }
+            color: '#666',
+            fontSize: { xs: '1.1rem', sm: '1.25rem' },
+            fontWeight: '500',
+            mb: 4,
+            opacity: 0.9,
+            pl: 0
           }}
         >
           Aquí está el resumen de tus tareas

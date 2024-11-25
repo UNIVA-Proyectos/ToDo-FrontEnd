@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../../styles/faqs.css";
 import faqs_image from "../../assets/FAQs.jpg";
-import { TextField, IconButton, Collapse, Typography, Box, Chip } from "@mui/material";
+import { 
+  TextField, 
+  IconButton, 
+  Collapse, 
+  Typography, 
+  Box, 
+  Chip,
+  Paper,
+  Zoom,
+  Fade
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
@@ -116,17 +126,21 @@ const FAQ = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
-    const filtered = faqsData.map(category => ({
-      ...category,
-      preguntas: category.preguntas.filter(faq => 
-        faq.pregunta.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        faq.respuesta.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        faq.keywords.some(keyword => keyword.toLowerCase().includes(searchTerm.toLowerCase()))
-      )
-    })).filter(category => category.preguntas.length > 0);
+    const filtered = faqsData
+      .filter(category => !selectedCategory || category.categoria === selectedCategory)
+      .map(category => ({
+        ...category,
+        preguntas: category.preguntas.filter(faq => 
+          !searchTerm || 
+          faq.pregunta.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          faq.respuesta.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          faq.keywords.some(keyword => keyword.toLowerCase().includes(searchTerm.toLowerCase()))
+        )
+      }))
+      .filter(category => category.preguntas.length > 0);
     
     setFilteredFaqs(filtered);
-  }, [searchTerm]);
+  }, [searchTerm, selectedCategory]);
 
   const toggleRespuesta = (categoryIndex, questionIndex) => {
     const newIndex = activeIndex === `${categoryIndex}-${questionIndex}` ? null : `${categoryIndex}-${questionIndex}`;
@@ -140,91 +154,102 @@ const FAQ = () => {
 
   return (
     <div className="faq-container">
-      <Box sx={{ textAlign: "center", mb: 4 }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Preguntas Frecuentes
-        </Typography>
-        <img src={faqs_image} alt="FAQ Imagen" className="faq-image" />
-      </Box>
+      <Fade in timeout={800}>
+        <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Typography 
+            variant="h2" 
+            component="h1" 
+            gutterBottom
+            sx={{
+              fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+              fontWeight: 700,
+              color: '#ffffff',
+              textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+            }}
+          >
+            Preguntas Frecuentes
+          </Typography>
+          <img src={faqs_image} alt="FAQ Imagen" className="faq-image" />
+        </Box>
+      </Fade>
 
-      <Box sx={{ mb: 4, display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap" }}>
-        {faqsData.map((category, index) => (
-          <Chip
-            key={index}
-            label={category.categoria}
-            onClick={() => handleCategoryClick(category.categoria)}
-            color={selectedCategory === category.categoria ? "primary" : "default"}
-            sx={{ m: 0.5 }}
+      <Zoom in timeout={600}>
+        <Box sx={{ mb: 4, display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap" }}>
+          {faqsData.map((category, index) => (
+            <Chip
+              key={index}
+              label={category.categoria}
+              onClick={() => handleCategoryClick(category.categoria)}
+              color={selectedCategory === category.categoria ? "primary" : "default"}
+              sx={{ m: 0.5 }}
+              className={selectedCategory === category.categoria ? 'Mui-selected' : ''}
+            />
+          ))}
+        </Box>
+      </Zoom>
+
+      <Fade in timeout={400}>
+        <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
+          <TextField
+            variant="outlined"
+            placeholder="Buscar preguntas..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: <SearchIcon sx={{ color: "action.active", mr: 1 }} />,
+            }}
+            sx={{ width: "100%", maxWidth: 500 }}
           />
-        ))}
-      </Box>
+        </Box>
+      </Fade>
 
-      <Box sx={{ mb: 4, display: "flex", justifyContent: "center" }}>
-        <TextField
-          variant="outlined"
-          placeholder="Buscar preguntas..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ color: "action.active", mr: 1 }} />,
-          }}
-          sx={{ width: "100%", maxWidth: 500 }}
-        />
-      </Box>
-
-      <Box sx={{ maxWidth: 800, mx: "auto" }}>
+      <Box sx={{ maxWidth: 800, mx: "auto", width: "100%" }}>
         {filteredFaqs.map((category, categoryIndex) => (
-          <Box key={categoryIndex} sx={{ mb: 4 }}>
-            <Typography variant="h5" component="h2" gutterBottom sx={{ color: "primary.main" }}>
-              {category.categoria}
-            </Typography>
-            {category.preguntas.map((faq, questionIndex) => (
-              <Box
-                key={questionIndex}
-                sx={{
-                  mb: 2,
-                  border: 1,
-                  borderColor: "divider",
-                  borderRadius: 1,
-                  overflow: "hidden",
+          <Fade in timeout={600} key={categoryIndex}>
+            <Box sx={{ mb: 4 }}>
+              <Typography 
+                variant="h5" 
+                component="h2" 
+                gutterBottom 
+                sx={{ 
+                  color: "#ffc247",
+                  fontWeight: 600,
+                  mb: 3
                 }}
               >
-                <Box
-                  onClick={() => toggleRespuesta(categoryIndex, questionIndex)}
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    bgcolor: activeIndex === `${categoryIndex}-${questionIndex}` ? "action.selected" : "background.paper",
-                    transition: "background-color 0.3s",
-                    "&:hover": {
-                      bgcolor: "action.hover",
-                    },
-                  }}
+                {category.categoria}
+              </Typography>
+              {category.preguntas.map((faq, questionIndex) => (
+                <Paper
+                  key={questionIndex}
+                  elevation={0}
+                  className="faq-accordion"
                 >
-                  <Typography variant="subtitle1" component="div" sx={{ fontWeight: "medium" }}>
-                    {faq.pregunta}
-                  </Typography>
-                  <IconButton
-                    sx={{
-                      transform: activeIndex === `${categoryIndex}-${questionIndex}` ? "rotate(180deg)" : "rotate(0)",
-                      transition: "transform 0.3s",
-                    }}
-                    aria-label={activeIndex === `${categoryIndex}-${questionIndex}` ? "Cerrar respuesta" : "Ver respuesta"}
+                  <div
+                    className="faq-question"
+                    onClick={() => toggleRespuesta(categoryIndex, questionIndex)}
                   >
-                    <ExpandMoreIcon />
-                  </IconButton>
-                </Box>
-                <Collapse in={activeIndex === `${categoryIndex}-${questionIndex}`}>
-                  <Box sx={{ p: 2, bgcolor: "background.default" }}>
-                    <Typography variant="body1">{faq.respuesta}</Typography>
-                  </Box>
-                </Collapse>
-              </Box>
-            ))}
-          </Box>
+                    <Typography variant="subtitle1" sx={{ flex: 1 }}>
+                      {faq.pregunta}
+                    </Typography>
+                    <IconButton 
+                      size="small"
+                      className={`faq-icon ${activeIndex === `${categoryIndex}-${questionIndex}` ? 'expanded' : ''}`}
+                    >
+                      <ExpandMoreIcon />
+                    </IconButton>
+                  </div>
+                  <Collapse in={activeIndex === `${categoryIndex}-${questionIndex}`}>
+                    <div className="faq-answer">
+                      <Typography variant="body2">
+                        {faq.respuesta}
+                      </Typography>
+                    </div>
+                  </Collapse>
+                </Paper>
+              ))}
+            </Box>
+          </Fade>
         ))}
       </Box>
 

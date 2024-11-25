@@ -10,6 +10,9 @@ import {
   faCheck,
   faShare,
   faTrash,
+  faFlag,
+  faCircle,
+  faExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
 import TaskDetailDialog from "../dialog/TaskDetailDialog";
@@ -36,7 +39,7 @@ import {
 } from "@mui/material";
 
 const TaskCard = React.memo(({ task, deleteTask }) => {
-  const { titulo, descripcion, dueDate, estado, id } = task;
+  const { titulo, descripcion, dueDate, estado, id, prioridad } = task;
   const [open, setOpen] = React.useState(false);
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
@@ -48,6 +51,19 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
   const dueDateFormatted = isDueDateValid ? dueDate.toDate() : null;
   const isOverdue =
     dueDateFormatted && dueDateFormatted < new Date() && estado === "Pendiente";
+
+  const getPriorityIcon = (priority) => {
+    switch (priority) {
+      case "baja":
+        return { icon: faCircle, color: "#4CAF50" };
+      case "alta":
+        return { icon: faExclamation, color: "#f44336" };
+      default:
+        return { icon: faFlag, color: "#FFC247" };
+    }
+  };
+
+  const priorityInfo = getPriorityIcon(prioridad);
 
   const handleClick = useCallback((event) => {
     event.stopPropagation();
@@ -147,9 +163,19 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
                   mb: 1,
                   lineHeight: 1.2,
                   textDecoration: estado === "Completada" ? "line-through" : "none",
-                  color: estado === "Completada" ? "text.disabled" : "text.primary"
+                  color: estado === "Completada" ? "text.disabled" : "text.primary",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
                 }}
               >
+                <FontAwesomeIcon 
+                  icon={priorityInfo.icon} 
+                  style={{ 
+                    color: priorityInfo.color,
+                    fontSize: '0.8rem'
+                  }} 
+                />
                 {titulo}
               </Typography>
               {descripcion && (
@@ -366,6 +392,7 @@ TaskCard.propTypes = {
     descripcion: PropTypes.string,
     dueDate: PropTypes.object,
     estado: PropTypes.string.isRequired,
+    prioridad: PropTypes.string.isRequired,
   }).isRequired,
   deleteTask: PropTypes.func.isRequired,
 };
