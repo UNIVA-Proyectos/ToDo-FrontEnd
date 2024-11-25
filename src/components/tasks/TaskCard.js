@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,7 +29,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
-const TaskCard = ({ task, deleteTask }) => {
+const TaskCard = React.memo(({ task, deleteTask }) => {
   const { titulo, descripcion, dueDate, estado, id } = task;
   const [open, setOpen] = React.useState(false);
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
@@ -42,46 +42,46 @@ const TaskCard = ({ task, deleteTask }) => {
   const isOverdue =
     dueDateFormatted && dueDateFormatted < new Date() && estado === "Pendiente";
 
-  const handleClick = (event) => {
+  const handleClick = useCallback((event) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleDelete = (event) => {
+  const handleDelete = useCallback((event) => {
     event.stopPropagation();
     if (window.confirm("¿Estás seguro de que quieres eliminar esta tarea?")) {
       deleteTask(task.id);
     }
     handleClose();
-  };
+  }, [deleteTask, task.id, handleClose]);
 
-  const handleToggleComplete = async (event) => {
+  const handleToggleComplete = useCallback(async (event) => {
     event.stopPropagation();
     const newStatus = estado === "Completada" ? "Pendiente" : "Completada";
     await updateTaskStatus(id, newStatus);
-  };
+  }, [estado, id, updateTaskStatus]);
 
-  const handleShare = (event) => {
+  const handleShare = useCallback((event) => {
     event.stopPropagation();
     setShareDialogOpen(true);
     handleClose();
-  };
+  }, [handleClose]);
 
-  const getStatusColor = () => {
+  const getStatusColor = useMemo(() => {
     if (estado === "Completada") return "success";
     if (isOverdue) return "error";
     return "warning";
-  };
+  }, [estado, isOverdue]);
 
-  const getStatusIcon = () => {
+  const getStatusIcon = useMemo(() => {
     if (estado === "Completada") return faCheckCircle;
     if (isOverdue) return faExclamationCircle;
     return faClock;
-  };
+  }, [estado, isOverdue]);
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -113,14 +113,14 @@ const TaskCard = ({ task, deleteTask }) => {
           <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
             <Avatar
               sx={{
-                width: 40,
-                height: 40,
-                bgcolor: (theme) => theme.palette[getStatusColor()].light,
-                color: (theme) => theme.palette[getStatusColor()].main,
+                width: 32,
+                height: 32,
+                bgcolor: (theme) => theme.palette[getStatusColor].light,
+                color: (theme) => theme.palette[getStatusColor].main,
                 mr: 1.5,
               }}
             >
-              <FontAwesomeIcon icon={getStatusIcon()} />
+              <FontAwesomeIcon icon={getStatusIcon} />
             </Avatar>
             <Box sx={{ flex: 1 }}>
               <Typography 
@@ -199,9 +199,9 @@ const TaskCard = ({ task, deleteTask }) => {
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 2 }}>
             <Chip
               size="small"
-              icon={<FontAwesomeIcon icon={getStatusIcon()} />}
+              icon={<FontAwesomeIcon icon={getStatusIcon} />}
               label={estado}
-              color={getStatusColor()}
+              color={getStatusColor}
               sx={{ height: 24 }}
             />
             {dueDateFormatted && (
@@ -255,7 +255,7 @@ const TaskCard = ({ task, deleteTask }) => {
       />
     </>
   );
-};
+});
 
 TaskCard.propTypes = {
   task: PropTypes.shape({
