@@ -724,12 +724,40 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
                   </Typography>
                 </Box>
               </Box>
-              <Divider />
               <Box sx={{ my: 1 }}>
                 <Typography variant="body2" color="textSecondary">
                   Prioridad:
                 </Typography>
-                <Typography variant="body1">{task.priority}</Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    mt: 1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      backgroundColor: task.priority === 'alta' ? '#f44336' : task.priority === 'normal' ? '#FFC247' : '#4CAF50',
+                      color: 'white',
+                      padding: '2px 8px',
+                      borderRadius: '15px',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    {task.priority === 'alta' ? (
+                      <FontAwesomeIcon icon={faExclamation} style={{ color: 'white' }} />
+                    ) : task.priority === 'normal' ? (
+                      <FontAwesomeIcon icon={faMinus} style={{ color: 'white' }} />
+                    ) : (
+                      <FontAwesomeIcon icon={faArrowDown} style={{ color: 'white' }} />
+                    )}
+                    <span>{getPriorityLabel()}</span>
+                  </Box>
+                </Box>
               </Box>
               <Divider />
               <Box sx={{ mt: 1 }}>
