@@ -729,7 +729,7 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
                 <Typography variant="body2" color="textSecondary">
                   Prioridad:
                 </Typography>
-                <Typography variant="body1">Media</Typography>
+                <Typography variant="body1">{task.priority}</Typography>
               </Box>
               <Divider />
               <Box sx={{ mt: 1 }}>

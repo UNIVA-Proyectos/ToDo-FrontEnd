@@ -35,8 +35,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import useUserData from "../../hooks/user/useUserData";
 import { db } from "../../config/firebase";
 import useNotifications from "../../hooks/notifications/useNotifications";
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Logo from '../../assets/To-Do-Logo.png';
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import Logo from "../../assets/To-Do-Logo.png";
 
 const drawerWidth = 240;
 
@@ -45,16 +45,16 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  background: 'transparent',
-  backgroundColor: 'transparent',
-  boxShadow: 'none',
-  '& .MuiAppBar-root': {
-    background: 'transparent',
-    backgroundColor: 'transparent',
+  background: "transparent",
+  backgroundColor: "transparent",
+  boxShadow: "none",
+  "& .MuiAppBar-root": {
+    background: "transparent",
+    backgroundColor: "transparent",
   },
-  '& .MuiToolbar-root': {
-    background: 'transparent',
-    backgroundColor: 'transparent',
+  "& .MuiToolbar-root": {
+    background: "transparent",
+    backgroundColor: "transparent",
   },
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
@@ -78,7 +78,7 @@ const Drawer = styled(MuiDrawer, {
   whiteSpace: "nowrap",
   boxSizing: "border-box",
   "& .MuiDrawer-paper": {
-    backgroundColor: '#25283D',
+    backgroundColor: "#25283D",
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
@@ -171,11 +171,11 @@ export default function Sidebar() {
   };
 
   const handleNotificationsClick = () => {
-    console.log('Notificaciones clicadas');
+    console.log("Notificaciones clicadas");
   };
 
   const handleProfileClick = () => {
-    console.log('Perfil clicado');
+    console.log("Perfil clicado");
   };
 
   const menuItems = [
@@ -210,22 +210,22 @@ export default function Sidebar() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar 
-        position="fixed" 
+      <AppBar
+        position="fixed"
         open={drawerOpen}
         sx={{
-          background: 'transparent',
-          backgroundColor: 'transparent',
-          '& .MuiPaper-root': {
-            background: 'transparent',
-            backgroundColor: 'transparent',
-          }
+          background: "transparent",
+          backgroundColor: "transparent",
+          "& .MuiPaper-root": {
+            background: "transparent",
+            backgroundColor: "transparent",
+          },
         }}
       >
         <Toolbar
           sx={{
-            background: 'transparent',
-            backgroundColor: 'transparent'
+            background: "transparent",
+            backgroundColor: "transparent",
           }}
         >
           <IconButton
@@ -235,15 +235,15 @@ export default function Sidebar() {
             edge="start"
             sx={{
               marginRight: 5,
-              visibility: drawerOpen ? 'hidden' : 'visible',
+              visibility: drawerOpen ? "hidden" : "visible",
               opacity: drawerOpen ? 0 : 1,
-              transition: theme.transitions.create(['visibility', 'opacity'], {
+              transition: theme.transitions.create(["visibility", "opacity"], {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
               }),
-              color: '#FFC247',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 194, 71, 0.1)',
+              color: "#FFC247",
+              "&:hover": {
+                backgroundColor: "rgba(255, 194, 71, 0.1)",
               },
             }}
           >
@@ -251,8 +251,8 @@ export default function Sidebar() {
           </IconButton>
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
+              display: "flex",
+              alignItems: "center",
               gap: 2,
               flexGrow: 1,
             }}
@@ -261,18 +261,18 @@ export default function Sidebar() {
               sx={{
                 width: 40,
                 height: 40,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <img 
-                src={Logo} 
-                alt="DoTime Logo" 
+              <img
+                src={Logo}
+                alt="DoTime Logo"
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain'
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "contain",
                 }}
               />
             </Box>
@@ -281,8 +281,8 @@ export default function Sidebar() {
               noWrap
               component="div"
               sx={{
-                color: '#FFC247',
-                fontWeight: 'bold',
+                color: "#25283D",
+                fontWeight: "bold",
               }}
             >
               DoTime
@@ -292,9 +292,9 @@ export default function Sidebar() {
             color="inherit"
             onClick={handleNotificationClick}
             sx={{
-              color: '#FFC247',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 194, 71, 0.1)',
+              color: "#FFC247",
+              "&:hover": {
+                backgroundColor: "rgba(255, 194, 71, 0.1)",
               },
             }}
           >
@@ -313,49 +313,61 @@ export default function Sidebar() {
                 mt: 1.5,
                 width: 320,
                 maxHeight: 400,
-                backgroundColor: '#25283D',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                backgroundColor: "#25283D",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: 1,
-                overflow: 'auto',
-                '& .MuiMenuItem-root': {
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                overflow: "auto",
+                "& .MuiMenuItem-root": {
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
                   py: 1.5,
-                  '&:last-child': {
-                    borderBottom: 'none'
+                  "&:last-child": {
+                    borderBottom: "none",
                   },
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 194, 71, 0.1)',
-                  }
-                }
-              }
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 194, 71, 0.1)",
+                  },
+                },
+              },
             }}
-            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-              <Typography variant="subtitle1" sx={{ color: '#FFC247', fontWeight: 600 }}>
+            <Box
+              sx={{ p: 2, borderBottom: "1px solid rgba(255, 255, 255, 0.1)" }}
+            >
+              <Typography
+                variant="subtitle1"
+                sx={{ color: "#FFC247", fontWeight: 600 }}
+              >
                 Notificaciones
               </Typography>
             </Box>
             {notifications && notifications.length > 0 ? (
               notifications.map((notification, index) => (
-                <MenuItem 
-                  key={index}
-                  onClick={handleNotificationClose}
-                >
+                <MenuItem key={index} onClick={handleNotificationClose}>
                   <ListItemText
                     primary={
-                      <Typography variant="subtitle2" sx={{ color: 'white', mb: 0.5 }}>
-                        {notification.title || 'Nueva notificación'}
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: "white", mb: 0.5 }}
+                      >
+                        {notification.title || "Nueva notificación"}
                       </Typography>
                     }
                     secondary={
                       <Box>
-                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                          {notification.message || 'Tienes una nueva notificación'}
+                        <Typography
+                          variant="body2"
+                          sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+                        >
+                          {notification.message ||
+                            "Tienes una nueva notificación"}
                         </Typography>
                         {notification.time && (
-                          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5 }}>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.5)", mt: 0.5 }}
+                          >
                             {notification.time}
                           </Typography>
                         )}
@@ -365,8 +377,8 @@ export default function Sidebar() {
                 </MenuItem>
               ))
             ) : (
-              <Box sx={{ p: 3, textAlign: 'center' }}>
-                <Typography sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+              <Box sx={{ p: 3, textAlign: "center" }}>
+                <Typography sx={{ color: "rgba(255, 255, 255, 0.5)" }}>
                   No hay notificaciones
                 </Typography>
               </Box>
@@ -381,35 +393,35 @@ export default function Sidebar() {
         onClose={handleDrawerClose}
         PaperProps={{
           sx: {
-            backgroundColor: '#25283D',
-            color: 'white',
+            backgroundColor: "#25283D",
+            color: "white",
           },
         }}
       >
         <DrawerHeader
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
             px: 2.5,
-            position: 'relative',
+            position: "relative",
             minHeight: 64,
           }}
         >
-          <IconButton 
+          <IconButton
             onClick={handleDrawerClose}
             sx={{
-              color: '#FFC247',
-              position: 'absolute',
+              color: "#FFC247",
+              position: "absolute",
               right: 8,
-              visibility: !drawerOpen ? 'hidden' : 'visible',
+              visibility: !drawerOpen ? "hidden" : "visible",
               opacity: !drawerOpen ? 0 : 1,
-              transition: theme.transitions.create(['visibility', 'opacity'], {
+              transition: theme.transitions.create(["visibility", "opacity"], {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
               }),
-              '&:hover': {
-                backgroundColor: 'rgba(255, 194, 71, 0.1)',
+              "&:hover": {
+                backgroundColor: "rgba(255, 194, 71, 0.1)",
               },
             }}
           >
@@ -420,47 +432,49 @@ export default function Sidebar() {
         {user && (
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: drawerOpen ? 'flex-start' : 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: drawerOpen ? "flex-start" : "center",
               gap: 2,
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
               minHeight: 80,
               p: 2,
             }}
           >
             <Avatar
-              alt={user.displayName || 'Usuario'}
+              alt={user.displayName || "Usuario"}
               src={user.photoURL}
               sx={{
                 width: drawerOpen ? 45 : 50,
                 height: drawerOpen ? 45 : 50,
-                border: '2px solid #FFC247',
-                transition: 'all 0.2s ease-in-out',
+                border: "2px solid #FFC247",
+                transition: "all 0.2s ease-in-out",
               }}
             />
             {drawerOpen && (
-              <Box sx={{ minWidth: 0, flex: 1, width: '100%', overflow: 'hidden' }}>
+              <Box
+                sx={{ minWidth: 0, flex: 1, width: "100%", overflow: "hidden" }}
+              >
                 <Typography
                   variant="subtitle1"
                   sx={{
-                    color: 'white',
+                    color: "white",
                     fontWeight: 600,
-                    whiteSpace: 'normal',
-                    wordBreak: 'break-word',
-                    width: '100%',
-                    mb: 0.5
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    width: "100%",
+                    mb: 0.5,
                   }}
                 >
-                  {user.displayName || 'Usuario'}
+                  {user.displayName || "Usuario"}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    whiteSpace: 'normal',
-                    wordBreak: 'break-all',
-                    width: '100%'
+                    color: "rgba(255, 255, 255, 0.7)",
+                    whiteSpace: "normal",
+                    wordBreak: "break-all",
+                    width: "100%",
                   }}
                 >
                   {user.email}
@@ -489,11 +503,17 @@ export default function Sidebar() {
                   justifyContent: drawerOpen ? "initial" : "center",
                   px: 2.5,
                   borderRadius: 2,
-                  backgroundColor: location.pathname === item.path ? 'rgba(255, 194, 71, 0.1)' : 'transparent',
-                  color: location.pathname === item.path ? '#FFC247' : 'rgba(255, 255, 255, 0.7)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 194, 71, 0.1)',
-                    color: '#FFC247',
+                  backgroundColor:
+                    location.pathname === item.path
+                      ? "rgba(255, 194, 71, 0.1)"
+                      : "transparent",
+                  color:
+                    location.pathname === item.path
+                      ? "#FFC247"
+                      : "rgba(255, 255, 255, 0.7)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 194, 71, 0.1)",
+                    color: "#FFC247",
                   },
                 }}
               >
@@ -502,7 +522,7 @@ export default function Sidebar() {
                     minWidth: 0,
                     mr: drawerOpen ? 3 : "auto",
                     justifyContent: "center",
-                    color: 'inherit',
+                    color: "inherit",
                   }}
                 >
                   {item.icon}
@@ -511,7 +531,7 @@ export default function Sidebar() {
                   primary={item.text}
                   sx={{
                     opacity: drawerOpen ? 1 : 0,
-                    '& .MuiTypography-root': {
+                    "& .MuiTypography-root": {
                       fontWeight: location.pathname === item.path ? 600 : 400,
                     },
                   }}
@@ -536,10 +556,10 @@ export default function Sidebar() {
                 justifyContent: drawerOpen ? "initial" : "center",
                 px: 2.5,
                 borderRadius: 2,
-                color: 'rgba(255, 255, 255, 0.7)',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 194, 71, 0.1)',
-                  color: '#FFC247',
+                color: "rgba(255, 255, 255, 0.7)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 194, 71, 0.1)",
+                  color: "#FFC247",
                 },
               }}
             >
@@ -548,7 +568,7 @@ export default function Sidebar() {
                   minWidth: 0,
                   mr: drawerOpen ? 3 : "auto",
                   justifyContent: "center",
-                  color: 'inherit',
+                  color: "inherit",
                 }}
               >
                 <LogoutIcon />
