@@ -164,7 +164,14 @@ const FAQ = () => {
   };
 
   const handleCategoryClick = (category) => {
-    setSelectedCategory(selectedCategory === category ? null : category);
+    if (selectedCategory === category) {
+      setSelectedCategory(null);
+      setFilteredFaqs(faqsData);
+    } else {
+      setSelectedCategory(category);
+      const filtered = faqsData.filter((cat) => cat.categoria === category);
+      setFilteredFaqs(filtered);
+    }
     setSearchTerm("");
   };
 
@@ -207,10 +214,33 @@ const FAQ = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
             startAdornment: (
-              <SearchIcon sx={{ color: "action.active", mr: 1 }} />
+              <SearchIcon sx={{ color: "rgba(255, 255, 255, 0.7)", mr: 1 }} />
             ),
+            sx: {
+              color: '#ffffff',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+              },
+            }
           }}
-          sx={{ width: "100%", maxWidth: 500 }}
+          sx={{ 
+            width: "100%", 
+            maxWidth: 500,
+            '& .MuiInputBase-input': {
+              color: '#ffffff',
+              '&::placeholder': {
+                color: 'rgba(255, 255, 255, 0.5)',
+                opacity: 1,
+              },
+            },
+          }}
         />
       </Box>
 
@@ -231,43 +261,49 @@ const FAQ = () => {
                 sx={{
                   mb: 2,
                   border: 1,
-                  borderColor: "divider",
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: 1,
-                  overflow: "hidden",
+                  overflow: 'hidden',
+                  bgcolor: 'rgba(255, 255, 255, 0.05)',
                 }}
               >
                 <Box
                   onClick={() => toggleRespuesta(categoryIndex, questionIndex)}
                   sx={{
                     p: 2,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    bgcolor:
-                      activeIndex === `${categoryIndex}-${questionIndex}`
-                        ? "action.selected"
-                        : "background.paper",
-                    transition: "background-color 0.3s",
-                    "&:hover": {
-                      bgcolor: "action.hover",
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    bgcolor: activeIndex === `${categoryIndex}-${questionIndex}`
+                      ? 'rgba(255, 255, 255, 0.1)'
+                      : 'rgba(255, 255, 255, 0.05)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 255, 255, 0.15)',
                     },
                   }}
                 >
                   <Typography
                     variant="subtitle1"
                     component="div"
-                    sx={{ fontWeight: "medium" }}
+                    sx={{
+                      fontWeight: 'medium',
+                      color: '#ffffff',
+                    }}
                   >
                     {faq.pregunta}
                   </Typography>
                   <IconButton
                     sx={{
-                      transform:
-                        activeIndex === `${categoryIndex}-${questionIndex}`
-                          ? "rotate(180deg)"
-                          : "rotate(0)",
-                      transition: "transform 0.3s",
+                      transform: activeIndex === `${categoryIndex}-${questionIndex}`
+                        ? 'rotate(180deg)'
+                        : 'rotate(0)',
+                      transition: 'transform 0.3s, color 0.3s',
+                      color: '#ffc247',
+                      '&:hover': {
+                        color: '#ffd47f',
+                      },
                     }}
                     aria-label={
                       activeIndex === `${categoryIndex}-${questionIndex}`
@@ -281,8 +317,21 @@ const FAQ = () => {
                 <Collapse
                   in={activeIndex === `${categoryIndex}-${questionIndex}`}
                 >
-                  <Box sx={{ p: 2, bgcolor: "background.default" }}>
-                    <Typography variant="body1">{faq.respuesta}</Typography>
+                  <Box sx={{
+                    p: 2,
+                    bgcolor: 'rgba(255, 255, 255, 0.02)',
+                    borderTop: 1,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                  }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: 'rgba(255, 255, 255, 0.9)',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {faq.respuesta}
+                    </Typography>
                   </Box>
                 </Collapse>
               </Box>

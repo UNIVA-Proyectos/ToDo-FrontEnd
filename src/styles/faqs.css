@@ -50,6 +50,11 @@ body {
   color: #ffffff !important;
 }
 
+.faq-container .MuiTypography-h2 {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
 .faq-container .MuiTypography-subtitle1 {
   color: #ffffff !important;
   font-weight: 500 !important;
@@ -99,14 +104,18 @@ body {
   background-color: rgba(255, 255, 255, 0.05) !important;
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin: 4px;
+  transition: all 0.3s ease;
 }
 
 .faq-container .MuiChip-root:hover {
   background-color: rgba(255, 194, 71, 0.1) !important;
   border-color: rgba(255, 194, 71, 0.5) !important;
+  transform: scale(1.05);
 }
 
-.faq-container .MuiChip-root.Mui-selected {
+.faq-container .MuiChip-root.Mui-selected,
+.faq-container .MuiChip-root[aria-pressed="true"] {
   background-color: rgba(255, 194, 71, 0.2) !important;
   color: #ffc247 !important;
   border-color: #ffc247 !important;
@@ -134,6 +143,35 @@ body {
   border-color: #ffc247;
 }
 
+.faq-container .question-box {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.faq-container .question-box:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.faq-image {
+  max-width: 300px;
+  height: auto;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  opacity: 0.9;
+  transition: transform 0.3s ease;
+}
+
+.faq-image:hover {
+  transform: scale(1.03);
+  opacity: 1;
+}
+
 .contact {
   text-align: left;
   justify-content: space-between;
@@ -141,22 +179,6 @@ body {
   font-size: 0.9em;
   color: #333;
   padding-top: 10px; /* Añade algo de espacio encima si es necesario */
-}
-
-.faq-image {
-  max-width: 300px;
-  height: auto;
-  margin: 2rem auto;
-  display: block;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-  opacity: 0.9;
-}
-
-.faq-image:hover {
-  transform: scale(1.03);
-  opacity: 1;
 }
 
 .faq-list {
