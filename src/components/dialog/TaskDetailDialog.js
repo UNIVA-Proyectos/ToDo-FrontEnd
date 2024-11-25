@@ -37,6 +37,8 @@ import {
   faTrash,
   faCheck,
   faExclamation,
+  faMinus,
+  faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../config/firebase";
