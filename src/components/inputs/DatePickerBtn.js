@@ -6,7 +6,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { createTheme, TextField } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
 
-const DatePickerBtn = ({ handleSelectDate, customIcon }) => {
+const DatePickerBtn = ({ handleSelectDate, onSelectDate, customIcon }) => {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const elegantTheme = createTheme({
     palette: {
@@ -153,7 +153,9 @@ const DatePickerBtn = ({ handleSelectDate, customIcon }) => {
 
   const handleDateChange = (newValue) => {
     setSelectedDate(newValue);
-    handleSelectDate(newValue);
+    // Support both prop names for backward compatibility
+    if (handleSelectDate) handleSelectDate(newValue);
+    if (onSelectDate) onSelectDate(newValue);
   };
 
   return (

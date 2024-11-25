@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,6 +9,10 @@ import {
   faEllipsisV,
   faCheck,
   faShare,
+  faTrash,
+  faFlag,
+  faCircle,
+  faExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
 import TaskDetailDialog from "../dialog/TaskDetailDialog";
@@ -27,12 +31,18 @@ import {
   Fade,
   Avatar,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 
-const TaskCard = ({ task, deleteTask }) => {
-  const { titulo, descripcion, dueDate, estado, id } = task;
+const TaskCard = React.memo(({ task, deleteTask }) => {
+  const { titulo, descripcion, dueDate, estado, id, prioridad } = task;
   const [open, setOpen] = React.useState(false);
   const [shareDialogOpen, setShareDialogOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
   const { updateTaskStatus } = useUpdateTaskStatus(db);
@@ -42,46 +52,68 @@ const TaskCard = ({ task, deleteTask }) => {
   const isOverdue =
     dueDateFormatted && dueDateFormatted < new Date() && estado === "Pendiente";
 
-  const handleClick = (event) => {
+  const getPriorityIcon = (priority) => {
+    switch (priority) {
+      case "baja":
+        return { icon: faCircle, color: "#4CAF50" };
+      case "alta":
+        return { icon: faExclamation, color: "#f44336" };
+      default:
+        return { icon: faFlag, color: "#FFC247" };
+    }
+  };
+
+  const priorityInfo = getPriorityIcon(prioridad);
+
+  const handleClick = useCallback((event) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleDelete = (event) => {
+  const handleDelete = useCallback((event) => {
     event.stopPropagation();
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta tarea?")) {
-      deleteTask(task.id);
-    }
+    setDeleteDialogOpen(true);
     handleClose();
-  };
+  }, [handleClose]);
 
-  const handleToggleComplete = async (event) => {
+  const handleConfirmDelete = useCallback((event) => {
+    event.stopPropagation();
+    deleteTask(task.id);
+    setDeleteDialogOpen(false);
+  }, [deleteTask, task.id]);
+
+  const handleCancelDelete = useCallback((event) => {
+    event.stopPropagation();
+    setDeleteDialogOpen(false);
+  }, []);
+
+  const handleToggleComplete = useCallback(async (event) => {
     event.stopPropagation();
     const newStatus = estado === "Completada" ? "Pendiente" : "Completada";
     await updateTaskStatus(id, newStatus);
-  };
+  }, [estado, id, updateTaskStatus]);
 
-  const handleShare = (event) => {
+  const handleShare = useCallback((event) => {
     event.stopPropagation();
     setShareDialogOpen(true);
     handleClose();
-  };
+  }, [handleClose]);
 
-  const getStatusColor = () => {
+  const getStatusColor = useMemo(() => {
     if (estado === "Completada") return "success";
     if (isOverdue) return "error";
     return "warning";
-  };
+  }, [estado, isOverdue]);
 
-  const getStatusIcon = () => {
+  const getStatusIcon = useMemo(() => {
     if (estado === "Completada") return faCheckCircle;
     if (isOverdue) return faExclamationCircle;
     return faClock;
-  };
+  }, [estado, isOverdue]);
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -110,30 +142,40 @@ const TaskCard = ({ task, deleteTask }) => {
         }}
       >
         <CardContent sx={{ pb: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+          <Box sx={{ display: "flex", alignItems: "flex-start", mb: 2 }}>
             <Avatar
               sx={{
-                width: 40,
-                height: 40,
-                bgcolor: (theme) => theme.palette[getStatusColor()].light,
-                color: (theme) => theme.palette[getStatusColor()].main,
-                mr: 1.5,
+                width: 32,
+                height: 32,
+                bgcolor: (theme) => theme.palette[getStatusColor].light,
+                color: (theme) => theme.palette[getStatusColor].main,
+                mr: 2,
               }}
             >
-              <FontAwesomeIcon icon={getStatusIcon()} />
+              <FontAwesomeIcon icon={getStatusIcon} />
             </Avatar>
-            <Box sx={{ flex: 1 }}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography 
                 variant="h6" 
                 sx={{ 
                   fontSize: "1rem",
                   fontWeight: 600,
-                  mb: 0.5,
+                  mb: 1,
                   lineHeight: 1.2,
                   textDecoration: estado === "Completada" ? "line-through" : "none",
-                  color: estado === "Completada" ? "text.disabled" : "text.primary"
+                  color: estado === "Completada" ? "text.disabled" : "text.primary",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
                 }}
               >
+                <FontAwesomeIcon 
+                  icon={priorityInfo.icon} 
+                  style={{ 
+                    color: priorityInfo.color,
+                    fontSize: '0.8rem'
+                  }} 
+                />
                 {titulo}
               </Typography>
               {descripcion && (
@@ -141,7 +183,7 @@ const TaskCard = ({ task, deleteTask }) => {
                   variant="body2"
                   color="text.secondary"
                   sx={{
-                    mb: 1,
+                    mb: 1.5,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     display: "-webkit-box",
@@ -196,12 +238,18 @@ const TaskCard = ({ task, deleteTask }) => {
             </Box>
           </Box>
           
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mt: 2 }}>
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between", 
+            mt: 2,
+            gap: 2 
+          }}>
             <Chip
               size="small"
-              icon={<FontAwesomeIcon icon={getStatusIcon()} />}
+              icon={<FontAwesomeIcon icon={getStatusIcon} />}
               label={estado}
-              color={getStatusColor()}
+              color={getStatusColor}
               sx={{ height: 24 }}
             />
             {dueDateFormatted && (
@@ -253,9 +301,89 @@ const TaskCard = ({ task, deleteTask }) => {
         task={task}
         db={db}
       />
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleCancelDelete}
+        onClick={(e) => e.stopPropagation()}
+        PaperProps={{
+          sx: {
+            backgroundColor: '#25283D',
+            borderRadius: 2,
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: '#fff',
+            maxWidth: '400px',
+            width: '100%',
+            '& .MuiDialogTitle-root': {
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: 2,
+            },
+            '& .MuiDialogContent-root': {
+              padding: 3,
+            },
+            '& .MuiDialogActions-root': {
+              padding: 2,
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            },
+          },
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 1.5,
+          color: '#FF6B6B',
+          fontWeight: 600,
+        }}>
+          <FontAwesomeIcon icon={faTrash} />
+          Eliminar Tarea
+        </DialogTitle>
+        <DialogContent>
+          <Typography sx={{ mb: 2 }}>
+            ¿Estás seguro de que quieres eliminar esta tarea?
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              p: 1.5,
+              borderRadius: 1,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
+          >
+            {titulo}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={handleCancelDelete}
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              }
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleConfirmDelete}
+            sx={{
+              backgroundColor: '#FF6B6B',
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#ff5252',
+              }
+            }}
+          >
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
-};
+});
 
 TaskCard.propTypes = {
   task: PropTypes.shape({
@@ -264,6 +392,7 @@ TaskCard.propTypes = {
     descripcion: PropTypes.string,
     dueDate: PropTypes.object,
     estado: PropTypes.string.isRequired,
+    prioridad: PropTypes.string.isRequired,
   }).isRequired,
   deleteTask: PropTypes.func.isRequired,
 };

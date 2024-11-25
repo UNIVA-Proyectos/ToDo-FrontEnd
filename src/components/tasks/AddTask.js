@@ -1,6 +1,7 @@
 import React, { useState, forwardRef } from "react";
 import DatePickerBtn from "../inputs/DatePickerBtn";
 import SelectLabels from "../inputs/SelectLabels";
+import PrioritySelect from "../inputs/PrioritySelect";
 import {
   Dialog,
   DialogTitle,
@@ -14,14 +15,21 @@ import {
   Tooltip,
   Fade,
   Slide,
-  CircularProgress
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
   faTimes, 
   faCalendarAlt,
   faTags,
-  faPlus
+  faPlus,
+  faFlag,
+  faCircle,
+  faExclamation
 } from "@fortawesome/free-solid-svg-icons";
 import { generateTaskDescription } from "../../services/aiService";
 
@@ -35,11 +43,19 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
   const [selectedTags, setSelectedTags] = useState([]);
   const [showAIHelper, setShowAIHelper] = useState(false);
   const [isAILoading, setIsAILoading] = useState(false);
+  const [priority, setPriority] = useState("normal");
   
   // Inicializar la fecha con el día actual sin hora
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [taskDate, setTaskDate] = useState(today);
+
+  // Configuración de prioridades
+  const priorities = [
+    { value: "baja", label: "Baja", icon: faCircle, color: "#4CAF50" },
+    { value: "normal", label: "Normal", icon: faFlag, color: "#FFC247" },
+    { value: "alta", label: "Alta", icon: faExclamation, color: "#f44336" }
+  ];
 
   const handleDescriptionChange = async (e) => {
     const value = e.target.value;
@@ -78,8 +94,9 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
       descripcion: taskDescription.trim(),
       estado: "Pendiente",
       fechaCreacion: new Date(),
-      dueDate: taskDate, // Esta fecha ya no tendrá hora
+      dueDate: taskDate,
       complete: false,
+      priority: priority,
       tags: selectedTags && selectedTags.length > 0 
         ? selectedTags.map(tag => tag.value) 
         : []
@@ -94,7 +111,7 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
     setTaskName("");
     setTaskDescription("");
     setSelectedTags([]);
-    // Resetear la fecha al día actual sin hora
+    setPriority("normal");
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     setTaskDate(today);
@@ -214,43 +231,36 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
           <Box sx={{ 
             display: 'flex', 
             gap: 2,
-            alignItems: 'center'
+            alignItems: 'flex-start',
+            mt: 2
           }}>
-            <Tooltip title="Fecha de vencimiento">
-              <Box sx={{ 
-                display: 'inline-flex',
-                alignItems: 'center'
-              }}>
-                <DatePickerBtn 
-                  handleSelectDate={onSelectDate}
-                  customIcon={
-                    <FontAwesomeIcon 
-                      icon={faCalendarAlt} 
-                      style={{ marginRight: '8px' }}
-                    />
-                  }
-                />
-              </Box>
-            </Tooltip>
+            <Box sx={{ flex: 2 }}>
+              <SelectLabels
+                selectedTags={selectedTags}
+                setSelectedTags={setSelectedTags}
+                sx={{ width: '100%' }}
+              />
+            </Box>
 
-            <Tooltip title="Etiquetas">
-              <Box sx={{ 
-                display: 'inline-flex',
-                alignItems: 'center',
-                flex: 1
-              }}>
-                <SelectLabels
-                  selectedTags={selectedTags}
-                  setSelectedTags={setSelectedTags}
-                  customIcon={
-                    <FontAwesomeIcon 
-                      icon={faTags} 
-                      style={{ marginRight: '8px' }}
-                    />
-                  }
-                />
-              </Box>
-            </Tooltip>
+            <Box sx={{ flex: 1 }}>
+              <PrioritySelect
+                value={priority}
+                onChange={(value) => setPriority(value)}
+              />
+            </Box>
+          </Box>
+
+          <Box sx={{ 
+            display: 'flex', 
+            gap: 2,
+            alignItems: 'center',
+            mt: 2,
+            justifyContent: 'flex-start'
+          }}>
+            <DatePickerBtn
+              selectedDate={taskDate}
+              onSelectDate={onSelectDate}
+            />
           </Box>
         </Box>
       </DialogContent>

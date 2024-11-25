@@ -98,6 +98,7 @@ const Home = () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     const groups = {
+      vencidas: [],
       hoy: [],
       manana: [],
       proximos: [],
@@ -117,7 +118,9 @@ const Home = () => {
       const todayTime = today.getTime();
       const tomorrowTime = tomorrow.getTime();
       
-      if (taskTime === todayTime) {
+      if (taskTime < todayTime && task.estado !== "Completada") {
+        groups.vencidas.push(task);
+      } else if (taskTime === todayTime) {
         groups.hoy.push(task);
       } else if (taskTime === tomorrowTime) {
         groups.manana.push(task);
@@ -132,30 +135,39 @@ const Home = () => {
   const groups = filteredAndGroupedTasks();
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 } }}>
-      <Box sx={{ mb: { xs: 2, sm: 4 } }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 4 }, px: 0 }}>
+      <Box sx={{ mb: { xs: 2, sm: 4 }, pl: 0 }}>
         <Typography 
           variant="h4" 
           component="h1" 
           gutterBottom 
           sx={{ 
-            fontWeight: 'bold',
-            color: '#2C2C2C',
-            fontSize: { xs: '1.75rem', sm: '2.125rem' }
+            fontWeight: '800',
+            color: '#25283D',
+            fontSize: { xs: '1.75rem', sm: '2rem' },
+            textAlign: 'left',
+            width: '100%',
+            pl: 0,
+            ml: 0,
+            mb: 1,
+            letterSpacing: '-0.5px'
           }}
         >
           {userLoading ? (
             <CircularProgress size={24} sx={{ mr: 2 }} />
           ) : (
-            <>Hola, {displayName.split(" ").slice(0, 2).join(" ")}</>
+            <>¡Hola, {displayName}!</>
           )}
         </Typography>
         <Typography 
-          variant="subtitle1" 
-          gutterBottom
+          variant="h6" 
           sx={{ 
-            color: '#424242',
-            fontSize: { xs: '0.875rem', sm: '1rem' }
+            color: '#666',
+            fontSize: { xs: '1.1rem', sm: '1.25rem' },
+            fontWeight: '500',
+            mb: 4,
+            opacity: 0.9,
+            pl: 0
           }}
         >
           Aquí está el resumen de tus tareas
@@ -178,8 +190,19 @@ const Home = () => {
               p: { xs: 2, sm: 3 }, 
               mb: { xs: 2, sm: 3 },
               backgroundColor: '#25283D',
-              borderRadius: 2,
-              border: '1px solid rgba(255, 255, 255, 0.1)'
+              borderRadius: 3,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
+                background: 'linear-gradient(90deg, #FFC247 0%, #FFB014 100%)',
+              }
             }}
           >
             <Box sx={{ 
@@ -188,24 +211,68 @@ const Home = () => {
               gap: { xs: 2, sm: 0 },
               justifyContent: 'space-between',
               alignItems: { xs: 'stretch', sm: 'center' },
-              mb: 3
+              mb: 4,
+              pb: 3,
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              position: 'relative'
             }}>
-              <Typography 
-                variant="h6" 
-                component="h2" 
-                sx={{ 
-                  fontWeight: 600,
-                  color: '#FFC247'
-                }}
-              >
-                Mis Tareas
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography 
+                  variant="h5" 
+                  component="h2" 
+                  sx={{ 
+                    fontWeight: 700,
+                    color: '#FFC247',
+                    fontSize: { xs: '1.5rem', sm: '1.75rem' },
+                    letterSpacing: '-0.01em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -8,
+                      left: 0,
+                      width: '40%',
+                      height: '2px',
+                      background: 'linear-gradient(90deg, #FFC247 0%, transparent 100%)',
+                      borderRadius: '2px'
+                    }
+                  }}
+                >
+                  Mis Tareas
+                </Typography>
+                <Box 
+                  sx={{ 
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                    border: '1px solid rgba(255, 194, 71, 0.2)',
+                  }}
+                >
+                  <Typography
+                    sx={{ 
+                      fontSize: '0.875rem',
+                      color: 'rgba(255, 194, 71, 0.8)',
+                      fontWeight: 500
+                    }}
+                  >
+                    {tasks.length} {tasks.length === 1 ? 'tarea' : 'tareas'}
+                  </Typography>
+                </Box>
+              </Box>
               <Box 
                 sx={{ 
                   display: 'flex', 
                   gap: 2, 
                   alignItems: 'center',
-                  justifyContent: 'flex-end'
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  borderRadius: 2,
+                  padding: '8px 16px',
+                  border: '1px solid rgba(255, 255, 255, 0.05)'
                 }}
               >
                 <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -455,21 +522,170 @@ const Home = () => {
                 xs: '1fr',
                 md: 'repeat(3, 1fr)'
               },
-              gap: 3,
+              gap: 4,
+              '& > *': {
+                minWidth: '280px',
+                background: 'rgba(255, 255, 255, 0.02)',
+                borderRadius: 2,
+                padding: 2,
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                height: 'fit-content',
+                position: 'relative',
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                }
+              }
             }}>
+              {/* Columna Vencidas */}
+              <Box>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 3,
+                    color: '#FF6B6B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    fontWeight: 600,
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -8,
+                      left: 0,
+                      width: '100%',
+                      height: '1px',
+                      background: 'linear-gradient(90deg, rgba(255, 107, 107, 0.3) 0%, transparent 100%)',
+                    }
+                  }}
+                >
+                  <Box 
+                    sx={{ 
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: '#FF6B6B',
+                      boxShadow: '0 0 8px rgba(255, 107, 107, 0.5)',
+                    }} 
+                  />
+                  Vencidas
+                  {groups.vencidas.length > 0 && (
+                    <Box
+                      sx={{
+                        ml: 'auto',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        color: '#FF6B6B',
+                        borderRadius: '12px',
+                        padding: '2px 8px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        minWidth: 20,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {groups.vencidas.length}
+                    </Box>
+                  )}
+                </Typography>
+                <Box 
+                  sx={{ 
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    minHeight: 200,
+                  }}
+                >
+                  {groups.vencidas.length > 0 ? (
+                    groups.vencidas.map((task) => (
+                      <Fade in key={task.id} timeout={300}>
+                        <Box>
+                          <TaskCard
+                            task={task}
+                            deleteTask={deleteTask}
+                          />
+                        </Box>
+                      </Fade>
+                    ))
+                  ) : (
+                    <Box 
+                      sx={{ 
+                        height: '100%',
+                        minHeight: '100px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        borderRadius: 2,
+                        p: 2,
+                      }}
+                    >
+                      <Typography 
+                        sx={{ 
+                          color: 'rgba(255, 255, 255, 0.5)',
+                          textAlign: 'center',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.5
+                        }}
+                      >
+                        No hay tareas vencidas
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+
               {/* Columna Hoy */}
               <Box>
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    mb: 2, 
+                    mb: 3,
                     color: '#FFC247',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1.5,
+                    fontWeight: 600,
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -8,
+                      left: 0,
+                      width: '100%',
+                      height: '1px',
+                      background: 'linear-gradient(90deg, rgba(255, 194, 71, 0.3) 0%, transparent 100%)',
+                    }
                   }}
                 >
+                  <Box 
+                    sx={{ 
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: '#FFC247',
+                      boxShadow: '0 0 8px rgba(255, 194, 71, 0.5)',
+                    }} 
+                  />
                   Hoy
+                  {groups.hoy.length > 0 && (
+                    <Box
+                      sx={{
+                        ml: 'auto',
+                        backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                        color: '#FFC247',
+                        borderRadius: '12px',
+                        padding: '2px 8px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        minWidth: 20,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {groups.hoy.length}
+                    </Box>
+                  )}
                 </Typography>
                 <Box 
                   sx={{ 
@@ -494,6 +710,7 @@ const Home = () => {
                     <Box 
                       sx={{ 
                         height: '100%',
+                        minHeight: '100px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -505,7 +722,9 @@ const Home = () => {
                       <Typography 
                         sx={{ 
                           color: 'rgba(255, 255, 255, 0.5)',
-                          textAlign: 'center'
+                          textAlign: 'center',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.5
                         }}
                       >
                         No hay tareas para hoy
@@ -520,14 +739,51 @@ const Home = () => {
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    mb: 2, 
+                    mb: 3,
                     color: '#FFC247',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1.5,
+                    fontWeight: 600,
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -8,
+                      left: 0,
+                      width: '100%',
+                      height: '1px',
+                      background: 'linear-gradient(90deg, rgba(255, 194, 71, 0.3) 0%, transparent 100%)',
+                    }
                   }}
                 >
+                  <Box 
+                    sx={{ 
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: '#FFC247',
+                      boxShadow: '0 0 8px rgba(255, 194, 71, 0.5)',
+                    }} 
+                  />
                   Mañana
+                  {groups.manana.length > 0 && (
+                    <Box
+                      sx={{
+                        ml: 'auto',
+                        backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                        color: '#FFC247',
+                        borderRadius: '12px',
+                        padding: '2px 8px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        minWidth: 20,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {groups.manana.length}
+                    </Box>
+                  )}
                 </Typography>
                 <Box 
                   sx={{ 
@@ -552,6 +808,7 @@ const Home = () => {
                     <Box 
                       sx={{ 
                         height: '100%',
+                        minHeight: '100px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -563,7 +820,9 @@ const Home = () => {
                       <Typography 
                         sx={{ 
                           color: 'rgba(255, 255, 255, 0.5)',
-                          textAlign: 'center'
+                          textAlign: 'center',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.5
                         }}
                       >
                         No hay tareas para mañana
@@ -578,14 +837,51 @@ const Home = () => {
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    mb: 2, 
+                    mb: 3,
                     color: '#FFC247',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1.5,
+                    fontWeight: 600,
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -8,
+                      left: 0,
+                      width: '100%',
+                      height: '1px',
+                      background: 'linear-gradient(90deg, rgba(255, 194, 71, 0.3) 0%, transparent 100%)',
+                    }
                   }}
                 >
+                  <Box 
+                    sx={{ 
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: '#FFC247',
+                      boxShadow: '0 0 8px rgba(255, 194, 71, 0.5)',
+                    }} 
+                  />
                   Próximos días
+                  {groups.proximos.length > 0 && (
+                    <Box
+                      sx={{
+                        ml: 'auto',
+                        backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                        color: '#FFC247',
+                        borderRadius: '12px',
+                        padding: '2px 8px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        minWidth: 20,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {groups.proximos.length}
+                    </Box>
+                  )}
                 </Typography>
                 <Box 
                   sx={{ 
@@ -610,6 +906,7 @@ const Home = () => {
                     <Box 
                       sx={{ 
                         height: '100%',
+                        minHeight: '100px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -621,10 +918,12 @@ const Home = () => {
                       <Typography 
                         sx={{ 
                           color: 'rgba(255, 255, 255, 0.5)',
-                          textAlign: 'center'
+                          textAlign: 'center',
+                          fontSize: '0.875rem',
+                          lineHeight: 1.5
                         }}
                       >
-                        No hay tareas programadas
+                        No hay tareas próximas
                       </Typography>
                     </Box>
                   )}
@@ -638,14 +937,51 @@ const Home = () => {
                 <Typography 
                   variant="h6" 
                   sx={{ 
-                    mb: 2, 
+                    mb: 3,
                     color: '#FFC247',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1.5,
+                    fontWeight: 600,
+                    position: 'relative',
+                    '&::after': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: -8,
+                      left: 0,
+                      width: '100%',
+                      height: '1px',
+                      background: 'linear-gradient(90deg, rgba(255, 194, 71, 0.3) 0%, transparent 100%)',
+                    }
                   }}
                 >
+                  <Box 
+                    sx={{ 
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: '#FFC247',
+                      boxShadow: '0 0 8px rgba(255, 194, 71, 0.5)',
+                    }} 
+                  />
                   Sin fecha asignada
+                  {groups.sinFecha.length > 0 && (
+                    <Box
+                      sx={{
+                        ml: 'auto',
+                        backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                        color: '#FFC247',
+                        borderRadius: '12px',
+                        padding: '2px 8px',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        minWidth: 20,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {groups.sinFecha.length}
+                    </Box>
+                  )}
                 </Typography>
                 <Box 
                   sx={{ 
