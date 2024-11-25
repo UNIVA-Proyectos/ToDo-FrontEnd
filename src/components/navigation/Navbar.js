@@ -57,19 +57,19 @@ export default function MobileNavigation() {
         />
         <BottomNavigationAction
           label="Configuración"
-          value="/configuracion"
+          value="/settings"
           icon={<SettingsIcon />}
           sx={{
-            color: value === "/configuracion" ? "#ffc247" : "white",
+            color: value === "/settings" ? "#ffc247" : "white",
             "&.Mui-selected": { color: "#ffc247" },
           }}
         />
         <BottomNavigationAction
           label="Soporte"
-          value="/soporte"
+          value="/help"
           icon={<HelpIcon />}
           sx={{
-            color: value === "/soporte" ? "#ffc247" : "white",
+            color: value === "/help" ? "#ffc247" : "white",
             "&.Mui-selected": { color: "#ffc247" },
           }}
         />
