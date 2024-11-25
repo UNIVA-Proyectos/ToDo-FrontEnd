@@ -89,6 +89,8 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
       return;
     }
 
+    console.log("Priority value before creating task:", priority); // Debug line
+
     const taskWithTags = {
       titulo: taskName.trim(),
       descripcion: taskDescription.trim(),
@@ -101,6 +103,8 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
         ? selectedTags.map(tag => tag.value) 
         : []
     };
+
+    console.log("Task object being sent:", taskWithTags); // Debug line
 
     addTask(taskWithTags);
     resetForm();

@@ -77,6 +77,9 @@ const customStyles = {
     cursor: "pointer",
     borderRadius: "4px",
     margin: "2px 0",
+    "& svg": {
+      color: isSelected ? "white !important" : `${data.color} !important`
+    },
     "&:hover": {
       backgroundColor: data.color,
       color: "white",
@@ -97,6 +100,32 @@ const customStyles = {
     "& svg": {
       color: "white !important"
     }
+  }),
+  multiValue: (styles, { data }) => ({
+    ...styles,
+    backgroundColor: data.color,
+    borderRadius: "15px",
+    padding: "2px 2px 2px 8px",
+    margin: "2px 4px 2px 0",
+    "& svg": {
+      color: "white !important"
+    }
+  }),
+  multiValueLabel: (styles) => ({
+    ...styles,
+    color: "white",
+    fontSize: "0.875rem",
+    padding: "0",
+  }),
+  multiValueRemove: (styles, { data }) => ({
+    ...styles,
+    color: "white",
+    borderRadius: "0 15px 15px 0",
+    padding: "0 6px",
+    "&:hover": {
+      backgroundColor: "rgba(0, 0, 0, 0.2)",
+      color: "white",
+    },
   }),
   input: (provided) => ({
     ...provided,
@@ -130,7 +159,7 @@ const customStyles = {
   }),
 };
 
-const PrioritySelect = ({ value, onChange }) => {
+const PrioritySelect = ({ value, onChange, isDisabled }) => {
   const selectedOption = priorities.find(p => p.value === value);
 
   return (
@@ -150,6 +179,7 @@ const PrioritySelect = ({ value, onChange }) => {
         isSearchable={false}
         menuPortalTarget={document.body}
         menuPosition="fixed"
+        isDisabled={isDisabled}
       />
     </div>
   );

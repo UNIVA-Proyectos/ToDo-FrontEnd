@@ -29,6 +29,7 @@ const useTasks = (db, user) => {
       estado: taskData.estado || 'Pendiente',
       tags: Array.isArray(taskData.tags) ? taskData.tags : [],
       dueDate: taskData.dueDate || null,
+      priority: taskData.priority || 'normal',
       user_id: taskData.user_id,
       sharedWith: taskData.sharedWith || [],
       isShared: taskData.user_id !== user.uid,

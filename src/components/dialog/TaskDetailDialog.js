@@ -131,6 +131,34 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
         return <FontAwesomeIcon icon={faFolderOpen} />;
     };
 
+    const getPriorityIcon = () => {
+        if (!task) return null;
+        switch (task.priority || "normal") {
+            case "alta":
+                return <FontAwesomeIcon icon={faExclamation} style={{ color: "#f44336" }} />;
+            case "normal":
+                return <FontAwesomeIcon icon={faMinus} style={{ color: "#FFC247" }} />;
+            case "baja":
+                return <FontAwesomeIcon icon={faArrowDown} style={{ color: "#4CAF50" }} />;
+            default:
+                return <FontAwesomeIcon icon={faMinus} style={{ color: "#FFC247" }} />;
+        }
+    };
+
+    const getPriorityLabel = () => {
+        if (!task) return "No asignada";
+        switch (task.priority || "normal") {
+            case "alta":
+                return "Alta";
+            case "normal":
+                return "Normal";
+            case "baja":
+                return "Baja";
+            default:
+                return "Normal";
+        }
+    };
+
     // Función para manejar la apertura del diálogo de confirmación
     const handleDeleteClick = () => {
         setConfirmDialogOpen(true);
