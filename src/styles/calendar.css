@@ -519,25 +519,26 @@
 .fc-agenda-date-cell {
   font-weight: 600;
   color: #ffffff !important;
-  width: 290px; /* Ajustar el ancho para pantallas pequeñas */
+  width: 220px; /* Ajustar el ancho para pantallas pequeñas */
   font-size: 0.9em; /* Ajustar el tamaño de fuente para pantallas pequeñas */
 }
+
 .calendar-container {
   display: flex;
   justify-content: center; /* Centra horizontalmente */
   align-items: center; /* Centra verticalmente */
   height: 100vh; /* O la altura que desees */
 }
+
 .fc .fc-button-primary {
   /* ... otros estilos ... */
   min-width: 80px; /* Ajusta el valor según sea necesario */
 }
+
 .fc-agenda-date-cell {
   /* ... otros estilos ... */
   width: 220px; /* Ajusta el valor según sea necesario */
 }
-<<<<<<< Updated upstream
-=======
 
 .agenda-event-title {
   flex: 1;
@@ -794,4 +795,3 @@
 .MuiTooltip-popper {
   z-index: 10001 !important;
 }
->>>>>>> Stashed changes
