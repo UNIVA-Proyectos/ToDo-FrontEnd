@@ -69,22 +69,25 @@ const AppLogin = () => {
     }
   }, [navigate]);
 
-  const handleResize = () => {
-    setIsMobile(window.innerWidth <= 768);
-  };
-
   useEffect(() => {
-    // Initial setup
-    handleResize();
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
 
-    // Add event listener
+    handleResize();
     window.addEventListener("resize", handleResize);
 
-    // Cleanup
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const togglePanel = (isActive) => setIsRightPanelActive(isActive);
+  const togglePanel = (isActive) => {
+    if (!isMobile) {
+      setIsRightPanelActive(isActive);
+    } else {
+      // En móvil, simplemente cambiamos el estado sin animación
+      setIsRightPanelActive(isActive);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -362,10 +365,7 @@ const AppLogin = () => {
         </div>
 
         <div className="overlay-container">
-          <div
-            className="overlay"
-            style={{ width: isMobile ? "120%" : "150%" }}
-          >
+          <div className="overlay">
             <div className="overlay-panel overlay-left">
               <h1>¡Bienvenido de nuevo!</h1>
               <p>
