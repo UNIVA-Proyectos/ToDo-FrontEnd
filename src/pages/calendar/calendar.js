@@ -272,7 +272,7 @@ const PageCalendar = () => {
             ]}
             initialView="dayGridMonth"
             headerToolbar={{
-              left: "prev,next today",
+              left: "prev,today,next",
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
             }}
@@ -282,39 +282,37 @@ const PageCalendar = () => {
             eventClick={handleEventClick}
             dateClick={handleDateClick}
             height="100%"
-            themeSystem="standard"
-            dayMaxEvents={true}
+            dayMaxEventRows={2}
             moreLinkText={count => `${count} más`}
             moreLinkClick="popover"
             views={{
-              dayGrid: {
-                moreLinkClassNames: 'custom-more-link',
-                moreLinkContent: ({ num }) => {
-                  return {
-                    html: `<span style="
-                      background: rgba(255, 255, 255, 0.1);
-                      padding: 2px 8px;
-                      border-radius: 12px;
-                      font-size: 0.8rem;
-                      color: rgba(255, 255, 255, 0.9);
-                      font-weight: 500;
-                    ">${num} más</span>`
-                  }
-                }
+              timeGridWeek: {
+                dayMaxEventRows: 2,
+                moreLinkText: count => `${count} más`
+              },
+              dayGridMonth: {
+                dayMaxEventRows: 2,
+                moreLinkText: count => `${count} más`
               }
             }}
-            eventTimeFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
-              meridiem: false,
-              hour12: false
-            }}
+            slotDuration="00:30:00"
+            slotMinTime="06:00:00"
+            slotMaxTime="22:00:00"
+            expandRows={true}
+            allDaySlot={false}
+            nowIndicator={true}
             buttonText={{
               today: "Hoy",
               month: "Mes",
               week: "Semana",
               day: "Día",
               list: "Lista"
+            }}
+            eventTimeFormat={{
+              hour: "2-digit",
+              minute: "2-digit",
+              meridiem: false,
+              hour12: false
             }}
             slotLabelFormat={{
               hour: "2-digit",
