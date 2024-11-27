@@ -397,7 +397,7 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
             <Button
               variant="contained"
               sx={{
-                background: "linear-gradient(to right, #2196f3, #e91e63)",
+                backgroundColor: "#2196f3",
                 color: "white",
                 fontWeight: "bold",
                 textTransform: "none",
