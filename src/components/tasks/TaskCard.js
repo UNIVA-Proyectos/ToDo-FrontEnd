@@ -166,17 +166,34 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
                   color: estado === "Completada" ? "text.disabled" : "text.primary",
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1
+                  gap: 1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '100%'
                 }}
+                title={titulo}  
               >
-                <FontAwesomeIcon 
-                  icon={priorityInfo.icon} 
-                  style={{ 
-                    color: priorityInfo.color,
-                    fontSize: '0.8rem'
-                  }} 
-                />
-                {titulo}
+                <Box component="span" sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  flexShrink: 0 
+                }}>
+                  <FontAwesomeIcon 
+                    icon={priorityInfo.icon} 
+                    style={{ 
+                      color: priorityInfo.color,
+                      fontSize: '0.8rem'
+                    }} 
+                  />
+                </Box>
+                <Box component="span" sx={{ 
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {titulo}
+                </Box>
               </Typography>
               {descripcion && (
                 <Typography
