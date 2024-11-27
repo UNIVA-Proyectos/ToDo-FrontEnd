@@ -20,19 +20,9 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/login.css";
 import logo from "../../assets/To-Do-Logo.png";
 
-const overlay = document.querySelector(".overlay");
-
-// Ajustar dinámicamente el ancho del overlay al cargar la página
-window.addEventListener("resize", () => {
-  if (window.innerWidth < 768) {
-    overlay.style.width = "120%"; // Cambia el tamaño según el ancho de pantalla
-  } else {
-    overlay.style.width = "150%";
-  }
-});
-
 const AppLogin = () => {
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -78,6 +68,21 @@ const AppLogin = () => {
       setCredentials((prev) => ({ ...prev, email: lastEmail }));
     }
   }, [navigate]);
+
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  useEffect(() => {
+    // Initial setup
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const togglePanel = (isActive) => setIsRightPanelActive(isActive);
 
@@ -357,7 +362,10 @@ const AppLogin = () => {
         </div>
 
         <div className="overlay-container">
-          <div className="overlay">
+          <div
+            className="overlay"
+            style={{ width: isMobile ? "120%" : "150%" }}
+          >
             <div className="overlay-panel overlay-left">
               <h1>¡Bienvenido de nuevo!</h1>
               <p>

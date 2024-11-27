@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -22,9 +22,31 @@ import { useTheme, useMediaQuery } from "@mui/material";
 // Componente para la página de login que selecciona la versión correcta según el dispositivo
 const LoginPage = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  
-  return isMobile ? <MobileLogin /> : <Login />;
+  const [mounted, setMounted] = useState(false);
+  const [showMobile, setShowMobile] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const checkMobile = () => {
+      const isMobile = window.innerWidth < 600;
+      setShowMobile(isMobile);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      setMounted(false);
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  if (!mounted) return null;
+
+  const MobileLoginMemo = React.memo(MobileLogin);
+  const LoginMemo = React.memo(Login);
+
+  return showMobile ? <MobileLoginMemo /> : <LoginMemo />;
 };
 
 // Componente para proteger rutas privadas
