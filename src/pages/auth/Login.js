@@ -1,23 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { 
-  auth, 
-  db, 
-  googleProvider, 
-  facebookProvider 
+import {
+  auth,
+  db,
+  googleProvider,
+  facebookProvider,
 } from "../../config/firebase";
-import { 
+import {
   signInWithEmailAndPassword,
   signInWithPopup,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   setPersistence,
-  browserSessionPersistence
+  browserSessionPersistence,
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/login.css";
+import logo from "../../assets/To-Do-Logo.png";
+
+const overlay = document.querySelector(".overlay");
+
+// Ajustar dinámicamente el ancho del overlay al cargar la página
+window.addEventListener("resize", () => {
+  if (window.innerWidth < 768) {
+    overlay.style.width = "120%"; // Cambia el tamaño según el ancho de pantalla
+  } else {
+    overlay.style.width = "150%";
+  }
+});
 
 const AppLogin = () => {
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
@@ -73,12 +85,12 @@ const AppLogin = () => {
     const { name, value } = e.target;
     setCredentials((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: !value }));
-    
-    if (name === 'password') {
+
+    if (name === "password") {
       setPasswordStrength(calculatePasswordStrength(value));
     }
-    if (name === 'email') {
-      setErrors(prev => ({ ...prev, email: !isValidEmail(value) }));
+    if (name === "email") {
+      setErrors((prev) => ({ ...prev, email: !isValidEmail(value) }));
     }
   };
 
@@ -111,7 +123,9 @@ const AppLogin = () => {
       setMessage(`Inicio de sesión con ${provider.providerId} exitoso.`);
       navigate("/home");
     } catch (error) {
-      setMessage(`Error al autenticar con ${provider.providerId}: ${error.message}`);
+      setMessage(
+        `Error al autenticar con ${provider.providerId}: ${error.message}`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -121,8 +135,14 @@ const AppLogin = () => {
     if (!validateFields()) return;
     setIsLoading(true);
     try {
-      const authFunc = isSignUp ? createUserWithEmailAndPassword : signInWithEmailAndPassword;
-      const { user } = await authFunc(auth, credentials.email, credentials.password);
+      const authFunc = isSignUp
+        ? createUserWithEmailAndPassword
+        : signInWithEmailAndPassword;
+      const { user } = await authFunc(
+        auth,
+        credentials.email,
+        credentials.password
+      );
       if (isSignUp) await saveUser(user, "email");
       localStorage.setItem("lastEmail", credentials.email);
       setMessage(`${isSignUp ? "Registro" : "Inicio de sesión"} exitoso.`);
@@ -184,18 +204,13 @@ const AppLogin = () => {
   return (
     <div className="login-container">
       <div
-        className={`container ${
-          isRightPanelActive ? "right-panel-active" : ""
-        }`}
+        className={`container ${isRightPanelActive ? "right-panel-active" : ""}`}
       >
         <div className="form-container sign-in-container">
           <form>
+            <img src={logo} alt="MyDoTime Logo" className="auth-logo" />
             <h1>Iniciar Sesión</h1>
-            {message && (
-              <p className="message error-message">
-                {message}
-              </p>
-            )}
+            {message && <p className="message error-message">{message}</p>}
             <div className="social-container">
               <a
                 href="#"
@@ -263,12 +278,9 @@ const AppLogin = () => {
 
         <div className="form-container sign-up-container">
           <form>
+            <img src={logo} alt="MyDoTime Logo" className="auth-logo" />
             <h1>Crear Cuenta</h1>
-            {message && (
-              <p className="message error-message">
-                {message}
-              </p>
-            )}
+            {message && <p className="message error-message">{message}</p>}
             <div className="social-container">
               <a
                 href="#"
