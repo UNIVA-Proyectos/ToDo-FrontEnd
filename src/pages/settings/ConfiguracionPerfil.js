@@ -14,6 +14,11 @@ import SaveIcon from "@mui/icons-material/Save";
 import LockIcon from "@mui/icons-material/Lock";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 function ConfiguracionPerfil() {
   const { userData, loading } = useUserData();
@@ -21,14 +26,27 @@ function ConfiguracionPerfil() {
 
   const [name, setNombre] = useState("");
   const [user] = useAuthState(auth);
-  const [photoURL, setPhotoURL] = useState("");
-  const [fechaNacimiento, setFechaNacimiento] = useState(new Date());
-  const [genero, setGenero] = useState("");
-  const [telefono, setTelefono] = useState("");
+  const [photoURL, setPhotoURL] = useState(userData?.photoURL || "");
+  const [fechaNacimiento, setFechaNacimiento] = useState(userData?.fechaNacimiento || "");
+  const [genero, setGenero] = useState(userData?.genero || "");
+  const [telefono, setTelefono] = useState(userData?.telefono || "");
   const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [crop, setCrop] = useState({
+    unit: '%',
+    width: 50,
+    aspect: 1
+  });
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const imgRef = useRef(null);
+  const previewCanvasRef = useRef(null);
+  const [openImageEditor, setOpenImageEditor] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('success');
 
   // Estados para el cambio de contraseña
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
@@ -90,102 +108,150 @@ function ConfiguracionPerfil() {
       telefono,
     };
     await updateUserData(updatedData);
-    alert("Datos actualizados con éxito.");
+    setAlertMessage("Datos actualizados con éxito.");
+    setAlertSeverity('success');
+    setOpenAlert(true);
   };
 
-  const handleChangePhoto = async (e) => {
+  // Función para manejar la selección inicial de la imagen
+  const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith("image/")) {
-      alert("Por favor selecciona una imagen válida.");
-      return;
-    }
-    if (!userData?.uid) {
-      alert("Usuario no encontrado. Inténtalo de nuevo.");
+      setAlertMessage("Por favor selecciona una imagen válida.");
+      setAlertSeverity('error');
+      setOpenAlert(true);
       return;
     }
 
-    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSelectedImage(reader.result);
+      setOpenImageEditor(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Función para cargar la imagen cuando se complete
+  const onImageLoad = (e) => {
+    imgRef.current = e.target;
+    const { width, height } = e.target;
+    const crop = {
+      unit: '%',
+      width: 90,
+      x: 5,
+      y: 5,
+      aspect: 1
+    };
+    setCrop(crop);
+  };
+
+  // Función para generar la vista previa
+  const generatePreview = async () => {
+    if (!completedCrop || !imgRef.current || !previewCanvasRef.current) return;
+
+    const image = imgRef.current;
+    const canvas = previewCanvasRef.current;
+    const crop = completedCrop;
+
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+
+    ctx.drawImage(
+      image,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    );
+  };
+
+  // Función para subir la imagen recortada
+  const handleUpload = async () => {
+    if (!completedCrop || !imgRef.current) {
+      setAlertMessage("Por favor, selecciona y recorta la imagen primero.");
+      setAlertSeverity('error');
+      setOpenAlert(true);
+      return;
+    }
 
     try {
-      // Validar el tamaño del archivo (máximo 5MB)
-      const MAX_SIZE = 5 * 1024 * 1024; // 5MB en bytes
-      if (file.size > MAX_SIZE) {
-        throw new Error("El archivo es demasiado grande. El tamaño máximo es 5MB.");
+      if (!userData || !userData.uid) {
+        throw new Error("Usuario no autenticado");
       }
 
-      // Validar el tipo de archivo
-      const fileExtension = file.name.split('.').pop().toLowerCase();
-      const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-      
-      if (!allowedExtensions.includes(fileExtension)) {
-        throw new Error("Formato de archivo no válido. Use: JPG, PNG, GIF o WEBP.");
-      }
+      setIsUploading(true);
 
-      // Crear nombre de archivo seguro
-      const safeFileName = `${userData.uid.replace(/[^a-zA-Z0-9]/g, '')}_${Date.now()}.${fileExtension}`;
-      const filePath = `profilePictures/${safeFileName}`;
-      
-      console.log('Creando referencia de storage para:', filePath);
+      // Crear un canvas con la imagen recortada
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const image = imgRef.current;
+
+      const scaleX = image.naturalWidth / image.width;
+      const scaleY = image.naturalHeight / image.height;
+
+      canvas.width = completedCrop.width;
+      canvas.height = completedCrop.height;
+
+      ctx.drawImage(
+        image,
+        completedCrop.x * scaleX,
+        completedCrop.y * scaleY,
+        completedCrop.width * scaleX,
+        completedCrop.height * scaleY,
+        0,
+        0,
+        completedCrop.width,
+        completedCrop.height
+      );
+
+      // Convertir el canvas a Blob
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+      const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+
+      // Subir a Firebase
+      const timestamp = Date.now();
+      const fileName = `${timestamp}.jpg`;
+      const filePath = `profilePictures/${fileName}`;
       const storageRef = ref(storage, filePath);
 
-      // Configurar los metadatos
-      const metadata = {
-        contentType: file.type,
-        cacheControl: 'public,max-age=7200',
-        customMetadata: {
-          'uploadedBy': userData.uid,
-          'uploadTime': new Date().toISOString()
-        }
-      };
+      const uploadResult = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(uploadResult.ref);
 
-      // Subir el archivo
-      console.log('Iniciando subida de archivo...');
-      const uploadTask = await uploadBytes(storageRef, file, metadata);
-      console.log('Archivo subido exitosamente:', uploadTask);
-
-      // Esperar un momento antes de obtener la URL
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Obtener la URL de descarga
-      console.log('Obteniendo URL de descarga...');
-      const downloadURL = await getDownloadURL(uploadTask.ref);
-      console.log('URL de descarga obtenida:', downloadURL);
-
-      // Actualizar el estado y Firestore
+      // Actualizar perfil
       setPhotoURL(downloadURL);
       await updateUserData({
         photoURL: downloadURL,
-        lastPhotoUpdate: Date.now()
+        lastPhotoUpdate: timestamp
       });
 
-      alert("Foto de perfil actualizada con éxito.");
+      // Limpiar estado
+      setSelectedImage(null);
+      setOpenImageEditor(false);
+      setCrop({
+        unit: '%',
+        width: 50,
+        aspect: 1
+      });
+      setCompletedCrop(null);
+
+      setAlertMessage("¡Foto de perfil actualizada con éxito!");
+      setAlertSeverity('success');
+      setOpenAlert(true);
     } catch (error) {
-      console.error("Error detallado:", error);
-      
-      if (error.message) {
-        alert(error.message);
-      } else if (error.code === 'storage/unauthorized') {
-        alert("No tienes permiso para realizar esta acción. Por favor, inicia sesión nuevamente.");
-      } else if (error.code === 'storage/canceled') {
-        alert("La subida fue cancelada.");
-      } else if (error.code === 'storage/unknown') {
-        alert("Ocurrió un error desconocido. Por favor, intenta de nuevo.");
-      } else {
-        alert("Error al subir la imagen. Por favor, intenta de nuevo.");
-      }
+      console.error("Error completo:", error);
+      setAlertMessage("Error al subir la imagen: " + error.message);
+      setAlertSeverity('error');
+      setOpenAlert(true);
     } finally {
       setIsUploading(false);
-    }
-  };
-
-  const handleDeletePhoto = async () => {
-    try {
-      await updateUserData({ photoURL: "" });
-      setPhotoURL(noProfileImage);
-      alert("Foto de perfil eliminada.");
-    } catch (error) {
-      console.error("Error al eliminar la foto:", error);
-      alert("Hubo un error al eliminar la foto.");
     }
   };
 
@@ -205,14 +271,38 @@ function ConfiguracionPerfil() {
     }
     try {
       // Aquí iría la lógica para cambiar la contraseña
-      alert("Contraseña actualizada con éxito");
+      setAlertMessage("Contraseña actualizada con éxito");
+      setAlertSeverity('success');
+      setOpenAlert(true);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setOpenPasswordModal(false);
     } catch (error) {
       setPasswordError("Error al cambiar la contraseña: " + error.message);
+      setAlertMessage("Error al cambiar la contraseña: " + error.message);
+      setAlertSeverity('error');
+      setOpenAlert(true);
     }
+  };
+
+  const handleCloseImageEditor = () => {
+    setSelectedImage(null);
+    setOpenImageEditor(false);
+    setCrop({ unit: '%', width: 50, aspect: 1 });
+  };
+
+  const showAlert = (message, severity = 'success') => {
+    setAlertMessage(message);
+    setAlertSeverity(severity);
+    setOpenAlert(true);
+  };
+
+  const handleCloseAlert = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenAlert(false);
   };
 
   if (loading) {
@@ -222,8 +312,37 @@ function ConfiguracionPerfil() {
   return (
     <div className="configuracion-usuario-container">
       <div className="configuracion-content">
-        <h1>Configuración de Perfil</h1>
-        
+        <div style={{
+          marginBottom: '2rem',
+          borderBottom: '2px solid #fff',
+          paddingBottom: '1rem'
+        }}>
+          <h1 style={{
+            fontSize: '2.5rem',
+            fontWeight: '600',
+            color: '#fff',
+            margin: '0',
+            padding: '0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            fontFamily: "'Poppins', sans-serif",
+            letterSpacing: '-0.5px'
+          }}>
+            Configuración de Perfil
+          </h1>
+          <p style={{
+            color: '#888',
+            margin: '0.5rem 0 0 0',
+            fontSize: '1rem',
+            fontWeight: '400',
+            fontFamily: "'Inter', sans-serif"
+          }}>
+            Personaliza tu información y ajusta tu cuenta
+          </p>
+        </div>
+
         <div className="profile-section">
           {/* Columna Izquierda */}
           <div className="left-column">
@@ -234,7 +353,9 @@ function ConfiguracionPerfil() {
                   type="file"
                   id="uploadPhoto"
                   style={{ display: "none" }}
-                  onChange={handleChangePhoto}
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  disabled={isUploading}
                 />
                 <button
                   className="btn change-photo"
@@ -245,7 +366,10 @@ function ConfiguracionPerfil() {
                 </button>
                 <button
                   className="btn delete-photo"
-                  onClick={handleDeletePhoto}
+                  onClick={() => {
+                    setPhotoURL(noProfileImage);
+                    updateUserData({ photoURL: noProfileImage });
+                  }}
                   disabled={isUploading}
                 >
                   Eliminar foto
@@ -340,6 +464,177 @@ function ConfiguracionPerfil() {
           </div>
         </div>
 
+        {/* Modal para editar imagen */}
+        <Modal
+          open={openImageEditor}
+          onClose={handleCloseImageEditor}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          className="modal-container"
+        >
+          <Box sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '90%',
+            maxWidth: '600px',
+            bgcolor: '#1a1a1a',
+            color: '#fff',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            borderRadius: '16px',
+            p: 0,
+            outline: 'none',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: '#2d2d2d',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#888',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: '#555',
+            }
+          }}>
+            <div className="image-editor-modal">
+              <div className="modal-header" style={{
+                padding: '20px',
+                borderBottom: '1px solid #333',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                background: '#2d2d2d'
+              }}>
+                <h2 style={{
+                  margin: 0,
+                  fontSize: '1.5rem',
+                  fontWeight: '600',
+                  color: '#fff'
+                }}>
+                  Ajustar imagen de perfil
+                </h2>
+                <button
+                  onClick={handleCloseImageEditor}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#888',
+                    cursor: 'pointer',
+                    fontSize: '1.5rem',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.color = '#fff'}
+                  onMouseOut={(e) => e.currentTarget.style.color = '#888'}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div style={{ padding: '20px' }}>
+                <div className="editor-content" style={{
+                  background: '#2d2d2d',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  marginBottom: '20px'
+                }}>
+                  <ReactCrop
+                    crop={crop}
+                    onChange={c => setCrop(c)}
+                    onComplete={c => setCompletedCrop(c)}
+                    aspect={1}
+                    circularCrop
+                    style={{
+                      background: '#1a1a1a',
+                      padding: '10px',
+                      borderRadius: '8px'
+                    }}
+                  >
+                    <img
+                      ref={imgRef}
+                      alt="Editar imagen"
+                      src={selectedImage}
+                      onLoad={onImageLoad}
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '50vh',
+                        borderRadius: '8px'
+                      }}
+                    />
+                  </ReactCrop>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  gap: '10px',
+                  justifyContent: 'flex-end',
+                  padding: '0 20px 20px'
+                }}>
+                  <button
+                    onClick={handleCloseImageEditor}
+                    className="btn cancel-photo"
+                    style={{
+                      background: '#3a3a3a',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s',
+                      fontSize: '0.9rem',
+                      fontWeight: '500'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = '#4a4a4a'}
+                    onMouseOut={(e) => e.currentTarget.style.background = '#3a3a3a'}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleUpload();
+                      handleCloseImageEditor();
+                    }}
+                    disabled={isUploading || !completedCrop?.width || !completedCrop?.height}
+                    className="btn save-photo"
+                    style={{
+                      background: '#007bff',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                      opacity: (isUploading || !completedCrop?.width || !completedCrop?.height) ? '0.7' : '1'
+                    }}
+                    onMouseOver={(e) => {
+                      if (!isUploading && completedCrop?.width && completedCrop?.height) {
+                        e.currentTarget.style.background = '#0056b3'
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (!isUploading && completedCrop?.width && completedCrop?.height) {
+                        e.currentTarget.style.background = '#007bff'
+                      }
+                    }}
+                  >
+                    {isUploading ? "Guardando..." : "Guardar cambios"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Box>
+        </Modal>
+
         {/* Modal de cambio de contraseña */}
         <Modal
           open={openPasswordModal}
@@ -397,6 +692,46 @@ function ConfiguracionPerfil() {
             </div>
           </Box>
         </Modal>
+
+        {/* Snackbar para alertas */}
+        <Snackbar
+          open={openAlert}
+          autoHideDuration={4000}
+          onClose={handleCloseAlert}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert
+            onClose={handleCloseAlert}
+            severity={alertSeverity}
+            sx={{
+              width: '100%',
+              minWidth: '300px',
+              borderRadius: '10px',
+              backgroundColor: alertSeverity === 'success' ? '#1a1a1a' : '#1a1a1a',
+              color: '#fff',
+              '& .MuiAlert-icon': {
+                color: alertSeverity === 'success' ? '#4caf50' : '#f44336',
+                marginRight: '12px',
+              },
+              '& .MuiSvgIcon-root': {
+                fontSize: '24px',
+              },
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+              border: `1px solid ${alertSeverity === 'success' ? '#4caf50' : '#f44336'}`,
+            }}
+            icon={alertSeverity === 'success' ? <CheckCircleOutlineIcon /> : undefined}
+          >
+            <span style={{ 
+              fontSize: '0.95rem',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              {alertMessage}
+            </span>
+          </Alert>
+        </Snackbar>
       </div>
     </div>
   );

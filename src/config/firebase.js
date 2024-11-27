@@ -29,6 +29,7 @@ export const facebookProvider = new FacebookAuthProvider();
 export const db = getFirestore(app);
 
 // Initialize Storage
-export const storage = getStorage(app);
+const storage = getStorage(app);
 
+export { storage };
 export default app;
