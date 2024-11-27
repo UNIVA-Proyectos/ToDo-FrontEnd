@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Box, Grid, Container, Typography, Paper, TextField, InputAdornment, IconButton, Menu, Divider, Tooltip, Fade, CircularProgress, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
-import TaskCard from "../../components/tasks/TaskCard";
-import TaskSummary from "../../components/tasks/taskSummary";
-import AddTask from "../../components/tasks/AddTask";
+import TaskCard from "../../components/tasks/TaskCard.jsx";
+import TaskSummary from "../../components/tasks/taskSummary.jsx";
+import AddTask from "../../components/tasks/AddTask.jsx";
 import useTasks from "../../hooks/tasks/useTasks";
 import { auth, db } from "../../config/firebase";
 import useAddTask from "../../hooks/tasks/useAddTask";

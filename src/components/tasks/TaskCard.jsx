@@ -15,8 +15,8 @@ import {
   faExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { Timestamp } from "firebase/firestore";
-import TaskDetailDialog from "../dialog/TaskDetailDialog";
-import ShareTaskDialog from "../dialog/ShareTaskDialog";
+import TaskDetailDialog from "../dialog/TaskDetailDialog.jsx";
+import ShareTaskDialog from "../dialog/ShareTaskDialog.jsx";
 import { db } from "../../config/firebase";
 import useUpdateTaskStatus from "../../hooks/tasks/useUpdateTaskStatus";
 import {

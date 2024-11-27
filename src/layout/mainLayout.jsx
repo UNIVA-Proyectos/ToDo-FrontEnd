@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Navbar from "../components/navigation/Navbar";
-import Sidebar from "../components/navigation/Sidebar";
+import Navbar from "../components/navigation/Navbar.jsx";
+import Sidebar from "../components/navigation/Sidebar.jsx";
 import { useMediaQuery } from "@mui/material";
 import { Outlet } from "react-router-dom";
 

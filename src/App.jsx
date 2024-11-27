@@ -3,19 +3,19 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  useNavigate,
   Navigate,
-  useLocation
+  useLocation,
+  useNavigate
 } from "react-router-dom";
 import "./styles/app.css";
-import Login from "./pages/auth/Login.js";
-import MobileLogin from "./pages/auth/MobileLogin.js";
-import Home from "./pages/dashboard/home.js";
-import Calendar from "./pages/calendar/calendar.js";
-import ProfileSettings from "./pages/settings/ConfiguracionPerfil.js";
-import BlankLayout from "./layout/blankLayout.js";
-import MainLayout from "./layout/mainLayout.js";
-import FAQ from "./pages/help/faq.js";
+import Login from "./pages/auth/Login.jsx";
+import MobileLogin from "./pages/auth/MobileLogin.jsx";
+import Home from "./pages/dashboard/home.jsx";
+import Calendar from "./pages/calendar/calendar.jsx";
+import ProfileSettings from "./pages/settings/ConfiguracionPerfil.jsx";
+import BlankLayout from "./layout/blankLayout.jsx";
+import MainLayout from "./layout/mainLayout.jsx";
+import FAQ from "./pages/help/faq.jsx";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "./config/firebase.js";
 import { useTheme, useMediaQuery } from "@mui/material";
