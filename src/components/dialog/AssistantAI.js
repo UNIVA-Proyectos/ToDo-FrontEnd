@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -26,13 +26,26 @@ const AssistantAI = ({ open, onClose, TaskInfo }) => {
   const [typewrittenResponse, setTypewrittenResponse] = useState("");
   const [isTyping, setIsTyping] = useState(false);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToBottom = useCallback(() => {
+    if (!open) return;
+    const scrollElement = messagesEndRef.current;
+    if (scrollElement) {
+      try {
+        window.requestAnimationFrame(() => {
+          scrollElement.scrollIntoView?.({ behavior: "smooth" });
+        });
+      } catch (error) {
+        console.warn('Error al hacer scroll:', error);
+      }
+    }
+  }, [open]);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, typewrittenResponse]);
+    if (open && messages.length > 0) {
+      const timeoutId = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [messages, typewrittenResponse, open, scrollToBottom]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
