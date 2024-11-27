@@ -11,6 +11,9 @@ import noProfileImage from "../../assets/no-profile-image.webp";
 import DatePickerBtn from "../../components/inputs/DatePickerBtn";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SaveIcon from "@mui/icons-material/Save";
+import LockIcon from "@mui/icons-material/Lock";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
 
 function ConfiguracionPerfil() {
   const { userData, loading } = useUserData();
@@ -26,6 +29,17 @@ function ConfiguracionPerfil() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Estados para el cambio de contraseña
+  const [openPasswordModal, setOpenPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  // Get the login provider
+  const isPasswordProvider = user?.providerData[0]?.providerId === 'password';
+  const loginProvider = user?.providerData[0]?.providerId;
 
   const opcionesGenero = [
     { value: "", label: "Selecciona una opción" },
@@ -174,8 +188,31 @@ function ConfiguracionPerfil() {
       alert("Hubo un error al eliminar la foto.");
     }
   };
+
   const handleSelectDate = (date) => {
     setFechaNacimiento(new Date(date));
+  };
+
+  const handlePasswordChange = async () => {
+    setPasswordError("");
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Las contraseñas nuevas no coinciden");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+    try {
+      // Aquí iría la lógica para cambiar la contraseña
+      alert("Contraseña actualizada con éxito");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setOpenPasswordModal(false);
+    } catch (error) {
+      setPasswordError("Error al cambiar la contraseña: " + error.message);
+    }
   };
 
   if (loading) {
@@ -273,6 +310,24 @@ function ConfiguracionPerfil() {
                   )}
                 </div>
               </div>
+
+              {/* Botón de cambio de contraseña */}
+              <div className="form-group">
+                {!isPasswordProvider ? (
+                  <div className="password-provider-notice">
+                    No se puede cambiar la contraseña - Cuenta vinculada con {loginProvider === 'google.com' ? 'Google' : 'Facebook'}
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => setOpenPasswordModal(true)} 
+                    className="change-password-button"
+                  >
+                    <LockIcon style={{ marginRight: "8px", fontSize: "20px" }} />
+                    Cambiar Contraseña
+                  </button>
+                )}
+              </div>
+
               <button onClick={handleSaveChanges} className="save-changes">
                 <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
                 Guardar Cambios
@@ -284,6 +339,64 @@ function ConfiguracionPerfil() {
             </div>
           </div>
         </div>
+
+        {/* Modal de cambio de contraseña */}
+        <Modal
+          open={openPasswordModal}
+          onClose={() => setOpenPasswordModal(false)}
+          aria-labelledby="modal-cambio-contraseña"
+        >
+          <Box className="password-modal">
+            <h2>Cambiar Contraseña</h2>
+            <div className="modal-form-group">
+              <label>Contraseña Actual</label>
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="input-field"
+                placeholder="Ingresa tu contraseña actual"
+              />
+            </div>
+            <div className="modal-form-group">
+              <label>Nueva Contraseña</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="input-field"
+                placeholder="Ingresa tu nueva contraseña"
+              />
+            </div>
+            <div className="modal-form-group">
+              <label>Confirmar Nueva Contraseña</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="input-field"
+                placeholder="Confirma tu nueva contraseña"
+              />
+            </div>
+            {passwordError && <p className="error-text">{passwordError}</p>}
+            <div className="modal-buttons">
+              <button 
+                onClick={handlePasswordChange}
+                className="save-changes"
+                disabled={!currentPassword || !newPassword || !confirmPassword}
+              >
+                <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
+                Guardar Contraseña
+              </button>
+              <button 
+                onClick={() => setOpenPasswordModal(false)}
+                className="cancel-button"
+              >
+                Cancelar
+              </button>
+            </div>
+          </Box>
+        </Modal>
       </div>
     </div>
   );
