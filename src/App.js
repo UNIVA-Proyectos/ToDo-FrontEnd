@@ -4,7 +4,8 @@ import {
   Routes,
   Route,
   useNavigate,
-  Navigate
+  Navigate,
+  useLocation
 } from "react-router-dom";
 import "./styles/app.css";
 import Login from "./pages/auth/Login.js";
@@ -51,32 +52,39 @@ const LoginPage = () => {
 
 // Componente para proteger rutas privadas
 const PrivateRoute = ({ element }) => {
-  const navigate = useNavigate();
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
+  const location = useLocation();
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
+  // Mientras se verifica la autenticación, no redirigir
+  if (loading) {
+    return null;
+  }
 
-  return user ? element : null;
+  // Solo redirigir si no hay usuario autenticado
+  if (!user) {
+    return <Navigate to="/" state={{ from: location }} />;
+  }
+
+  return element;
 };
 
 const App = () => {
+  const [user] = useAuthState(auth);
+
   return (
     <Router>
       <Routes>
         <Route element={<BlankLayout />}>
-          <Route path="/" element={<LoginPage />} />
+          <Route 
+            path="/" 
+            element={user ? <Navigate to="/home" replace /> : <LoginPage />} 
+          />
         </Route>
         <Route element={<PrivateRoute element={<MainLayout />} />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/dashboard" element={<Navigate to="/home" replace />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/settings" element={<ProfileSettings />} />
           <Route path="/help" element={<FAQ />} />
-          {/* Ruta para manejar URLs no encontradas */}
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Route>
       </Routes>
