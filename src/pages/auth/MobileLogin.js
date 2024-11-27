@@ -67,6 +67,7 @@ const MobileLogin = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isDarkMode = theme.palette.mode === 'dark';
 
   if (!isMobile) {
     return null; // No renderizar en dispositivos de escritorio
@@ -173,9 +174,12 @@ const MobileLogin = () => {
           sx={{
             width: "100%",
             p: 3,
-            backgroundColor: "#25283D",
+            backgroundColor: theme.palette.mode === 'dark' ? '#1A1C2C' : '#F5F5F7',
+            color: theme.palette.mode === 'dark' ? '#fff' : '#25283D',
             borderRadius: 2,
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            border: theme.palette.mode === 'dark' 
+              ? '1px solid rgba(255, 255, 255, 0.1)' 
+              : '1px solid rgba(0, 0, 0, 0.1)',
             position: "relative",
             overflow: "hidden"
           }}
@@ -209,17 +213,16 @@ const MobileLogin = () => {
               sx={{
                 width: '180px',
                 height: 'auto',
-                mb: 2,
-                filter: 'drop-shadow(0 0 10px rgba(255, 194, 71, 0.3))'
+                mb: 2
               }}
             />
             <Typography
               variant="h4"
               align="center"
               sx={{
-                color: "#FFC247",
+                color: theme.palette.mode === 'dark' ? "#FFC247" : "#25283D",
                 fontWeight: "bold",
-                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                textShadow: theme.palette.mode === 'dark' ? '0 2px 4px rgba(0,0,0,0.2)' : 'none'
               }}
             >
               {isSignUp ? "Crear Cuenta" : "Iniciar Sesión"}
@@ -249,16 +252,19 @@ const MobileLogin = () => {
                 sx={{
                   mb: 2,
                   "& .MuiOutlinedInput-root": {
-                    color: "white",
+                    color: theme.palette.mode === 'dark' ? "white" : "#25283D",
                     "& fieldset": {
-                      borderColor: "rgba(255, 255, 255, 0.23)",
+                      borderColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
                     },
                     "&:hover fieldset": {
                       borderColor: "#FFC247",
                     },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#FFC247",
+                    }
                   },
                   "& .MuiInputLabel-root": {
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.7)" : "#25283D"
                   },
                 }}
                 InputProps={{
@@ -285,16 +291,19 @@ const MobileLogin = () => {
               sx={{
                 mb: 2,
                 "& .MuiOutlinedInput-root": {
-                  color: "white",
+                  color: theme.palette.mode === 'dark' ? "white" : "#25283D",
                   "& fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
                   },
                   "&:hover fieldset": {
                     borderColor: "#FFC247",
                   },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#FFC247",
+                  }
                 },
                 "& .MuiInputLabel-root": {
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.7)" : "#25283D"
                 },
               }}
               InputProps={{
@@ -320,16 +329,19 @@ const MobileLogin = () => {
               sx={{
                 mb: 3,
                 "& .MuiOutlinedInput-root": {
-                  color: "white",
+                  color: theme.palette.mode === 'dark' ? "white" : "#25283D",
                   "& fieldset": {
-                    borderColor: "rgba(255, 255, 255, 0.23)",
+                    borderColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
                   },
                   "&:hover fieldset": {
                     borderColor: "#FFC247",
                   },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#FFC247",
+                  }
                 },
                 "& .MuiInputLabel-root": {
-                  color: "rgba(255, 255, 255, 0.7)",
+                  color: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.7)" : "#25283D"
                 },
               }}
               InputProps={{
@@ -343,7 +355,7 @@ const MobileLogin = () => {
                   <IconButton
                     onClick={() => setShowPassword(!showPassword)}
                     edge="end"
-                    sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+                    sx={{ color: theme.palette.mode === 'dark' ? "white" : "#25283D" }}
                   >
                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                   </IconButton>
@@ -363,8 +375,8 @@ const MobileLogin = () => {
                 color: "#25283D",
                 fontWeight: "bold",
                 "&:hover": {
-                  backgroundColor: "#ffb014",
-                },
+                  backgroundColor: "#FFD47F",
+                }
               }}
             >
               {isLoading ? (
@@ -377,9 +389,9 @@ const MobileLogin = () => {
             <Divider sx={{ 
               my: 2, 
               "&::before, &::after": {
-                borderColor: "rgba(255, 255, 255, 0.1)",
+                borderColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
               },
-              color: "rgba(255, 255, 255, 0.7)" 
+              color: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.7)" : "#25283D"
             }}>
               o continuar con
             </Divider>
@@ -392,11 +404,11 @@ const MobileLogin = () => {
                 disabled={isLoading}
                 sx={{
                   py: 1.5,
-                  borderColor: "rgba(255, 255, 255, 0.23)",
-                  color: "white",
+                  borderColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
+                  color: theme.palette.mode === 'dark' ? "white" : "#25283D",
                   "&:hover": {
                     borderColor: "#FFC247",
-                    backgroundColor: "rgba(255, 194, 71, 0.1)",
+                    backgroundColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 194, 71, 0.1)",
                   },
                 }}
               >
@@ -410,11 +422,11 @@ const MobileLogin = () => {
                 disabled={isLoading}
                 sx={{
                   py: 1.5,
-                  borderColor: "rgba(255, 255, 255, 0.23)",
-                  color: "white",
+                  borderColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
+                  color: theme.palette.mode === 'dark' ? "white" : "#25283D",
                   "&:hover": {
                     borderColor: "#FFC247",
-                    backgroundColor: "rgba(255, 194, 71, 0.1)",
+                    backgroundColor: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 194, 71, 0.1)",
                   },
                 }}
               >
@@ -432,7 +444,7 @@ const MobileLogin = () => {
             }}>
               <Typography
                 align="center"
-                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+                sx={{ color: theme.palette.mode === 'dark' ? "rgba(255, 255, 255, 0.7)" : "#25283D" }}
               >
                 {isSignUp ? "¿Ya tienes una cuenta?" : "¿No tienes una cuenta?"}
               </Typography>
@@ -441,20 +453,10 @@ const MobileLogin = () => {
                 disabled={isTransitioning}
                 sx={{
                   color: "#FFC247",
-                  borderColor: "rgba(255, 194, 71, 0.5)",
-                  borderWidth: 1,
-                  borderStyle: "solid",
-                  borderRadius: 2,
-                  px: 4,
-                  py: 1,
-                  transition: "all 0.3s ease-in-out",
+                  borderColor: "#FFC247",
                   "&:hover": {
-                    backgroundColor: "rgba(255, 194, 71, 0.1)",
-                    borderColor: "#FFC247",
-                    transform: "translateY(-2px)"
-                  },
-                  "&:active": {
-                    transform: "translateY(0)"
+                    backgroundColor: "#FFC247",
+                    color: theme.palette.mode === 'dark' ? "#1A1C2C" : "#25283D"
                   }
                 }}
               >
