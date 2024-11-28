@@ -157,7 +157,7 @@ const ResetPassword = () => {
           <div className="flex justify-center">
             <ReCAPTCHA
               ref={recaptchaRef}
-              sitekey="6LeX64wqAAAAAG4pwe3MXg54KhgKCnZZO5RIjDtg"
+              sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
               theme="light"
             />
           </div>
