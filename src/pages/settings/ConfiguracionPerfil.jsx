@@ -100,17 +100,26 @@ function ConfiguracionPerfil() {
   }, [userData, loading]);
 
   const handleSaveChanges = async () => {
-    const updatedData = {
-      name,
-      photoURL,
-      fechaNacimiento,
-      genero,
-      telefono,
-    };
-    await updateUserData(updatedData);
-    setAlertMessage("Datos actualizados con éxito.");
-    setAlertSeverity('success');
-    setOpenAlert(true);
+    try {
+      const updatedData = {
+        name,
+        fechaNacimiento,
+        genero,
+        telefono,
+      };
+
+      console.log('Guardando cambios:', updatedData);
+      await updateUserData(updatedData);
+      
+      setAlertMessage("Datos actualizados con éxito.");
+      setAlertSeverity('success');
+      setOpenAlert(true);
+    } catch (error) {
+      console.error('Error al guardar cambios:', error);
+      setAlertMessage("Error al actualizar los datos: " + error.message);
+      setAlertSeverity('error');
+      setOpenAlert(true);
+    }
   };
 
   // Función para manejar la selección inicial de la imagen
@@ -216,17 +225,20 @@ function ConfiguracionPerfil() {
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
       const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
 
-      // Subir a Firebase
+      // Subir a Firebase Storage
       const timestamp = Date.now();
-      const fileName = `${timestamp}.jpg`;
+      const fileName = `${user.uid}_${timestamp}.jpg`;
       const filePath = `profilePictures/${fileName}`;
       const storageRef = ref(storage, filePath);
 
+      console.log('Subiendo imagen a Storage...');
       const uploadResult = await uploadBytes(storageRef, file);
+      console.log('Imagen subida, obteniendo URL...');
       const downloadURL = await getDownloadURL(uploadResult.ref);
+      console.log('URL obtenida:', downloadURL);
 
-      // Actualizar perfil
-      setPhotoURL(downloadURL);
+      // Actualizar perfil usando el hook
+      console.log('Actualizando datos de usuario...');
       await updateUserData({
         photoURL: downloadURL,
         lastPhotoUpdate: timestamp
