@@ -22,6 +22,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUserPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { searchUserByEmail, shareTaskWithUser, removeSharedUser } from '../../services/shareTaskService';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 const ShareTaskDialog = ({ open, onClose, task, db }) => {
     const [email, setEmail] = useState('');
@@ -29,6 +30,89 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [recentEmails, setRecentEmails] = useState([]);
+    const [currentTask, setCurrentTask] = useState(task);
+    const [userPhotoUpdates, setUserPhotoUpdates] = useState({});
+
+    // Suscribirse a cambios en la tarea
+    useEffect(() => {
+        if (!open || !task?.id) return;
+
+        console.log('Suscribiéndose a cambios en la tarea:', task.id);
+        
+        const unsubscribe = onSnapshot(
+            doc(db, "tasks", task.id),
+            (doc) => {
+                if (doc.exists()) {
+                    const taskData = { id: doc.id, ...doc.data() };
+                    console.log('Tarea actualizada:', taskData);
+                    setCurrentTask(taskData);
+                }
+            },
+            (error) => {
+                console.error("Error al observar la tarea:", error);
+            }
+        );
+
+        return () => {
+            console.log('Desuscribiéndose de cambios en la tarea');
+            unsubscribe();
+        };
+    }, [db, task?.id, open]);
+
+    // Suscribirse a cambios en los usuarios compartidos
+    useEffect(() => {
+        if (!currentTask?.sharedWith?.length) return;
+
+        console.log('Configurando suscripciones para usuarios compartidos');
+        
+        const unsubscribes = currentTask.sharedWith.map(sharedUser => {
+            return onSnapshot(
+                doc(db, "users", sharedUser.id),
+                (userDoc) => {
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.photoURL !== sharedUser.photoURL) {
+                            console.log('Detectado cambio en foto de usuario compartido:', {
+                                userId: sharedUser.id,
+                                oldPhoto: sharedUser.photoURL,
+                                newPhoto: userData.photoURL
+                            });
+                            setUserPhotoUpdates(prev => ({
+                                ...prev,
+                                [sharedUser.id]: userData.photoURL
+                            }));
+                        }
+                    }
+                }
+            );
+        });
+
+        return () => {
+            console.log('Limpiando suscripciones de usuarios compartidos');
+            unsubscribes.forEach(unsubscribe => unsubscribe());
+        };
+    }, [db, currentTask?.sharedWith]);
+
+    // Aplicar actualizaciones de fotos al currentTask
+    useEffect(() => {
+        if (Object.keys(userPhotoUpdates).length === 0) return;
+
+        const updatedTask = {
+            ...currentTask,
+            sharedWith: currentTask.sharedWith.map(user => ({
+                ...user,
+                photoURL: userPhotoUpdates[user.id] || user.photoURL
+            }))
+        };
+
+        console.log('Aplicando actualizaciones de fotos:', {
+            updates: userPhotoUpdates,
+            newTask: updatedTask
+        });
+
+        setCurrentTask(updatedTask);
+        setUserPhotoUpdates({});
+    }, [userPhotoUpdates]);
 
     // Validación de email
     const isValidEmail = (email) => {
@@ -59,12 +143,12 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                 return;
             }
 
-            if (task.sharedWith?.some(sharedUser => sharedUser.id === user.id)) {
+            if (currentTask.sharedWith?.some(sharedUser => sharedUser.id === user.id)) {
                 setError('Esta tarea ya está compartida con este usuario');
                 return;
             }
 
-            await shareTaskWithUser(db, task.id, user);
+            await shareTaskWithUser(db, currentTask.id, user);
             
             // Guardar email en recientes
             const updatedRecents = [email, ...recentEmails.filter(e => e !== email)].slice(0, 5);
@@ -82,7 +166,7 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
 
     const handleRemoveShare = async (userId) => {
         try {
-            await removeSharedUser(db, task.id, userId);
+            await removeSharedUser(db, currentTask.id, userId);
             setSuccess('Usuario removido exitosamente');
         } catch (error) {
             setError(error.message);
@@ -138,7 +222,7 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                 <DialogContent>
                     <Box sx={{ mb: 3 }}>
                         <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                            Tarea: {task?.titulo}
+                            Tarea: {currentTask?.titulo}
                         </Typography>
                     </Box>
 
@@ -200,13 +284,13 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                         </Button>
                     </Box>
 
-                    {task?.sharedWith?.length > 0 && (
+                    {currentTask?.sharedWith?.length > 0 && (
                         <Box>
                             <Typography variant="subtitle1" sx={{ mb: 1 }}>
                                 Compartido con:
                             </Typography>
                             <List>
-                                {task.sharedWith.map((user) => (
+                                {currentTask.sharedWith.map((user) => (
                                     <ListItem 
                                         key={user.id}
                                         sx={{

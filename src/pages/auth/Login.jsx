@@ -198,6 +198,7 @@ const AppLogin = () => {
       uid: user.uid,
       email: user.email,
       name: provider === "email" ? credentials.name : user.displayName,
+      photoURL: user.photoURL || null,
       provider,
       lastLogin: new Date(),
       ...(provider === "email" && { createdAt: new Date() }),

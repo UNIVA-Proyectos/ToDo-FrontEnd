@@ -442,8 +442,8 @@ export default function Sidebar() {
             }}
           >
             <Avatar
-              alt={user.displayName || "Usuario"}
-              src={user.photoURL}
+              alt={userData?.name || user.displayName || "Usuario"}
+              src={userData?.photoURL || user.photoURL}
               sx={{
                 width: drawerOpen ? 45 : 50,
                 height: drawerOpen ? 45 : 50,
@@ -466,7 +466,7 @@ export default function Sidebar() {
                     mb: 0.5,
                   }}
                 >
-                  {user.displayName || "Usuario"}
+                  {userData?.name || user.displayName || "Usuario"}
                 </Typography>
                 <Typography
                   variant="body2"

@@ -1,5 +1,5 @@
-import { collection, query, where, onSnapshot, or } from "firebase/firestore";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
+import { useState, useEffect, useCallback } from "react";
 
 const useTasks = (db, user) => {
   const [tasks, setTasks] = useState([]);
@@ -21,6 +21,9 @@ const useTasks = (db, user) => {
       return null;
     }
 
+    const sharedUsers = taskData.sharedWith || [];
+    const isSharedWithUser = sharedUsers.some(sharedUser => sharedUser.email === user.email);
+
     return {
       id: doc.id,
       docId: doc.id,
@@ -31,11 +34,11 @@ const useTasks = (db, user) => {
       dueDate: taskData.dueDate || null,
       priority: taskData.priority || 'normal',
       user_id: taskData.user_id,
-      sharedWith: taskData.sharedWith || [],
+      sharedWith: sharedUsers,
       isShared: taskData.user_id !== user.uid,
-      canEdit: taskData.user_id === user.uid || (taskData.sharedWith && taskData.sharedWith.includes(user.uid))
+      canEdit: taskData.user_id === user.uid || isSharedWithUser
     };
-  }, [user.uid]);
+  }, [user.uid, user.email]);
 
   const updateCounts = useCallback((tasksList) => {
     const completed = tasksList.filter(task => task.estado === "Completada");
@@ -54,7 +57,7 @@ const useTasks = (db, user) => {
   }, []);
 
   useEffect(() => {
-    if (!user?.uid) {
+    if (!user?.uid || !user?.email) {
       setTasks([]);
       setCompletedCount(0);
       setPendingCount(0);
@@ -67,25 +70,47 @@ const useTasks = (db, user) => {
     setError(null);
 
     try {
-      console.log('Iniciando suscripción a tareas para usuario:', user.uid);
+      console.log('Iniciando suscripción a tareas para usuario:', user.email);
 
-      const q = query(
+      // Primero, obtenemos las tareas propias del usuario
+      const ownTasksQuery = query(
         collection(db, "tasks"),
-        or(
-          where("user_id", "==", user.uid),
-          where("sharedWith", "array-contains", user.uid)
-        )
+        where("user_id", "==", user.uid)
       );
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const fetchedTasks = querySnapshot.docs
-          .map(processTask)
-          .filter(task => task !== null);
+      // Luego, obtenemos todas las tareas y filtramos las compartidas
+      const allTasksQuery = query(collection(db, "tasks"));
 
-        console.log('Total de tareas obtenidas:', fetchedTasks.length);
-        setTasks(fetchedTasks);
-        updateCounts(fetchedTasks);
-        setLoading(false);
+      const unsubscribe = onSnapshot(allTasksQuery, async (querySnapshot) => {
+        try {
+          // Obtener tareas propias
+          const ownTasksSnapshot = await getDocs(ownTasksQuery);
+          const ownTasks = ownTasksSnapshot.docs.map(processTask).filter(task => task !== null);
+
+          // Filtrar tareas compartidas
+          const sharedTasks = querySnapshot.docs
+            .map(processTask)
+            .filter(task => {
+              if (!task) return false;
+              const sharedUsers = task.sharedWith || [];
+              return sharedUsers.some(sharedUser => sharedUser.email === user.email);
+            });
+
+          // Combinar tareas propias y compartidas
+          const allTasks = [...ownTasks, ...sharedTasks];
+          
+          // Eliminar duplicados si los hay
+          const uniqueTasks = Array.from(new Map(allTasks.map(task => [task.id, task])).values());
+
+          console.log('Total de tareas obtenidas:', uniqueTasks.length);
+          setTasks(uniqueTasks);
+          updateCounts(uniqueTasks);
+          setLoading(false);
+        } catch (error) {
+          console.error("Error procesando tareas:", error);
+          setError(error);
+          setLoading(false);
+        }
       }, (error) => {
         console.error("Error en la suscripción:", error);
         setError(error);
@@ -103,26 +128,13 @@ const useTasks = (db, user) => {
     }
   }, [db, user, processTask, updateCounts]);
 
-  const sortedTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => {
-      // Primero por estado (pendientes primero)
-      if (a.estado !== b.estado) {
-        return a.estado === "Pendiente" ? -1 : 1;
-      }
-      // Luego por fecha de vencimiento
-      const dateA = a.dueDate?.toDate() || new Date(9999, 11, 31);
-      const dateB = b.dueDate?.toDate() || new Date(9999, 11, 31);
-      return dateA - dateB;
-    });
-  }, [tasks]);
-
-  return { 
-    tasks: sortedTasks, 
-    completedCount, 
-    pendingCount, 
-    overdueCount,
+  return {
+    tasks,
     loading,
-    error
+    error,
+    completedCount,
+    pendingCount,
+    overdueCount
   };
 };
 
