@@ -440,10 +440,6 @@
     background: #222;
   }
 
-  .auth-logo {
-    /* No additional styles needed for dark mode */
-  }
-
   /* Estilos específicos para la foto de perfil en modo oscuro */
   .MuiAvatar-root {
     background-color: #333 !important;
