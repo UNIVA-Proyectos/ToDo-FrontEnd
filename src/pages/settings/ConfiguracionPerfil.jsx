@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "../../config/firebase";
-import { auth } from "../../config/firebase";
+import { auth, storage } from '../../config/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { 
+  EmailAuthProvider, 
+  reauthenticateWithCredential, 
+  updatePassword,
+  sendPasswordResetEmail 
+} from 'firebase/auth';
 import "../../styles/configUsuario.css"; // CSS global
 import useUserData from "../../hooks/user/useUserData";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +24,17 @@ import 'react-image-crop/dist/ReactCrop.css';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import Icon from '@mui/material/Icon';
 
 function ConfiguracionPerfil() {
   const { userData, loading } = useUserData();
@@ -38,9 +54,19 @@ function ConfiguracionPerfil() {
   const [crop, setCrop] = useState({
     unit: '%',
     width: 50,
+    height: 50,
+    x: 25,
+    y: 25,
     aspect: 1
   });
-  const [completedCrop, setCompletedCrop] = useState(null);
+  const [completedCrop, setCompletedCrop] = useState({
+    unit: '%',
+    width: 50,
+    height: 50,
+    x: 25,
+    y: 25,
+    aspect: 1
+  });
   const imgRef = useRef(null);
   const previewCanvasRef = useRef(null);
   const [openImageEditor, setOpenImageEditor] = useState(false);
@@ -54,6 +80,14 @@ function ConfiguracionPerfil() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [passwordValidation, setPasswordValidation] = useState({
+    length: false,
+    number: false,
+    special: false,
+    capital: false
+  });
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [resetError, setResetError] = useState('');
 
   // Get the login provider
   const isPasswordProvider = user?.providerData[0]?.providerId === 'password';
@@ -142,16 +176,19 @@ function ConfiguracionPerfil() {
 
   // Función para cargar la imagen cuando se complete
   const onImageLoad = (e) => {
-    imgRef.current = e.target;
     const { width, height } = e.target;
-    const crop = {
+    const initialCrop = {
       unit: '%',
-      width: 90,
-      x: 5,
-      y: 5,
+      width: 50,
+      height: 50,
+      x: 25,
+      y: 25,
       aspect: 1
     };
-    setCrop(crop);
+    
+    setCrop(initialCrop);
+    setCompletedCrop(initialCrop);
+    imgRef.current = e.target;
   };
 
   // Función para generar la vista previa
@@ -203,22 +240,33 @@ function ConfiguracionPerfil() {
       const ctx = canvas.getContext('2d');
       const image = imgRef.current;
 
-      const scaleX = image.naturalWidth / image.width;
-      const scaleY = image.naturalHeight / image.height;
+      // Calcular las dimensiones reales basadas en porcentajes
+      const scaleX = image.naturalWidth / 100;
+      const scaleY = image.naturalHeight / 100;
 
-      canvas.width = completedCrop.width;
-      canvas.height = completedCrop.height;
+      // Convertir valores de porcentaje a píxeles
+      const pixelCrop = {
+        x: (completedCrop.x * image.naturalWidth) / 100,
+        y: (completedCrop.y * image.naturalHeight) / 100,
+        width: (completedCrop.width * image.naturalWidth) / 100,
+        height: (completedCrop.height * image.naturalHeight) / 100
+      };
 
+      // Establecer las dimensiones del canvas
+      canvas.width = pixelCrop.width;
+      canvas.height = pixelCrop.height;
+
+      // Dibujar la imagen recortada
       ctx.drawImage(
         image,
-        completedCrop.x * scaleX,
-        completedCrop.y * scaleY,
-        completedCrop.width * scaleX,
-        completedCrop.height * scaleY,
+        pixelCrop.x,
+        pixelCrop.y,
+        pixelCrop.width,
+        pixelCrop.height,
         0,
         0,
-        completedCrop.width,
-        completedCrop.height
+        pixelCrop.width,
+        pixelCrop.height
       );
 
       // Convertir el canvas a Blob
@@ -247,12 +295,7 @@ function ConfiguracionPerfil() {
       // Limpiar estado
       setSelectedImage(null);
       setOpenImageEditor(false);
-      setCrop({
-        unit: '%',
-        width: 50,
-        aspect: 1
-      });
-      setCompletedCrop(null);
+      resetCrop();
 
       setAlertMessage("¡Foto de perfil actualizada con éxito!");
       setAlertSeverity('success');
@@ -267,41 +310,145 @@ function ConfiguracionPerfil() {
     }
   };
 
+  // Función para manejar cambios en el crop
+  const onCropChange = (newCrop, percentCrop) => {
+    // Asegurarse de que todos los valores sean números válidos
+    const validatedCrop = {
+      unit: '%',
+      width: Math.max(0, percentCrop.width || 0),
+      height: Math.max(0, percentCrop.height || 0),
+      x: Math.max(0, percentCrop.x || 0),
+      y: Math.max(0, percentCrop.y || 0),
+      aspect: 1
+    };
+    
+    setCrop(validatedCrop);
+  };
+
+  // Función para manejar el crop completado
+  const onCropComplete = (crop, percentCrop) => {
+    // Asegurarse de que todos los valores sean números válidos
+    const validatedCrop = {
+      unit: '%',
+      width: Math.max(0, percentCrop.width || 0),
+      height: Math.max(0, percentCrop.height || 0),
+      x: Math.max(0, percentCrop.x || 0),
+      y: Math.max(0, percentCrop.y || 0),
+      aspect: 1
+    };
+    
+    setCompletedCrop(validatedCrop);
+  };
+
+  // Función para reiniciar el crop
+  const resetCrop = () => {
+    const defaultCrop = {
+      unit: '%',
+      width: 50,
+      height: 50,
+      x: 25,
+      y: 25,
+      aspect: 1
+    };
+    setCrop(defaultCrop);
+    setCompletedCrop(defaultCrop);
+  };
+
   const handleSelectDate = (date) => {
     setFechaNacimiento(new Date(date));
   };
 
+  const validatePassword = (password) => {
+    setPasswordValidation({
+      length: password.length >= 8,
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      capital: /[A-Z]/.test(password)
+    });
+  };
+
   const handlePasswordChange = async () => {
-    setPasswordError("");
-    if (newPassword !== confirmPassword) {
-      setPasswordError("Las contraseñas nuevas no coinciden");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setPasswordError("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
     try {
-      // Aquí iría la lógica para cambiar la contraseña
-      setAlertMessage("Contraseña actualizada con éxito");
-      setAlertSeverity('success');
-      setOpenAlert(true);
+      setPasswordError("");
+
+      // Validar que todos los campos estén llenos
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        setPasswordError("Por favor, completa todos los campos");
+        return;
+      }
+
+      // Validar que la nueva contraseña cumpla con los requisitos
+      if (!Object.values(passwordValidation).every(Boolean)) {
+        setPasswordError("La nueva contraseña no cumple con los requisitos mínimos");
+        return;
+      }
+
+      // Validar que las contraseñas coincidan
+      if (newPassword !== confirmPassword) {
+        setPasswordError("Las contraseñas no coinciden");
+        return;
+      }
+
+      // Reautenticar al usuario
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        currentPassword
+      );
+      await reauthenticateWithCredential(user, credential);
+
+      // Cambiar la contraseña
+      await updatePassword(user, newPassword);
+
+      // Limpiar estados y mostrar mensaje de éxito
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setOpenPasswordModal(false);
+      showAlert("Contraseña actualizada con éxito", "success");
     } catch (error) {
-      setPasswordError("Error al cambiar la contraseña: " + error.message);
-      setAlertMessage("Error al cambiar la contraseña: " + error.message);
-      setAlertSeverity('error');
-      setOpenAlert(true);
+      console.error("Error al cambiar la contraseña:", error);
+      if (error.code === 'auth/wrong-password') {
+        setPasswordError("La contraseña actual es incorrecta");
+      } else {
+        setPasswordError("Error al cambiar la contraseña: " + error.message);
+      }
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    try {
+      if (!user?.email) {
+        setResetError('No hay un correo electrónico asociado a tu cuenta');
+        return;
+      }
+      
+      await sendPasswordResetEmail(auth, user.email);
+      setResetEmailSent(true);
+      setResetError('');
+      // Cerrar el modal de cambio de contraseña después de 3 segundos
+      setTimeout(() => {
+        setOpenPasswordModal(false);
+        setResetEmailSent(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error al enviar correo de restablecimiento:', error);
+      switch (error.code) {
+        case 'auth/too-many-requests':
+          setResetError('Has intentado restablecer tu contraseña demasiadas veces. Por favor, intenta más tarde.');
+          break;
+        case 'auth/user-not-found':
+          setResetError('No se encontró ninguna cuenta con este correo electrónico.');
+          break;
+        default:
+          setResetError('Error al enviar el correo de restablecimiento. Por favor, intenta más tarde.');
+      }
     }
   };
 
   const handleCloseImageEditor = () => {
     setSelectedImage(null);
     setOpenImageEditor(false);
-    setCrop({ unit: '%', width: 50, aspect: 1 });
+    resetCrop();
   };
 
   const showAlert = (message, severity = 'success') => {
@@ -560,15 +707,14 @@ function ConfiguracionPerfil() {
                 }}>
                   <ReactCrop
                     crop={crop}
-                    onChange={c => setCrop(c)}
-                    onComplete={c => setCompletedCrop(c)}
+                    onChange={onCropChange}
+                    onComplete={onCropComplete}
                     aspect={1}
                     circularCrop
-                    style={{
-                      background: '#1a1a1a',
-                      padding: '10px',
-                      borderRadius: '8px'
-                    }}
+                    minWidth={100}
+                    minHeight={100}
+                    keepSelection={true}
+                    style={{ maxWidth: '100%' }}
                   >
                     <img
                       ref={imgRef}
@@ -648,62 +794,290 @@ function ConfiguracionPerfil() {
         </Modal>
 
         {/* Modal de cambio de contraseña */}
-        <Modal
-          open={openPasswordModal}
+        <Dialog 
+          open={openPasswordModal} 
           onClose={() => setOpenPasswordModal(false)}
-          aria-labelledby="modal-cambio-contraseña"
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            style: {
+              borderRadius: '12px',
+              padding: '16px',
+              backgroundColor: '#25283D',
+              color: 'white'
+            }
+          }}
         >
-          <Box className="password-modal">
-            <h2>Cambiar Contraseña</h2>
-            <div className="modal-form-group">
-              <label>Contraseña Actual</label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="input-field"
-                placeholder="Ingresa tu contraseña actual"
-              />
-            </div>
-            <div className="modal-form-group">
-              <label>Nueva Contraseña</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="input-field"
-                placeholder="Ingresa tu nueva contraseña"
-              />
-            </div>
-            <div className="modal-form-group">
-              <label>Confirmar Nueva Contraseña</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input-field"
-                placeholder="Confirma tu nueva contraseña"
-              />
-            </div>
-            {passwordError && <p className="error-text">{passwordError}</p>}
-            <div className="modal-buttons">
-              <button 
+          <DialogTitle sx={{
+            textAlign: 'center',
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            color: '#ffffff',
+            pb: 1,
+            borderBottom: '2px solid rgba(255, 194, 71, 0.3)'
+          }}>
+            Cambiar Contraseña
+          </DialogTitle>
+          <DialogContent sx={{ mt: 2 }}>
+            {resetEmailSent ? (
+              <Alert 
+                severity="success" 
+                sx={{ 
+                  mt: 2,
+                  backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                  color: '#4caf50',
+                  '& .MuiAlert-icon': {
+                    color: '#4caf50'
+                  }
+                }}
+              >
+                Se ha enviado un correo de restablecimiento a tu dirección de correo electrónico.
+              </Alert>
+            ) : (
+              <>
+                <Box sx={{ mb: 3, backgroundColor: 'rgba(255, 255, 255, 0.05)', p: 3, borderRadius: '8px' }}>
+                  <Typography variant="body2" color="rgba(255, 255, 255, 0.7)" align="center" sx={{ mb: 2 }}>
+                    Tu contraseña debe cumplir con los siguientes requisitos:
+                  </Typography>
+                  <Box sx={{ mt: 2 }}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          {passwordValidation.length ? (
+                            <CheckCircleIcon sx={{ color: '#ffc247' }} />
+                          ) : (
+                            <RadioButtonUncheckedIcon sx={{ color: 'rgba(255, 255, 255, 0.3)' }} />
+                          )}
+                          <Typography variant="body2" color="rgba(255, 255, 255, 0.9)">
+                            Mínimo 8 caracteres
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          {passwordValidation.number ? (
+                            <CheckCircleIcon sx={{ color: '#ffc247' }} />
+                          ) : (
+                            <RadioButtonUncheckedIcon sx={{ color: 'rgba(255, 255, 255, 0.3)' }} />
+                          )}
+                          <Typography variant="body2" color="rgba(255, 255, 255, 0.9)">
+                            Al menos un número
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          {passwordValidation.special ? (
+                            <CheckCircleIcon sx={{ color: '#ffc247' }} />
+                          ) : (
+                            <RadioButtonUncheckedIcon sx={{ color: 'rgba(255, 255, 255, 0.3)' }} />
+                          )}
+                          <Typography variant="body2" color="rgba(255, 255, 255, 0.9)">
+                            Un carácter especial
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          {passwordValidation.capital ? (
+                            <CheckCircleIcon sx={{ color: '#ffc247' }} />
+                          ) : (
+                            <RadioButtonUncheckedIcon sx={{ color: 'rgba(255, 255, 255, 0.3)' }} />
+                          )}
+                          <Typography variant="body2" color="rgba(255, 255, 255, 0.9)">
+                            Una mayúscula
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Box>
+
+                <TextField
+                  fullWidth
+                  type="password"
+                  label="Contraseña Actual"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  margin="normal"
+                  variant="outlined"
+                  sx={{
+                    mb: 2,
+                    '& .MuiOutlinedInput-root': {
+                      color: 'white',
+                      '& fieldset': {
+                        borderColor: 'rgba(255, 255, 255, 0.23)',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(255, 194, 71, 0.5)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#ffc247',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      '&.Mui-focused': {
+                        color: '#ffc247',
+                      },
+                    },
+                  }}
+                />
+
+                <TextField
+                  fullWidth
+                  type="password"
+                  label="Nueva Contraseña"
+                  value={newPassword}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    validatePassword(e.target.value);
+                  }}
+                  margin="normal"
+                  variant="outlined"
+                  sx={{
+                    mb: 2,
+                    '& .MuiOutlinedInput-root': {
+                      color: 'white',
+                      '& fieldset': {
+                        borderColor: 'rgba(255, 255, 255, 0.23)',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(255, 194, 71, 0.5)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#ffc247',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      '&.Mui-focused': {
+                        color: '#ffc247',
+                      },
+                    },
+                  }}
+                />
+
+                <TextField
+                  fullWidth
+                  type="password"
+                  label="Confirmar Nueva Contraseña"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  margin="normal"
+                  variant="outlined"
+                  error={confirmPassword !== '' && newPassword !== confirmPassword}
+                  helperText={confirmPassword !== '' && newPassword !== confirmPassword ? 'Las contraseñas no coinciden' : ''}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      color: 'white',
+                      '& fieldset': {
+                        borderColor: 'rgba(255, 255, 255, 0.23)',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(255, 194, 71, 0.5)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#ffc247',
+                      },
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      '&.Mui-focused': {
+                        color: '#ffc247',
+                      },
+                    },
+                    '& .MuiFormHelperText-root': {
+                      color: '#ff4444',
+                    },
+                  }}
+                />
+
+                {passwordError && (
+                  <Alert 
+                    severity="error" 
+                    sx={{ 
+                      mt: 2,
+                      backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                      color: '#ff4444',
+                      '& .MuiAlert-icon': {
+                        color: '#ff4444'
+                      }
+                    }}
+                  >
+                    {passwordError}
+                  </Alert>
+                )}
+
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                  <Button
+                    onClick={handleForgotPassword}
+                    sx={{
+                      color: '#ffc247',
+                      textDecoration: 'underline',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 194, 71, 0.1)',
+                      }
+                    }}
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Button>
+                </Box>
+
+                {resetError && (
+                  <Alert 
+                    severity="error" 
+                    sx={{ 
+                      mt: 2,
+                      backgroundColor: 'rgba(255, 68, 68, 0.1)',
+                      color: '#ff4444',
+                      '& .MuiAlert-icon': {
+                        color: '#ff4444'
+                      }
+                    }}
+                  >
+                    {resetError}
+                  </Alert>
+                )}
+              </>
+            )}
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'center', gap: 2 }}>
+            <Button
+              onClick={() => setOpenPasswordModal(false)}
+              variant="outlined"
+              sx={{
+                borderColor: 'rgba(255, 255, 255, 0.23)',
+                color: 'rgba(255, 255, 255, 0.7)',
+                '&:hover': {
+                  borderColor: 'rgba(255, 255, 255, 0.5)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                }
+              }}
+            >
+              Cancelar
+            </Button>
+            {!resetEmailSent && (
+              <Button
                 onClick={handlePasswordChange}
-                className="save-changes"
-                disabled={!currentPassword || !newPassword || !confirmPassword}
+                variant="contained"
+                sx={{
+                  bgcolor: '#ffc247',
+                  color: '#25283D',
+                  '&:hover': {
+                    bgcolor: '#ffb014'
+                  },
+                  '&:disabled': {
+                    bgcolor: 'rgba(255, 194, 71, 0.3)',
+                    color: 'rgba(37, 40, 61, 0.7)'
+                  }
+                }}
               >
-                <SaveIcon style={{ marginRight: "8px", fontSize: "20px" }} />
-                Guardar Contraseña
-              </button>
-              <button 
-                onClick={() => setOpenPasswordModal(false)}
-                className="cancel-button"
-              >
-                Cancelar
-              </button>
-            </div>
-          </Box>
-        </Modal>
+                Cambiar Contraseña
+              </Button>
+            )}
+          </DialogActions>
+        </Dialog>
 
         {/* Snackbar para alertas */}
         <Snackbar
