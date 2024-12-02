@@ -159,21 +159,42 @@
 }
 
 .fc-event-content.task-pending {
-  background-color: rgba(255, 194, 71, 0.15) !important;
+  background-color: rgba(255, 194, 71, 0.9) !important;
   border: none !important;
   padding: 4px 8px;
 }
 
 .fc-list-event.task-pending {
   border-left-color: #ffc247 !important;
+  background-color: rgba(255, 194, 71, 0.9) !important;
 }
 
 .fc-list-event.task-pending:hover {
-  background: rgba(255, 194, 71, 0.08) !important;
+  background: rgba(129, 90, 10, 0.8) !important;
 }
 
 .fc-list-event.task-pending .fc-list-event-title {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: #25283D !important;
+  font-weight: 600 !important;
+}
+
+.fc-list-event.task-completed {
+  background-color: rgba(76, 175, 80, 0.9) !important;
+}
+
+.fc-list-event.task-in-progress {
+  background-color: rgba(33, 150, 243, 0.9) !important;
+}
+
+.fc-list-event.task-high-priority {
+  background-color: rgba(244, 67, 54, 0.9) !important;
+}
+
+.fc-list-event.task-completed .fc-list-event-title,
+.fc-list-event.task-in-progress .fc-list-event-title,
+.fc-list-event.task-high-priority .fc-list-event-title {
+  color: #ffffff !important;
+  font-weight: 500 !important;
 }
 
 /* Ajustes de la cuadrícula */
@@ -208,7 +229,7 @@
 
 /* Eventos */
 .fc-daygrid-event-harness {
-  margin: 2px 0 !important;
+  margin: 0 !important;
 }
 
 .fc-event {
@@ -238,6 +259,45 @@
 .task-high-priority {
   background: rgba(244, 67, 54, 0.9) !important;
   color: white !important;
+}
+
+.fc-event-content.task-pending {
+  background-color: rgba(255, 194, 71, 0.9) !important;
+  border: none !important;
+  padding: 4px 8px;
+}
+
+.fc-list-event.task-pending {
+  border-left-color: #ffc247 !important;
+  background-color: rgba(255, 194, 71, 0.9) !important;
+}
+
+.fc-list-event.task-pending:hover {
+  background: rgba(129, 90, 10, 0.8) !important;
+}
+
+.fc-list-event.task-pending .fc-list-event-title {
+  color: #25283D !important;
+  font-weight: 600 !important;
+}
+
+.fc-list-event.task-completed {
+  background-color: rgba(76, 175, 80, 0.9) !important;
+}
+
+.fc-list-event.task-in-progress {
+  background-color: rgba(33, 150, 243, 0.9) !important;
+}
+
+.fc-list-event.task-high-priority {
+  background-color: rgba(244, 67, 54, 0.9) !important;
+}
+
+.fc-list-event.task-completed .fc-list-event-title,
+.fc-list-event.task-in-progress .fc-list-event-title,
+.fc-list-event.task-high-priority .fc-list-event-title {
+  color: #ffffff !important;
+  font-weight: 500 !important;
 }
 
 /* Botón "más" */
@@ -300,11 +360,6 @@
 
 .fc .fc-daygrid-body-balanced .fc-daygrid-day-events {
   position: relative !important;
-}
-
-.fc-timeGridWeek-view .fc-daygrid-more-link {
-  margin: 0 2px !important;
-  padding: 2px 4px !important;
 }
 
 /* Contenedor de eventos */
@@ -555,7 +610,7 @@
 }
 
 .fc .fc-list-day-cushion {
-  background: rgba(255, 194, 71, 0.1) !important;
+  background: rgba(37, 40, 61, 0.6) !important;
   padding: 0.75rem 1rem !important;
   margin: 1rem 0 0.5rem 0 !important;
   border-radius: 8px !important;
@@ -575,6 +630,7 @@
   font-size: 0.9rem !important;
   text-transform: capitalize !important;
   padding: 0 0.5rem !important;
+  text-decoration: none !important;
 }
 
 /* Ocultar el punto separador entre la fecha y el día */
@@ -589,31 +645,135 @@
 .fc .fc-list-event {
   display: flex;
   align-items: center;
-  background: transparent !important;
-  margin: 0.5rem 0 !important;
-  border-radius: 8px !important;
+  background: rgba(37, 40, 61, 0.4) !important;
+  margin: 0.75rem 1rem !important;
+  border-radius: 12px !important;
   transition: all 0.2s ease;
   cursor: pointer;
-  border-left: 3px solid transparent;
+  border-left: 4px solid transparent;
+  position: relative;
+  overflow: hidden;
 }
 
 .fc .fc-list-event:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(37, 40, 61, 0.6) !important;
   transform: translateX(4px);
 }
 
 .fc .fc-list-event-title {
-  font-weight: 500 !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  padding: 0.75rem !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  padding: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 1;
 }
 
 .fc .fc-list-event-time {
   font-weight: 500 !important;
   color: rgba(255, 255, 255, 0.7) !important;
   font-size: 0.9rem !important;
-  padding: 0.75rem !important;
-  min-width: 110px;
+  padding: 1rem !important;
+  min-width: 120px;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos específicos para cada tipo de tarea */
+.fc-list-event.task-completed {
+  border-left-color: #4CAF50 !important;
+}
+
+.fc-list-event.task-completed::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0) 100%);
+  pointer-events: none;
+}
+
+.fc-list-event.task-pending {
+  border-left-color: #ffc247 !important;
+}
+
+.fc-list-event.task-pending::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(255, 194, 71, 0.1) 0%, rgba(255, 194, 71, 0) 100%);
+  pointer-events: none;
+}
+
+.fc-list-event.task-in-progress {
+  border-left-color: #2196F3 !important;
+}
+
+.fc-list-event.task-in-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(33, 150, 243, 0.1) 0%, rgba(33, 150, 243, 0) 100%);
+  pointer-events: none;
+}
+
+.fc-list-event.task-high-priority {
+  border-left-color: #f44336 !important;
+}
+
+.fc-list-event.task-high-priority::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0) 100%);
+  pointer-events: none;
+}
+
+/* Hover states */
+.fc-list-event:hover::after {
+  opacity: 0.7;
+}
+
+/* Iconos en el título */
+.fc-list-event-title svg {
+  font-size: 1.1rem !important;
+  opacity: 0.9;
+}
+
+/* Contenedor de la tabla */
+.fc .fc-list-table {
+  border: none !important;
+  border-spacing: 0 !important;
+  border-collapse: separate !important;
+}
+
+/* Ajuste del contenedor de la lista */
+.fc-list-view {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Eliminar bordes y fondos innecesarios */
+.fc .fc-list-table td {
+  background: none !important;
+  border: none !important;
+}
+
+/* Ocultar el punto del evento */
+.fc-list-event-dot {
+  display: none !important;
 }
 
 .fc-list-event.task-completed {
@@ -621,7 +781,7 @@
 }
 
 .fc-list-event.task-completed:hover {
-  background: rgba(76, 175, 80, 0.08) !important;
+  background: rgba(37, 40, 61, 0.6) !important;
 }
 
 .fc-list-event.task-pending {
@@ -629,7 +789,7 @@
 }
 
 .fc-list-event.task-pending:hover {
-  background: rgba(255, 194, 71, 0.08) !important;
+  background: rgba(37, 40, 61, 0.6) !important;
 }
 
 .fc-list-event.task-in-progress {
@@ -637,7 +797,7 @@
 }
 
 .fc-list-event.task-in-progress:hover {
-  background: rgba(33, 150, 243, 0.08) !important;
+  background: rgba(37, 40, 61, 0.6) !important;
 }
 
 .fc-list-event.task-high-priority {
@@ -645,7 +805,7 @@
 }
 
 .fc-list-event.task-high-priority:hover {
-  background: rgba(244, 67, 54, 0.08) !important;
+  background: rgba(37, 40, 61, 0.6) !important;
 }
 
 .fc-list-event-dot {
@@ -1098,7 +1258,7 @@
   }
 }
 
-/* Ajustes del encabezado y barra de días */
+/* Ajuste del encabezado y barra de días */
 .fc .fc-toolbar {
   margin-bottom: 0 !important;
   padding-bottom: 0.5rem !important;
@@ -1223,6 +1383,13 @@
 
 .fc-timegrid-event .fc-event-main {
   padding: 2px 4px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease !important;
+}
+
+.fc-timegrid-event:hover .fc-event-main {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
 .fc-timegrid-event .fc-event-time {
@@ -1280,4 +1447,185 @@
 /* Contenedor principal de la vista de semana */
 .fc-timeGridWeek-view .fc-view-harness {
   height: calc(100vh - 150px) !important;
+}
+
+.fc-list-event-title > div {
+  background: rgba(255, 194, 71, 0.9) !important;
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.fc-list-event-title > div > svg {
+  font-size: 18px !important;
+  min-width: 18px !important;
+}
+
+.fc-list-event-title > div > span {
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+}
+
+.task-completed .fc-list-event-title > div {
+  background: rgba(76, 175, 80, 0.9) !important;
+}
+
+.task-in-progress .fc-list-event-title > div {
+  background: rgba(33, 150, 243, 0.9) !important;
+}
+
+.task-high-priority .fc-list-event-title > div {
+  background: rgba(244, 67, 54, 0.9) !important;
+}
+
+.fc-list-event-title > div > div.event-meta > svg {
+  position: relative !important;
+  top: -1px !important;
+}
+
+/* Vista de mes - Rediseño */
+.fc-dayGridMonth-view {
+  background: #25283D !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+}
+
+/* Cabecera de días */
+.fc-col-header {
+  margin-bottom: 8px !important;
+}
+
+.fc-col-header-cell {
+  background: transparent !important;
+  border: none !important;
+  padding: 12px 4px !important;
+}
+
+.fc-col-header-cell-cushion {
+  color: #ffc247 !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+/* Celdas de días */
+.fc-daygrid-day {
+  border: none !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+  padding: 4px !important;
+}
+
+.fc-daygrid-day-frame {
+  border-radius: 10px !important;
+  min-height: 120px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.2s ease !important;
+}
+
+.fc-daygrid-day-frame:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.fc-daygrid-day.fc-day-today .fc-daygrid-day-frame {
+  background: rgba(255, 194, 71, 0.05) !important;
+  border: 1px solid rgba(255, 194, 71, 0.2) !important;
+}
+
+.fc-daygrid-day-top {
+  padding: 8px !important;
+}
+
+.fc-daygrid-day-number {
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+  background: #ffc247 !important;
+  color: #25283D !important;
+}
+
+.fc-day-other .fc-daygrid-day-number {
+  opacity: 0.4 !important;
+}
+
+/* Eventos */
+.fc-daygrid-event-harness {
+  margin: 0 !important;
+}
+
+.fc-event {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+}
+
+.fc-event-main {
+  padding: 0 !important;
+  background: none !important;
+}
+
+.fc-event-main-frame {
+  background: none !important;
+}
+
+.fc-daygrid-event {
+  margin: 2px 4px !important;
+  background: none !important;
+  border: none !important;
+}
+
+.fc-daygrid-event .fc-event-title {
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
+  display: block !important;
+}
+
+/* Estados de las tareas */
+.task-pending .fc-event-title {
+  background: rgba(255, 194, 71, 0.9) !important;
+  color: #25283D !important;
+}
+
+.task-completed .fc-event-title {
+  background: rgba(76, 175, 80, 0.9) !important;
+  color: white !important;
+}
+
+.task-in-progress .fc-event-title {
+  background: rgba(33, 150, 243, 0.9) !important;
+  color: white !important;
+}
+
+.task-high-priority .fc-event-title {
+  background: rgba(244, 67, 54, 0.9) !important;
+  color: white !important;
+}
+
+/* Botón más */
+.fc-daygrid-more-link {
+  margin: 4px 6px !important;
+  padding: 4px 8px !important;
+  background: rgba(255, 194, 71, 0.1) !important;
+  border-radius: 6px !important;
+  color: #ffc247 !important;
+  font-size: 0.8rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.fc-daygrid-more-link:hover {
+  background: rgba(255, 194, 71, 0.2) !important;
+  text-decoration: none !important;
 }
