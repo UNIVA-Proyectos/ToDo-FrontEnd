@@ -200,7 +200,10 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
                     alignItems: 'center',
                     pb: 1
                 }}>
-                    <Typography variant="h6">
+                    <Typography 
+                        variant="h6" 
+                        component="div"
+                    >
                         Compartir Tarea
                     </Typography>
                     <IconButton
