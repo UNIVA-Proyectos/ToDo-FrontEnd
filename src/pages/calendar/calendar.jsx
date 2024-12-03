@@ -25,12 +25,24 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import MobileCalendar from "../../components/calendar/MobileCalendar";
 
 const PageCalendar = () => {
   const [user] = useAuthState(auth);
   const { tasks } = useTasks(db, user);
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Llamar al inicio para establecer el estado inicial
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const getEventClassName = (task) => {
     if (task.priority === "Alta") return "task-high-priority";
@@ -201,29 +213,6 @@ const PageCalendar = () => {
     );
   };
 
-  const events = tasks
-    .filter(task => task && task.dueDate)
-    .map((task) => {
-      const dueDate = task.dueDate?.toDate();
-      if (!dueDate) {
-        console.error('Fecha inválida para la tarea:', task);
-        return null;
-      }
-
-      return {
-        id: task.id,
-        title: task.titulo || 'Sin título',
-        start: dueDate,
-        end: dueDate,
-        allDay: true,
-        className: getEventClassName(task),
-        extendedProps: {
-          task: task
-        }
-      };
-    })
-    .filter(Boolean);
-
   const handleEventClick = (info) => {
     setSelectedTask(info.event.extendedProps.task);
     setOpen(true);
@@ -240,91 +229,56 @@ const PageCalendar = () => {
 
   return (
     <Fade in={true} timeout={500}>
-      <Box sx={{ height: "calc(100vh - 100px)", p: 3 }}>
-        <Paper 
-          elevation={0}
-          sx={{ 
-            height: "100%", 
-            p: 2,
-            borderRadius: "16px",
-            backgroundColor: "#ffffff",
-            overflow: "visible",
-            position: "relative",
-            '& .fc': {
-              '--fc-border-color': '#ebedf0',
-              position: 'relative',
-              zIndex: 1
-            },
-            '& .fc .fc-popover': {
-              zIndex: 10000
-            },
-            '& .fc-popover-body': {
-              zIndex: 10000
-            }
-          }}
-        >
-          <FullCalendar
-            plugins={[
-              dayGridPlugin,
-              timeGridPlugin,
-              listPlugin,
-              interactionPlugin
-            ]}
-            initialView="dayGridMonth"
-            headerToolbar={{
-              left: "prev,today,next",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
-            }}
-            locale={esLocale}
-            events={events}
-            eventContent={renderEventContent}
-            eventClick={handleEventClick}
-            dateClick={handleDateClick}
-            height="100%"
-            dayMaxEventRows={2}
-            moreLinkText={count => `${count} más`}
-            moreLinkClick="popover"
-            views={{
-              timeGridWeek: {
-                dayMaxEventRows: 2,
-                moreLinkText: count => `${count} más`,
-                titleFormat: { year: 'numeric', month: 'long', day: '2-digit' }
-              },
-              dayGridMonth: {
-                dayMaxEventRows: 2,
-                moreLinkText: count => `${count} más`,
-                titleFormat: { year: 'numeric', month: 'long' }
-              },
-              timeGridDay: {
-                titleFormat: { year: 'numeric', month: 'long', day: '2-digit', weekday: 'long' }
-              }
-            }}
-            slotDuration="00:30:00"
-            slotMinTime="06:00:00"
-            slotMaxTime="22:00:00"
-            expandRows={true}
-            allDaySlot={false}
-            nowIndicator={true}
-            buttonText={{
-              today: "Hoy",
-              month: "Mes",
-              week: "Semana",
-              day: "Día",
-              list: "Lista"
-            }}
-            eventTimeFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false
-            }}
-            slotLabelFormat={{
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false
+      <Box sx={{ 
+        height: '100vh',
+        width: '100%',
+        overflow: 'hidden',
+        position: 'relative'
+      }}>
+        {isMobile ? (
+          <MobileCalendar 
+            events={tasks.map(task => ({
+              id: task.id,
+              title: task.titulo,
+              start: task.dueDate?.toDate?.(),
+              end: task.dueDate?.toDate?.(),
+              estado: task.estado,
+              priority: task.priority,
+              descripcion: task.descripcion
+            }))}
+            onEventClick={(event) => {
+              setSelectedTask(event);
+              setOpen(true);
             }}
           />
-        </Paper>
+        ) : (
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            headerToolbar={{
+              left: "prev,next today",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+            }}
+            locale={esLocale}
+            events={tasks.map((task) => ({
+              id: task.id,
+              title: task.titulo,
+              start: task.dueDate?.toDate?.(),
+              end: task.dueDate?.toDate?.(),
+              className: getEventClassName(task),
+              extendedProps: {
+                task: task,
+                description: task.descripcion,
+                priority: task.priority,
+                status: task.estado,
+              }
+            }))}
+            eventClick={handleEventClick}
+            height="100%"
+            dayMaxEvents={3}
+          />
+        )}
         {selectedTask && (
           <TaskDetailDialog
             open={open}
