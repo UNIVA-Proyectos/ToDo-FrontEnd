@@ -22,6 +22,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
+import PropTypes from 'prop-types';
 import '../../styles/mobileCalendar.css';
 
 const MobileCalendar = ({ events, onEventClick }) => {
@@ -216,6 +217,21 @@ const MobileCalendar = ({ events, onEventClick }) => {
       </Box>
     </Paper>
   );
+};
+
+MobileCalendar.propTypes = {
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      start: PropTypes.instanceOf(Date),
+      end: PropTypes.instanceOf(Date),
+      estado: PropTypes.string,
+      priority: PropTypes.string,
+      descripcion: PropTypes.string
+    })
+  ).isRequired,
+  onEventClick: PropTypes.func.isRequired
 };
 
 export default MobileCalendar;

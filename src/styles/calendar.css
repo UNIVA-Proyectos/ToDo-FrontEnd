@@ -1324,3 +1324,100 @@
 .fc-col-header-cell-cushion {
   color: rgba(255, 255, 255, 0.7) !important;
 }
+
+/* Estilos modernos para la vista de lista/agenda */
+.fc-list-view {
+  background: #25283D !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.fc-list-day {
+  background: transparent !important;
+}
+
+.fc-list-day-cushion {
+  background: rgba(255, 194, 71, 0.1) !important;
+  padding: 12px 20px !important;
+  margin: 0 !important;
+}
+
+.fc-list-day-text {
+  color: #FFC247 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.fc-list-day-side-text {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 500 !important;
+  font-size: 0.8rem !important;
+}
+
+.fc-list-event {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  margin: 8px 12px !important;
+  padding: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.fc-list-event:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fc-list-event-dot {
+  display: none !important;
+}
+
+.fc-list-event-time {
+  font-size: 0.85rem !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 500 !important;
+  padding: 8px 12px !important;
+}
+
+.fc-list-event-title {
+  font-size: 0.95rem !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+  padding: 8px 12px !important;
+}
+
+.fc-list-empty {
+  background: transparent !important;
+  padding: 40px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+}
+
+/* Scrollbar personalizada para la vista de lista */
+.fc-list-view .fc-scroller {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05) !important;
+}
+
+.fc-list-view .fc-scroller::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.fc-list-view .fc-scroller::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 3px !important;
+}
+
+.fc-list-view .fc-scroller::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 3px !important;
+}
