@@ -17,7 +17,7 @@ import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import "../../styles/login.css";
+import "../../styles/pages/login.css";
 import logo from "../../assets/To-Do-Logo.png";
 
 const AppLogin = () => {

@@ -23,7 +23,7 @@ import {
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday } from 'date-fns';
 import { es } from 'date-fns/locale';
 import PropTypes from 'prop-types';
-import '../../styles/mobileCalendar.css';
+import "../../styles/components/calendar/mobileCalendar.css";
 
 const MobileCalendar = ({ events, onEventClick }) => {
   const [currentDate, setCurrentDate] = useState(new Date());

@@ -8,7 +8,7 @@ import {
   updatePassword,
   sendPasswordResetEmail 
 } from 'firebase/auth';
-import "../../styles/configUsuario.css"; // CSS global
+import "../../styles/pages/configUsuario.css"; // CSS global
 import useUserData from "../../hooks/user/useUserData";
 import { useNavigate } from "react-router-dom";
 import useUpdateUserData from "../../hooks/user/useUpdateUserData";

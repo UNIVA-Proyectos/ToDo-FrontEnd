@@ -1,14 +1,17 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:400,800");
+
+/* Importa Font Awesome */
 @import "~@fortawesome/fontawesome-free/css/all.css";
 
 /* importa los archivos css */
-@import "./home.css";
-@import "./login.css";
-@import "./sidebar.css";
-@import "./taskCard.css";
-@import "./taskSummary.css";
-@import "./datepicker.css";
-@import "./taskDialog.css";
+@import "./pages/login.css";
+@import "./pages/home.css";
+@import "./components/layout/sidebar.css";
+@import "./components/layout/task-card.css";
+@import "./components/layout/task-summary.css";
+@import "./components/layout/task-dialog.css";
+@import "./components/inputs/datepicker.css";
+@import "./components/calendar/mobileCalendar.css";
 
 /* Reset global */
 html, body {

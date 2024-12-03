@@ -55,8 +55,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import useDeleteTask from "../../hooks/tasks/useDeleteTask";
-import useComments from "../../hooks/comments/useComments";
-import useDeleteComment from "../../hooks/comments/useDeleteComment";
+import useComments from "../../hooks/features/comments/useComments";
+import useDeleteComment from "../../hooks/features/comments/useDeleteComment";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
@@ -68,7 +68,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import AssistantAI from "./AssistantAI.jsx";
+import AssistantAI from "../services/assistant/AssistantAI.jsx";
 import MobileTaskDetailDialog from "./MobileTaskDetailDialog";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
