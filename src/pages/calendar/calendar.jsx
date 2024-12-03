@@ -288,11 +288,16 @@ const PageCalendar = () => {
             views={{
               timeGridWeek: {
                 dayMaxEventRows: 2,
-                moreLinkText: count => `${count} más`
+                moreLinkText: count => `${count} más`,
+                titleFormat: { year: 'numeric', month: 'long', day: '2-digit' }
               },
               dayGridMonth: {
                 dayMaxEventRows: 2,
-                moreLinkText: count => `${count} más`
+                moreLinkText: count => `${count} más`,
+                titleFormat: { year: 'numeric', month: 'long' }
+              },
+              timeGridDay: {
+                titleFormat: { year: 'numeric', month: 'long', day: '2-digit', weekday: 'long' }
               }
             }}
             slotDuration="00:30:00"
@@ -311,24 +316,12 @@ const PageCalendar = () => {
             eventTimeFormat={{
               hour: "2-digit",
               minute: "2-digit",
-              meridiem: false,
               hour12: false
             }}
             slotLabelFormat={{
               hour: "2-digit",
               minute: "2-digit",
               hour12: false
-            }}
-            views={{
-              dayGridMonth: {
-                titleFormat: { year: 'numeric', month: 'long' }
-              },
-              timeGridWeek: {
-                titleFormat: { year: 'numeric', month: 'long', day: '2-digit' }
-              },
-              timeGridDay: {
-                titleFormat: { year: 'numeric', month: 'long', day: '2-digit', weekday: 'long' }
-              }
             }}
           />
         </Paper>
