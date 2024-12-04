@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   font-family: "Montserrat", sans-serif;
-  height: 100vh;
+  min-height: 100vh;
   padding: 20px;
   position: relative;
   background: linear-gradient(135deg, #1a1b2e 0%, #25283d 100%);
@@ -216,8 +216,8 @@
   overflow: hidden;
   width: 768px;
   max-width: 100%;
-  min-height: 680px;
-  z-index: 1;
+  min-height: 620px;
+  max-height: 620px;
 }
 
 .form-container {
@@ -225,6 +225,9 @@
   top: 0;
   height: 100%;
   transition: all 0.6s ease-in-out;
+  max-height: 620px;
+  margin: auto;
+  overflow: hidden;
 }
 
 .sign-in-container {
@@ -505,10 +508,13 @@
   .container {
     min-height: 100vh;
     border-radius: 0;
+    max-height: none;
   }
   
   .form-container {
-    width: 100%;
+    max-height: none;
+    height: 100%;
+    overflow: auto;
   }
   
   .overlay-container {

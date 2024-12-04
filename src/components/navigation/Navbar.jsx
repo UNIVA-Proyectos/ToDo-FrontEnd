@@ -19,7 +19,7 @@ export default function MobileNavigation() {
 
   return (
     <>
-      <div style={{ paddingBottom: "56px" }}>
+      <div style={{ paddingBottom: "70px" }}>
         {" "}
         {/* Deja espacio para el BottomNavigation */}
         {/* Aquí va el contenido principal de tu página */}
@@ -31,8 +31,26 @@ export default function MobileNavigation() {
           position: "fixed",
           bottom: 0,
           backgroundColor: "#25283d",
-          height: "56px", // Altura del BottomNavigation
-          zIndex: 1000, // Asegura que se muestre encima del contenido
+          height: "60px",
+          zIndex: 1000,
+          borderTop: "2px solid rgba(255, 194, 71, 0.1)",
+          "& .MuiBottomNavigationAction-root": {
+            minWidth: "auto",
+            color: "#666",
+            "&.Mui-selected": {
+              color: "#ffc247",
+              "& .MuiSvgIcon-root": {
+                filter: "drop-shadow(0 0 2px rgba(255, 194, 71, 0.3))",
+              },
+            },
+          },
+          "& .MuiBottomNavigationAction-label": {
+            fontSize: "0.7rem",
+            marginTop: "4px",
+          },
+          "& .MuiSvgIcon-root": {
+            fontSize: "1.4rem",
+          },
         }}
         value={value}
         onChange={handleChange}
@@ -41,37 +59,21 @@ export default function MobileNavigation() {
           label="Tareas"
           value="/home"
           icon={<TaskIcon />}
-          sx={{
-            color: value === "/home" ? "#ffc247" : "white",
-            "&.Mui-selected": { color: "#ffc247" },
-          }}
         />
         <BottomNavigationAction
           label="Calendario"
           value="/calendar"
           icon={<CalendarMonthIcon />}
-          sx={{
-            color: value === "/calendar" ? "#ffc247" : "white",
-            "&.Mui-selected": { color: "#ffc247" },
-          }}
         />
         <BottomNavigationAction
           label="Configuración"
           value="/settings"
           icon={<SettingsIcon />}
-          sx={{
-            color: value === "/settings" ? "#ffc247" : "white",
-            "&.Mui-selected": { color: "#ffc247" },
-          }}
         />
         <BottomNavigationAction
           label="Soporte"
           value="/help"
           icon={<HelpIcon />}
-          sx={{
-            color: value === "/help" ? "#ffc247" : "white",
-            "&.Mui-selected": { color: "#ffc247" },
-          }}
         />
       </BottomNavigation>
     </>
