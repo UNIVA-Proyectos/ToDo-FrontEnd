@@ -12,6 +12,7 @@ import {
   onAuthStateChanged,
   setPersistence,
   browserSessionPersistence,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -210,6 +211,38 @@ const AppLogin = () => {
     setShowPassword((prev) => !prev);
   };
 
+  const handleForgotPassword = async () => {
+    if (!credentials.email) {
+      setMessage("Por favor, ingresa tu correo electrónico para restablecer la contraseña.");
+      setErrors(prev => ({ ...prev, email: true }));
+      return;
+    }
+    
+    if (!isValidEmail(credentials.email)) {
+      setMessage("Por favor, ingresa un correo electrónico válido.");
+      setErrors(prev => ({ ...prev, email: true }));
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, credentials.email);
+      setMessage("Te hemos enviado un correo con las instrucciones para restablecer tu contraseña.");
+    } catch (error) {
+      let errorMessage;
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "No existe una cuenta con este correo.";
+          break;
+        default:
+          errorMessage = "Error al enviar el correo. Inténtalo de nuevo.";
+      }
+      setMessage(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="login-container">
       <div
@@ -282,6 +315,13 @@ const AppLogin = () => {
             >
               Iniciar Sesión
             </button>
+            <a
+              href="#"
+              onClick={handleForgotPassword}
+              className="account-option"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
           </form>
         </div>
 
