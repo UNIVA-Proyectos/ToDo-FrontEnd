@@ -81,6 +81,65 @@ const AppLogin = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    // Create particles
+    const createParticles = () => {
+      const container = document.querySelector('.login-container');
+      if (!container) return;
+
+      const particleCount = Math.min(50, Math.floor(window.innerWidth / 20));
+      const particles = [];
+
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        const size = Math.random();
+        
+        // Assign size class based on random value
+        if (size < 0.4) {
+          particle.className = 'particle particle-small';
+        } else if (size < 0.7) {
+          particle.className = 'particle particle-medium';
+        } else {
+          particle.className = 'particle particle-large';
+        }
+
+        // Random initial position
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        particle.style.left = `${left}%`;
+        particle.style.top = `${top}%`;
+
+        // Random animation delay
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+
+        container.appendChild(particle);
+        particles.push(particle);
+      }
+
+      return () => {
+        particles.forEach(particle => {
+          if (particle.parentNode) {
+            particle.parentNode.removeChild(particle);
+          }
+        });
+      };
+    };
+
+    const cleanup = createParticles();
+    
+    // Recreate particles on window resize
+    const handleResize = () => {
+      if (cleanup) cleanup();
+      createParticles();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      if (cleanup) cleanup();
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const togglePanel = (isActive) => {
     if (!isMobile) {
       setIsRightPanelActive(isActive);
