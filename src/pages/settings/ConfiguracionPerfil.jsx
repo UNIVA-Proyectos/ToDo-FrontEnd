@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth, storage } from '../../config/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { auth } from '../../config/firebase';
 import { 
   EmailAuthProvider, 
   reauthenticateWithCredential, 
@@ -37,6 +36,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import Icon from '@mui/material/Icon';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { uploadToCloudinary } from '../../services/cloudinaryService';
 
 function ConfiguracionPerfil() {
   const { userData, loading } = useUserData();
@@ -191,7 +191,7 @@ function ConfiguracionPerfil() {
   };
 
   // Función para manejar la selección inicial de la imagen
-  const handleImageSelect = (e) => {
+  const handleImageSelect = async (e) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith("image/")) {
       setAlertMessage("Por favor selecciona una imagen válida.");
@@ -200,12 +200,28 @@ function ConfiguracionPerfil() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setSelectedImage(reader.result);
-      setOpenImageEditor(true);
-    };
-    reader.readAsDataURL(file);
+    try {
+      setIsUploading(true);
+      console.log('Preparando imagen para subir...', file);
+      
+      // Subir la imagen a Cloudinary
+      const imageUrl = await uploadToCloudinary(file);
+      
+      // Actualizar la URL de la foto en el estado y en Firebase
+      setPhotoURL(imageUrl);
+      await updateUserData({ photoURL: imageUrl });
+      
+      setAlertMessage("Imagen actualizada con éxito");
+      setAlertSeverity('success');
+      setOpenAlert(true);
+    } catch (error) {
+      console.error('Error completo:', error);
+      setAlertMessage(error.message || "Error al subir la imagen");
+      setAlertSeverity('error');
+      setOpenAlert(true);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   // Función para cargar la imagen cuando se complete
@@ -307,56 +323,13 @@ function ConfiguracionPerfil() {
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
       const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
 
-      // Subir a Firebase Storage
-      const timestamp = Date.now();
-      const fileName = `${user.uid}_${timestamp}.jpg`;
-      const filePath = `profilePictures/${fileName}`;
-      const storageRef = ref(storage, filePath);
-
-      console.log('Preparando imagen para subir...');
-      // Asegurarse de que el blob sea válido
-      if (!blob || blob.size === 0) {
-        throw new Error('La imagen procesada no es válida');
-      }
-
-      // Verificar el tamaño máximo (por ejemplo, 5MB)
-      if (blob.size > 5 * 1024 * 1024) {
-        throw new Error('La imagen es demasiado grande. El tamaño máximo es 5MB');
-      }
-
-      console.log('Subiendo imagen a Storage...', {
-        fileName,
-        filePath,
-        blobSize: blob.size,
-        blobType: blob.type
-      });
-
-      // Intentar la subida con metadata explícito
-      const metadata = {
-        contentType: 'image/jpeg',
-        customMetadata: {
-          'uploadedBy': user.uid,
-          'timestamp': timestamp.toString()
-        }
-      };
-
-      const uploadResult = await uploadBytes(storageRef, file, metadata);
-      console.log('Imagen subida, obteniendo URL...');
-      const downloadURL = await getDownloadURL(uploadResult.ref);
-      console.log('URL obtenida:', downloadURL);
-
-      // Actualizar perfil usando el hook
-      console.log('Actualizando datos de usuario...');
-      await updateUserData({
-        photoURL: downloadURL,
-        lastPhotoUpdate: timestamp
-      });
-
-      // Limpiar estado
-      setSelectedImage(null);
-      setOpenImageEditor(false);
-      resetCrop();
-
+      // Subir a Cloudinary
+      const imageUrl = await uploadToCloudinary(file);
+      
+      // Actualizar la URL de la foto en el estado y en Firebase
+      setPhotoURL(imageUrl);
+      await updateUserData({ photoURL: imageUrl });
+      
       setAlertMessage("¡Foto de perfil actualizada con éxito!");
       setAlertSeverity('success');
       setOpenAlert(true);
