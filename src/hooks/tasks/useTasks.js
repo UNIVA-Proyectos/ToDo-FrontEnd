@@ -1,5 +1,5 @@
 import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const useTasks = (db, user) => {
   const [tasks, setTasks] = useState([]);
@@ -8,21 +8,12 @@ const useTasks = (db, user) => {
   const [overdueCount, setOverdueCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const unsubscribeRef = useRef(null);
 
   const processTask = useCallback((doc) => {
-    if (!doc.exists()) {
-      console.error('Documento no existe:', doc.id);
-      return null;
-    }
-
+    if (!doc.exists()) return null;
     const taskData = doc.data();
-    if (!taskData) {
-      console.error('Datos inválidos para el documento:', doc.id);
-      return null;
-    }
-
-    const sharedUsers = taskData.sharedWith || [];
-    const isSharedWithUser = sharedUsers.some(sharedUser => sharedUser.email === user.email);
+    if (!taskData) return null;
 
     return {
       id: doc.id,
@@ -34,32 +25,31 @@ const useTasks = (db, user) => {
       dueDate: taskData.dueDate || null,
       priority: taskData.priority || 'normal',
       user_id: taskData.user_id,
-      sharedWith: sharedUsers,
+      sharedWith: taskData.sharedWith || [],
       isShared: taskData.user_id !== user.uid,
-      canEdit: taskData.user_id === user.uid || isSharedWithUser,
-      fechaInicio: taskData.dueDate || new Date(),
-      fechaFin: taskData.dueDate || new Date()
+      canEdit: taskData.user_id === user.uid || (taskData.sharedWith || []).some(shared => shared.email === user.email)
     };
-  }, [user.uid, user.email]);
+  }, [user]);
 
   const updateCounts = useCallback((tasksList) => {
-    const completed = tasksList.filter(task => task.estado === "Completada");
+    const now = new Date();
+    const completed = tasksList.filter(task => task.estado === "Completada").length;
     const overdue = tasksList.filter(task => {
       const dueDate = task.dueDate?.toDate();
-      return task.estado === "Pendiente" && dueDate && dueDate < new Date();
-    });
+      return task.estado === "Pendiente" && dueDate && dueDate < now;
+    }).length;
     const pending = tasksList.filter(task => {
       const dueDate = task.dueDate?.toDate();
-      return task.estado === "Pendiente" && (!dueDate || dueDate >= new Date());
-    });
+      return task.estado === "Pendiente" && (!dueDate || dueDate >= now);
+    }).length;
 
-    setCompletedCount(completed.length);
-    setOverdueCount(overdue.length);
-    setPendingCount(pending.length);
+    setCompletedCount(completed);
+    setOverdueCount(overdue);
+    setPendingCount(pending);
   }, []);
 
   useEffect(() => {
-    if (!user?.uid || !user?.email) {
+    if (!user?.uid || !user?.email || !db) {
       setTasks([]);
       setCompletedCount(0);
       setPendingCount(0);
@@ -72,56 +62,62 @@ const useTasks = (db, user) => {
     setError(null);
 
     try {
-      console.log('Iniciando suscripción a tareas para usuario:', user.email);
+      // Limpiar suscripción anterior si existe
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
 
-      // Primero, obtenemos las tareas propias del usuario
-      const ownTasksQuery = query(
+      const tasksQuery = query(
         collection(db, "tasks"),
         where("user_id", "==", user.uid)
       );
 
-      // Luego, obtenemos todas las tareas y filtramos las compartidas
-      const allTasksQuery = query(collection(db, "tasks"));
+      const sharedTasksQuery = query(
+        collection(db, "tasks"),
+        where("sharedWith", "array-contains", { email: user.email })
+      );
 
-      const unsubscribe = onSnapshot(allTasksQuery, async (querySnapshot) => {
-        try {
-          // Obtener tareas propias
-          const ownTasksSnapshot = await getDocs(ownTasksQuery);
-          const ownTasks = ownTasksSnapshot.docs.map(processTask).filter(task => task !== null);
+      const unsubscribe = onSnapshot(
+        tasksQuery,
+        async (querySnapshot) => {
+          try {
+            const ownTasks = querySnapshot.docs
+              .map(processTask)
+              .filter(task => task !== null);
 
-          // Filtrar tareas compartidas
-          const sharedTasks = querySnapshot.docs
-            .map(processTask)
-            .filter(task => {
-              if (!task) return false;
-              const sharedUsers = task.sharedWith || [];
-              return sharedUsers.some(sharedUser => sharedUser.email === user.email);
-            });
+            const sharedSnapshot = await getDocs(sharedTasksQuery);
+            const sharedTasks = sharedSnapshot.docs
+              .map(processTask)
+              .filter(task => task !== null);
 
-          // Combinar tareas propias y compartidas
-          const allTasks = [...ownTasks, ...sharedTasks];
-          
-          // Eliminar duplicados si los hay
-          const uniqueTasks = Array.from(new Map(allTasks.map(task => [task.id, task])).values());
+            const allTasks = [...ownTasks, ...sharedTasks];
+            const uniqueTasks = Array.from(
+              new Map(allTasks.map(task => [task.id, task])).values()
+            );
 
-          console.log('Total de tareas obtenidas:', uniqueTasks.length);
-          setTasks(uniqueTasks);
-          updateCounts(uniqueTasks);
-          setLoading(false);
-        } catch (error) {
-          console.error("Error procesando tareas:", error);
+            setTasks(uniqueTasks);
+            updateCounts(uniqueTasks);
+            setLoading(false);
+          } catch (error) {
+            console.error("Error procesando tareas:", error);
+            setError(error);
+            setLoading(false);
+          }
+        },
+        (error) => {
+          console.error("Error en la suscripción:", error);
           setError(error);
           setLoading(false);
         }
-      }, (error) => {
-        console.error("Error en la suscripción:", error);
-        setError(error);
-        setLoading(false);
-      });
+      );
+
+      unsubscribeRef.current = unsubscribe;
 
       return () => {
-        console.log('Limpiando suscripción a tareas');
-        unsubscribe();
+        if (unsubscribeRef.current) {
+          unsubscribeRef.current();
+          unsubscribeRef.current = null;
+        }
       };
     } catch (error) {
       console.error("Error al configurar la suscripción:", error);

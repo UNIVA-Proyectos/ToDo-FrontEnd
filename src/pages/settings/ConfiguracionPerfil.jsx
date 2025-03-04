@@ -313,8 +313,34 @@ function ConfiguracionPerfil() {
       const filePath = `profilePictures/${fileName}`;
       const storageRef = ref(storage, filePath);
 
-      console.log('Subiendo imagen a Storage...');
-      const uploadResult = await uploadBytes(storageRef, file);
+      console.log('Preparando imagen para subir...');
+      // Asegurarse de que el blob sea válido
+      if (!blob || blob.size === 0) {
+        throw new Error('La imagen procesada no es válida');
+      }
+
+      // Verificar el tamaño máximo (por ejemplo, 5MB)
+      if (blob.size > 5 * 1024 * 1024) {
+        throw new Error('La imagen es demasiado grande. El tamaño máximo es 5MB');
+      }
+
+      console.log('Subiendo imagen a Storage...', {
+        fileName,
+        filePath,
+        blobSize: blob.size,
+        blobType: blob.type
+      });
+
+      // Intentar la subida con metadata explícito
+      const metadata = {
+        contentType: 'image/jpeg',
+        customMetadata: {
+          'uploadedBy': user.uid,
+          'timestamp': timestamp.toString()
+        }
+      };
+
+      const uploadResult = await uploadBytes(storageRef, file, metadata);
       console.log('Imagen subida, obteniendo URL...');
       const downloadURL = await getDownloadURL(uploadResult.ref);
       console.log('URL obtenida:', downloadURL);

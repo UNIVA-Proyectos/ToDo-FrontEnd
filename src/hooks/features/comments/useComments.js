@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { collection, addDoc, query, where, getDocs, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 
 const useComments = (db) => {
     const [comentarios, setComentarios] = useState([]);
@@ -12,22 +12,17 @@ const useComments = (db) => {
         setLoading(true);
         setError(null);
         try {
-            const comentariosRef = collection(db, 'comentario');
-            const q = query(
-                comentariosRef,
-                where("taskId", "==", taskId)
-            );
-            const querySnapshot = await getDocs(q);
+            const comentariosRef = collection(db, 'tasks', taskId, 'comentarios');
+            const querySnapshot = await getDocs(comentariosRef);
             const comentariosData = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
-            // Ordenar los comentarios por fecha después de obtenerlos
             comentariosData.sort((a, b) => b.fecha.seconds - a.fecha.seconds);
             setComentarios(comentariosData);
         } catch (error) {
             console.error("Error al cargar comentarios:", error);
-            setError(error.message);
+            setError("No tienes permisos para ver los comentarios de esta tarea");
         } finally {
             setLoading(false);
         }
@@ -37,15 +32,25 @@ const useComments = (db) => {
         if (!comentarioData.taskId) return;
 
         try {
-            const docRef = await addDoc(collection(db, 'comentario'), {
-                ...comentarioData,
-                fecha: Timestamp.now()
-            });
+            const docRef = await addDoc(
+                collection(db, 'tasks', comentarioData.taskId, 'comentarios'),
+                {
+                    texto: comentarioData.texto,
+                    userId: comentarioData.userId,
+                    userEmail: comentarioData.userEmail,
+                    userName: comentarioData.userName,
+                    userPhoto: comentarioData.userPhoto,
+                    fecha: Timestamp.now(),
+                }
+            );
             
-            // Actualizar el estado local inmediatamente
             const nuevoComentario = {
                 id: docRef.id,
-                ...comentarioData,
+                texto: comentarioData.texto,
+                userId: comentarioData.userId,
+                userEmail: comentarioData.userEmail,
+                userName: comentarioData.userName,
+                userPhoto: comentarioData.userPhoto,
                 fecha: Timestamp.now()
             };
             
@@ -56,23 +61,28 @@ const useComments = (db) => {
             return docRef;
         } catch (error) {
             console.error("Error al agregar comentario:", error);
-            setError(error.message);
+            setError("No tienes permisos para comentar en esta tarea");
             throw error;
         }
     };
 
-    const eliminarComentario = async (comentarioId) => {
-        if (!comentarioId) return;
+    const eliminarComentario = async (taskId, comentarioId, userId) => {
+        if (!comentarioId || !taskId || !userId) {
+            console.error("Faltan datos necesarios para eliminar el comentario");
+            return;
+        }
 
         try {
-            await deleteDoc(doc(db, 'comentario', comentarioId));
-            // Actualizar el estado local inmediatamente
+            const comentarioRef = doc(db, 'tasks', taskId, 'comentarios', comentarioId);
+            await deleteDoc(comentarioRef);
+            
+            // Actualizar el estado local después de eliminar
             setComentarios(prevComentarios => 
                 prevComentarios.filter(com => com.id !== comentarioId)
             );
         } catch (error) {
             console.error("Error al eliminar comentario:", error);
-            setError(error.message);
+            setError("No tienes permisos para eliminar este comentario");
             throw error;
         }
     };

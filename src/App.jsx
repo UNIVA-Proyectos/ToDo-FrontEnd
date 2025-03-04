@@ -36,12 +36,24 @@ const LoginPage = () => {
 // Protege las rutas que requieren autenticación
 const PrivateRoute = ({ element: Element }) => {
   const location = useLocation();
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
+  const [lastPath, setLastPath] = useState(localStorage.getItem('lastPath') || '/home');
+
+  useEffect(() => {
+    if (!loading && location.pathname !== '/') {
+      localStorage.setItem('lastPath', location.pathname);
+      setLastPath(location.pathname);
+    }
+  }, [location.pathname, loading]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return user ? (
     Element
   ) : (
-    <Navigate to="/" state={{ from: location }} replace />
+    <Navigate to="/" state={{ from: lastPath }} replace />
   );
 };
 
@@ -59,7 +71,18 @@ const TitleHandler = () => {
 };
 
 const App = () => {
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
+  const [initialLoad, setInitialLoad] = useState(true);
+
+  useEffect(() => {
+    if (!loading) {
+      setInitialLoad(false);
+    }
+  }, [loading]);
+
+  if (loading && initialLoad) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Router>
@@ -70,7 +93,16 @@ const App = () => {
           <Route element={<BlankLayout />}>
             <Route 
               path="/" 
-              element={user ? <Navigate to="/home" replace /> : <LoginPage />} 
+              element={
+                user ? (
+                  <Navigate 
+                    to={localStorage.getItem('lastPath') || '/home'} 
+                    replace 
+                  />
+                ) : (
+                  <LoginPage />
+                )
+              } 
             />
             <Route path="/reset-password" element={<ResetPassword />} />
           </Route>

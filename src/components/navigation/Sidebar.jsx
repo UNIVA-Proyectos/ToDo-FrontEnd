@@ -119,11 +119,11 @@ export default function Sidebar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [notificationAnchorEl, setNotificationAnchorEl] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     if (user) {
-      console.log("Usuario autenticado:", user);
-      console.log("Nombre del usuario:", user.displayName);
+      setUserProfile(user);
     }
   }, [user]);
 
@@ -171,11 +171,11 @@ export default function Sidebar() {
   };
 
   const handleNotificationsClick = () => {
-    console.log("Notificaciones clicadas");
+    setNotificationAnchorEl(null);
   };
 
   const handleProfileClick = () => {
-    console.log("Perfil clicado");
+    navigate('/settings');
   };
 
   const menuItems = [

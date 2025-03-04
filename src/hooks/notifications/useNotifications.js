@@ -13,10 +13,10 @@ const useNotifications = (db, user) => {
 
             try {
                 // Obtener tareas pendientes
-                const tasksRef = collection(db, 'tareas');
+                const tasksRef = collection(db, 'tasks'); 
                 const q = query(
                     tasksRef,
-                    where("userId", "==", user.uid),
+                    where("user_id", "==", user.uid), 
                     where("estado", "==", "Pendiente")
                 );
                 const querySnapshot = await getDocs(q);

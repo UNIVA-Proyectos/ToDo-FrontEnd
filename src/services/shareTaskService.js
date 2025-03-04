@@ -135,8 +135,6 @@ export const removeSharedUser = async (db, taskId, userId) => {
 // Función para actualizar la información de un usuario en todas sus tareas compartidas
 export const updateUserInfoInSharedTasks = async (db, userId, newUserInfo) => {
     try {
-        console.log('Actualizando información del usuario en tareas compartidas:', { userId, newUserInfo });
-        
         // Buscar todas las tareas donde el usuario está compartido
         const tasksRef = collection(db, "tasks");
         const q = query(tasksRef);
@@ -170,9 +168,6 @@ export const updateUserInfoInSharedTasks = async (db, userId, newUserInfo) => {
 
         if (updatedCount > 0) {
             await batch.commit();
-            console.log(`Actualizadas ${updatedCount} tareas con la nueva información del usuario`);
-        } else {
-            console.log('No se encontraron tareas para actualizar');
         }
 
         return true;

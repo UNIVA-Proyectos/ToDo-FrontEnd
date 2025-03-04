@@ -203,19 +203,34 @@ const AppLogin = () => {
     if (!validateFields()) return;
     setIsLoading(true);
     try {
+      console.log('Iniciando autenticación...', {
+        isSignUp,
+        emailLength: credentials.email?.length,
+        passwordLength: credentials.password?.length
+      });
+
+      // Establecer la persistencia antes de la autenticación
+      await setPersistence(auth, browserSessionPersistence);
+      console.log('Persistencia establecida');
+      
       const authFunc = isSignUp
         ? createUserWithEmailAndPassword
         : signInWithEmailAndPassword;
+      
+      console.log('Intentando autenticación...');
       const { user } = await authFunc(
         auth,
         credentials.email,
         credentials.password
       );
+      console.log('Autenticación exitosa');
+
       if (isSignUp) await saveUser(user, "email");
       localStorage.setItem("lastEmail", credentials.email);
       setMessage(`${isSignUp ? "Registro" : "Inicio de sesión"} exitoso.`);
       navigate("/home");
     } catch (error) {
+      console.error('Error completo:', error);
       let errorMessage = "";
       switch (error.code) {
         case "auth/weak-password":
