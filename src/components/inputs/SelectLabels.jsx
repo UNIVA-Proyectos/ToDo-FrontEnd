@@ -8,7 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import React, { useState } from 'react';
 import CreateLabelDialog from '../dialog/CreateLabelDialog';
 
-const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, setSelectedTags }) => {
+const SelectLabels = ({ value, onChange, label, customIcon, selectedTags = [], setSelectedTags }) => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [customOptions, setCustomOptions] = useState([]);
 
@@ -51,14 +51,26 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
     }
   ];
 
-  const handleChange = (_data, selected) => {
-    if (selected?.some(option => option.value === "__create__")) {
+  const handleChange = (selected, { action, removedValue }) => {
+    console.log("SelectLabels handleChange called with:", { selected, action, removedValue });
+    
+    // Si no hay selección, establecer un array vacío
+    if (!selected || selected.length === 0) {
+      console.log("No selection, setting empty array");
+      setSelectedTags([]);
+      return;
+    }
+
+    // Verificar si se seleccionó la opción de crear
+    if (selected.some(option => option?.value === "__create__")) {
+      console.log("Create option selected, opening dialog");
       setCreateDialogOpen(true);
       // Remove the "Crear etiqueta" option from selection
-      const filteredSelection = selected.filter(option => option.value !== "__create__");
+      const filteredSelection = selected.filter(option => option?.value !== "__create__");
       setSelectedTags(filteredSelection);
     } else {
-      setSelectedTags(selected || []);
+      console.log("Setting selected tags:", selected);
+      setSelectedTags(selected);
     }
   };
 
@@ -108,11 +120,11 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
       maxHeight: "none !important",
       overflowY: "visible",
     }),
-    option: (provided, { _data, isFocused, isSelected }) => ({
+    option: (provided, { data, isFocused, isSelected }) => ({
       ...provided,
       color: "#fff",
       backgroundColor: isSelected 
-        ? _data.color 
+        ? (data?.color || "#FFC247")
         : isFocused 
           ? "rgba(255, 255, 255, 0.1)" 
           : "transparent",
@@ -124,16 +136,16 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
       borderRadius: "4px",
       margin: "2px 0",
       "&:hover": {
-        backgroundColor: _data.color,
+        backgroundColor: data?.color || "#FFC247",
         color: "white",
         "& svg": {
           color: "white !important"
         }
       },
     }),
-    multiValue: (styles, { _data }) => ({
+    multiValue: (styles, { data }) => ({
       ...styles,
-      backgroundColor: _data.color,
+      backgroundColor: data?.color || "#FFC247",
       borderRadius: "15px",
       padding: "2px 2px 2px 8px",
       margin: "2px 4px 2px 0",
@@ -147,7 +159,7 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
       fontSize: "0.875rem",
       padding: "0",
     }),
-    multiValueRemove: (styles, { _data }) => ({
+    multiValueRemove: (styles, { data }) => ({
       ...styles,
       color: "white",
       borderRadius: "0 15px 15px 0",
@@ -157,6 +169,12 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
         color: "white",
       },
     }),
+    input: (provided) => ({
+      ...provided,
+      color: "white",
+      margin: "0",
+      padding: "0",
+    }),
     placeholder: (provided) => ({
       ...provided,
       color: "rgba(255, 255, 255, 0.8)",
@@ -164,15 +182,15 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
       fontWeight: "400",
       letterSpacing: "0.5px",
     }),
-    input: (provided) => ({
+    singleValue: (provided, { data }) => ({
       ...provided,
       color: "white",
-      margin: "0",
-      padding: "0",
-    }),
-    singleValue: (provided, { _data }) => ({
-      ...provided,
-      color: "white",
+      backgroundColor: data?.color || "#FFC247",
+      padding: "2px 8px",
+      borderRadius: "15px",
+      "& svg": {
+        color: "white !important"
+      }
     }),
     indicatorsContainer: (provided) => ({
       ...provided,
@@ -201,17 +219,20 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
     valueContainer: (provided) => ({
       ...provided,
       padding: "2px 8px",
-      flexWrap: "wrap",
     }),
   };
 
   const formatOptionLabel = ({ label, icon, data, isSelected }) => (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-      {React.cloneElement(icon, {
-        sx: { 
-          color: isSelected ? 'white' : icon.props.sx.color 
-        }
-      })}
+      {icon && React.isValidElement(icon) ? 
+        React.cloneElement(icon, {
+          sx: { 
+            color: isSelected ? 'white' : (icon.props?.sx?.color || '#FFC247') 
+          }
+        }) 
+        : 
+        null
+      }
       <span>{label}</span>
     </div>
   );
@@ -231,6 +252,7 @@ const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, se
           placeholder="+ Agregar etiquetas"
           menuPortalTarget={document.body}
           menuPosition="fixed"
+          classNamePrefix="react-select"
         />
       </div>
       <CreateLabelDialog

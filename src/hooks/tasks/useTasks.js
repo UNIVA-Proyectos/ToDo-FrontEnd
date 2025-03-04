@@ -75,7 +75,7 @@ const useTasks = (db, user) => {
       // Consulta para tareas compartidas
       const sharedTasksQuery = query(
         tasksCollection,
-        where("sharedWith", "array-contains", { email: user.email })
+        where("sharedWith", "array-contains", user.email)
       );
 
       // Suscribirse a ambas consultas

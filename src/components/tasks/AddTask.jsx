@@ -32,6 +32,10 @@ import {
   faExclamation
 } from "@fortawesome/free-solid-svg-icons";
 import { generateTaskDescription } from "../../services/aiService";
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import SchoolIcon from '@mui/icons-material/School';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -40,7 +44,7 @@ const Transition = forwardRef(function Transition(props, ref) {
 const AddTask = ({ open = false, addTask, handleClose }) => {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);  // Asegurarnos que siempre sea un array
   const [showAIHelper, setShowAIHelper] = useState(false);
   const [isAILoading, setIsAILoading] = useState(false);
   const [priority, setPriority] = useState("normal");
@@ -90,7 +94,9 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
     }
 
     console.log("Priority value before creating task:", priority); // Debug line
+    console.log("Selected tags before creating task:", selectedTags); // Debug line
 
+    // Asegurarnos de que todos los valores son válidos
     const taskWithTags = {
       titulo: taskName.trim(),
       descripcion: taskDescription.trim(),
@@ -98,9 +104,9 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
       fechaCreacion: new Date(),
       dueDate: taskDate,
       complete: false,
-      priority: priority,
-      tags: selectedTags && selectedTags.length > 0 
-        ? selectedTags.map(tag => tag.value) 
+      priority: priority || "normal",
+      tags: Array.isArray(selectedTags) && selectedTags.length > 0 
+        ? selectedTags.filter(tag => tag?.value !== undefined && tag?.value !== null && tag?.value !== "").map(tag => tag.value) 
         : []
     };
 
@@ -114,7 +120,7 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
   const resetForm = () => {
     setTaskName("");
     setTaskDescription("");
-    setSelectedTags([]);
+    setSelectedTags([]); // Asegurarnos que se resetea como array vacío
     setPriority("normal");
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -137,7 +143,19 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
         sx: {
           borderRadius: 2,
           backgroundColor: '#25283D',
-          color: 'white'
+          color: 'white',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          '& .MuiDialogTitle-root': {
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          },
+          '& .MuiDialogContent-root': {
+            backgroundColor: '#25283D'
+          },
+          '& .MuiDialogActions-root': {
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#25283D'
+          }
         }
       }}
     >
@@ -177,6 +195,7 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
             sx={{
               '& .MuiOutlinedInput-root': {
                 color: 'white',
+                backgroundColor: '#25283D',
                 '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
                 '&:hover fieldset': { borderColor: '#FFC247' },
                 '&.Mui-focused fieldset': { borderColor: '#FFC247' },
@@ -184,6 +203,8 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
               '& .MuiInputLabel-root': {
                 color: 'rgba(255, 255, 255, 0.7)',
                 '&.Mui-focused': { color: '#FFC247' },
+                backgroundColor: '#25283D',
+                padding: '0 8px',
               },
             }}
           />
@@ -214,20 +235,16 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
             sx={{
               '& .MuiOutlinedInput-root': {
                 color: 'white',
-                '& fieldset': { 
-                  borderColor: 'rgba(255, 255, 255, 0.23)',
-                },
+                backgroundColor: '#25283D',
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
                 '&:hover fieldset': { borderColor: '#FFC247' },
                 '&.Mui-focused fieldset': { borderColor: '#FFC247' },
               },
               '& .MuiInputLabel-root': {
                 color: 'rgba(255, 255, 255, 0.7)',
                 '&.Mui-focused': { color: '#FFC247' },
-              },
-              '& .MuiInputLabel-outlined': {
                 backgroundColor: '#25283D',
-                paddingLeft: '4px',
-                paddingRight: '4px',
+                padding: '0 8px',
               },
             }}
           />
@@ -240,7 +257,7 @@ const AddTask = ({ open = false, addTask, handleClose }) => {
           }}>
             <Box sx={{ flex: 2 }}>
               <SelectLabels
-                selectedTags={selectedTags}
+                selectedTags={selectedTags || []}
                 setSelectedTags={setSelectedTags}
                 sx={{ width: '100%' }}
               />
