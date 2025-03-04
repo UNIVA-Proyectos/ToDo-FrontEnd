@@ -504,6 +504,65 @@
   margin-bottom: 20px;
 }
 
+.btn-link {
+  background: none;
+  border: none;
+  color: #4481eb;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 10px 0;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: #5995fd;
+}
+
+.btn-link:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.social-button {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  font-size: 1.1rem;
+  height: 46px;
+  margin: 0 0.45rem;
+  width: 46px;
+}
+
+.social-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.social-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.forgot-password-link {
+  background: none !important;
+  border: none !important;
+  color: #666 !important;
+  font-size: 0.8rem !important;
+  padding: 5px !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  margin-top: 15px !important;
+  margin-bottom: 15px !important;
+  transition: color 0.3s ease !important;
+  display: block !important;
+}
+
+.forgot-password-link:hover {
+  color: #4bb4f7 !important;
+}
+
 @media (max-width: 768px) {
   .container {
     min-height: 100vh;
@@ -535,8 +594,14 @@
 
   .login-container h1,
   .login-container h2,
-  .login-container p {
+  .login-container p,
+  .login-container a {
     color: #ffffff;
+  }
+
+  .login-container a:hover {
+    color: #ffc247;
+    text-decoration: underline;
   }
 
   .container {

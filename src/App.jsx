@@ -23,6 +23,7 @@ const Calendar = lazy(() => import('./pages/calendar/calendar'));
 const ProfileSettings = lazy(() => import('./pages/settings/ConfiguracionPerfil'));
 const FAQ = lazy(() => import('./pages/help/faq'));
 const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 const MobileLogin = lazy(() => import('./pages/auth/MobileLogin'));
 const Login = lazy(() => import('./pages/auth/Login'));
 
@@ -105,6 +106,7 @@ const App = () => {
               } 
             />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
           </Route>
           <Route element={<PrivateRoute element={<MainLayout />} />}>
             <Route path="/home" element={<Home />} />

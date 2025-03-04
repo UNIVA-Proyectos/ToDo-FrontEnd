@@ -1,7 +1,7 @@
-import { doc, updateDoc, writeBatch, collection, getDocs } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 
-// Función para actualizar la foto del usuario en todos los lugares necesarios
+// Función para actualizar la foto del usuario
 export const updateUserPhoto = async (db, auth, photoURL) => {
     try {
         const user = auth.currentUser;
@@ -21,36 +21,7 @@ export const updateUserPhoto = async (db, auth, photoURL) => {
         await updateDoc(userRef, { photoURL });
         console.log('Foto actualizada en documento de usuario');
 
-        // 3. Actualizar en todas las tareas compartidas
-        const batch = writeBatch(db);
-        const tasksSnapshot = await getDocs(collection(db, 'tasks'));
-        let updatedCount = 0;
-
-        tasksSnapshot.forEach((taskDoc) => {
-            const taskData = taskDoc.data();
-            const sharedWith = taskData.sharedWith || [];
-            const userIndex = sharedWith.findIndex(u => u.id === user.uid);
-
-            if (userIndex !== -1) {
-                const updatedSharedWith = [...sharedWith];
-                updatedSharedWith[userIndex] = {
-                    ...updatedSharedWith[userIndex],
-                    photoURL
-                };
-                
-                batch.update(doc(db, 'tasks', taskDoc.id), {
-                    sharedWith: updatedSharedWith
-                });
-                updatedCount++;
-            }
-        });
-
-        if (updatedCount > 0) {
-            await batch.commit();
-            console.log(`Foto actualizada en ${updatedCount} tareas compartidas`);
-        }
-
-        return true;
+        return { success: true };
     } catch (error) {
         console.error('Error actualizando foto de usuario:', error);
         throw error;

@@ -27,21 +27,22 @@ const useTasks = (db, user) => {
       user_id: taskData.user_id,
       sharedWith: taskData.sharedWith || [],
       isShared: taskData.user_id !== user.uid,
-      canEdit: taskData.user_id === user.uid || (taskData.sharedWith || []).some(shared => shared.email === user.email)
+      canEdit: taskData.user_id === user.uid
     };
   }, [user]);
 
   const updateCounts = useCallback((tasksList) => {
     const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
     const completed = tasksList.filter(task => task.estado === "Completada").length;
     const overdue = tasksList.filter(task => {
-      const dueDate = task.dueDate?.toDate();
-      return task.estado === "Pendiente" && dueDate && dueDate < now;
+      if (task.estado !== "Pendiente" || !task.dueDate) return false;
+      const dueDate = task.dueDate.toDate();
+      const dueDateWithoutTime = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+      return dueDateWithoutTime < today;
     }).length;
-    const pending = tasksList.filter(task => {
-      const dueDate = task.dueDate?.toDate();
-      return task.estado === "Pendiente" && (!dueDate || dueDate >= now);
-    }).length;
+    const pending = tasksList.filter(task => task.estado === "Pendiente").length;
 
     setCompletedCount(completed);
     setOverdueCount(overdue);
@@ -51,9 +52,6 @@ const useTasks = (db, user) => {
   useEffect(() => {
     if (!user?.uid || !user?.email || !db) {
       setTasks([]);
-      setCompletedCount(0);
-      setPendingCount(0);
-      setOverdueCount(0);
       setLoading(false);
       return;
     }
@@ -62,33 +60,38 @@ const useTasks = (db, user) => {
     setError(null);
 
     try {
-      // Limpiar suscripción anterior si existe
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
       }
 
-      const tasksQuery = query(
-        collection(db, "tasks"),
+      const tasksCollection = collection(db, "tasks");
+
+      // Consulta para tareas propias
+      const ownTasksQuery = query(
+        tasksCollection,
         where("user_id", "==", user.uid)
       );
 
+      // Consulta para tareas compartidas
       const sharedTasksQuery = query(
-        collection(db, "tasks"),
+        tasksCollection,
         where("sharedWith", "array-contains", { email: user.email })
       );
 
-      const unsubscribe = onSnapshot(
-        tasksQuery,
-        async (querySnapshot) => {
+      // Suscribirse a ambas consultas
+      const unsubscribeOwn = onSnapshot(
+        ownTasksQuery,
+        async (ownSnapshot) => {
           try {
-            const ownTasks = querySnapshot.docs
-              .map(processTask)
-              .filter(task => task !== null);
-
             const sharedSnapshot = await getDocs(sharedTasksQuery);
+            
+            const ownTasks = ownSnapshot.docs
+              .map(processTask)
+              .filter(Boolean);
+            
             const sharedTasks = sharedSnapshot.docs
               .map(processTask)
-              .filter(task => task !== null);
+              .filter(Boolean);
 
             const allTasks = [...ownTasks, ...sharedTasks];
             const uniqueTasks = Array.from(
@@ -111,7 +114,9 @@ const useTasks = (db, user) => {
         }
       );
 
-      unsubscribeRef.current = unsubscribe;
+      unsubscribeRef.current = () => {
+        unsubscribeOwn();
+      };
 
       return () => {
         if (unsubscribeRef.current) {

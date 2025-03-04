@@ -8,7 +8,7 @@ const useUserData = () => {
   const [user] = useAuthState(auth);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [photoUpdateInProgress, setPhotoUpdateInProgress] = useState(false);
+  const [lastPhotoUpdate, setLastPhotoUpdate] = useState(null);
 
   useEffect(() => {
     if (!user) {
@@ -23,25 +23,6 @@ const useUserData = () => {
       async (docSnapshot) => {
         if (docSnapshot.exists()) {
           const data = docSnapshot.data();
-          
-          // Solo actualizar la foto si no hay una actualización en progreso
-          if (!photoUpdateInProgress && user.photoURL !== data.photoURL) {
-            console.log('Detectado cambio en la foto del usuario:', {
-              authPhoto: user.photoURL,
-              firestorePhoto: data.photoURL
-            });
-            
-            try {
-              setPhotoUpdateInProgress(true);
-              await updateUserPhoto(db, auth, user.photoURL);
-              console.log('Foto actualizada exitosamente en todos los lugares');
-            } catch (error) {
-              console.error('Error al actualizar la foto del usuario:', error);
-            } finally {
-              setPhotoUpdateInProgress(false);
-            }
-          }
-          
           setUserData(data);
         } else {
           // Si el documento no existe, crear uno nuevo
@@ -49,14 +30,16 @@ const useUserData = () => {
             uid: user.uid,
             email: user.email,
             name: user.displayName,
-            photoURL: user.photoURL,
+            photoURL: user.photoURL || null,
+            createdAt: new Date(),
+            lastLogin: new Date()
           };
           
           try {
             await updateDoc(doc(db, "users", user.uid), newUserData);
             setUserData(newUserData);
           } catch (error) {
-            console.error('Error al crear documento de usuario:', error);
+            console.error("Error al crear documento de usuario:", error);
           }
         }
         setLoading(false);
@@ -68,9 +51,33 @@ const useUserData = () => {
     );
 
     return () => unsubscribe();
-  }, [user, photoUpdateInProgress]);
+  }, [user]);
 
-  return { userData, loading };
+  // Función para actualizar la foto del usuario
+  const updatePhoto = async (photoURL) => {
+    if (!user || !photoURL || photoURL === lastPhotoUpdate) return;
+    
+    try {
+      setLastPhotoUpdate(photoURL);
+      await updateUserPhoto(db, auth, photoURL);
+      
+      // Actualizar el documento del usuario
+      await updateDoc(doc(db, "users", user.uid), {
+        photoURL: photoURL
+      });
+      
+      console.log("Foto actualizada con éxito");
+    } catch (error) {
+      console.error("Error al actualizar la foto:", error);
+      throw error;
+    }
+  };
+
+  return {
+    userData,
+    loading,
+    updatePhoto
+  };
 };
 
 export default useUserData;

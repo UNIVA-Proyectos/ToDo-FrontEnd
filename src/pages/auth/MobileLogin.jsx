@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { 
   auth, 
-  db, 
-  googleProvider, 
-  facebookProvider 
+  db 
 } from "../../config/firebase";
 import { 
   signInWithEmailAndPassword,
   signInWithPopup,
   createUserWithEmailAndPassword,
   setPersistence,
-  browserSessionPersistence
+  browserSessionPersistence,
+  GoogleAuthProvider,
+  FacebookAuthProvider
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -136,7 +136,19 @@ const MobileLogin = () => {
     setIsLoading(true);
     try {
       await setPersistence(auth, browserSessionPersistence);
-      const result = await signInWithPopup(auth, provider);
+      let authProvider;
+      switch (provider) {
+        case 'google':
+          authProvider = new GoogleAuthProvider();
+          break;
+        case 'facebook':
+          authProvider = new FacebookAuthProvider();
+          break;
+        default:
+          throw new Error('Proveedor no soportado');
+      }
+
+      const result = await signInWithPopup(auth, authProvider);
       await setDoc(doc(db, "users", result.user.uid), {
         name: result.user.displayName,
         email: result.user.email,
@@ -400,7 +412,7 @@ const MobileLogin = () => {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={() => handleSocialLogin(googleProvider)}
+                onClick={() => handleSocialLogin('google')}
                 disabled={isLoading}
                 sx={{
                   py: 1.5,
@@ -418,7 +430,7 @@ const MobileLogin = () => {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={() => handleSocialLogin(facebookProvider)}
+                onClick={() => handleSocialLogin('facebook')}
                 disabled={isLoading}
                 sx={{
                   py: 1.5,

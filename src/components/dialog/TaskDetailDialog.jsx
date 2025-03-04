@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactMarkdown from 'react-markdown';
 import {
   Dialog,
   DialogContent,
@@ -271,21 +272,20 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
     if (!comentario.trim()) return;
 
     try {
-      const comentarioData = {
+      await agregarComentario({
+        taskId: task.id,
         texto: comentario,
         userId: user.uid,
-        userName: user.displayName || user.email,
-        userPhoto: user.photoURL || "",
-        taskId: task.id,
-      };
-
-      await agregarComentario(comentarioData);
+        userEmail: user.email,
+        userName: user.displayName || 'Usuario',
+        userPhoto: user.photoURL || '',
+      });
       setComentario("");
-      setSnackbarMessage("Comentario agregado con éxito");
+      setSnackbarMessage("Comentario agregado exitosamente");
       setSnackbarOpen(true);
     } catch (error) {
       console.error("Error al enviar comentario:", error);
-      setSnackbarMessage("Error al enviar el comentario");
+      setSnackbarMessage("Error al enviar comentario");
       setSnackbarOpen(true);
     }
   };
@@ -299,15 +299,14 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
   const handleConfirmDeleteComment = async () => {
     try {
       setCommentDeleteState("success");
-      await deleteComment(confirmDeleteCommentId);
-      await cargarComentarios(task.id);
+      await eliminarComentario(task.id, confirmDeleteCommentId);
       setSnackbarMessage("Comentario eliminado con éxito");
       setSnackbarOpen(true);
       setTimeout(() => {
         setConfirmCommentDialogOpen(false);
         setConfirmDeleteCommentId(null);
         setCommentDeleteState("initial");
-      }, 1500); // Aumentado para dar tiempo a la animación
+      }, 1500);
     } catch (error) {
       console.error("Error al eliminar comentario:", error);
       setSnackbarMessage("Error al eliminar el comentario");
@@ -530,15 +529,32 @@ const TaskDetailDialog = ({ open, onClose, task, db }) => {
                   </Box>
                 </Box>
               ) : (
-                <Typography
-                  variant="body1"
-                  sx={{
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {task.descripcion || "Sin descripción"}
-                </Typography>
+                <Box sx={{ 
+                  '& h1, & h2, & h3, & h4': {
+                    marginTop: '16px',
+                    marginBottom: '8px',
+                    fontWeight: 600,
+                  },
+                  '& ul, & ol': {
+                    paddingLeft: '20px',
+                    marginBottom: '16px',
+                  },
+                  '& p': {
+                    marginBottom: '16px',
+                  },
+                  '& strong': {
+                    color: '#25283d',
+                  }
+                }}>
+                  <ReactMarkdown components={{
+                    p: ({node, ...props}) => <Typography variant="body1" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }} {...props} />,
+                    h1: ({node, ...props}) => <Typography variant="h5" {...props} />,
+                    h2: ({node, ...props}) => <Typography variant="h6" {...props} />,
+                    strong: ({node, ...props}) => <Box component="strong" sx={{ color: '#25283d' }} {...props} />
+                  }}>
+                    {task.descripcion || "Sin descripción"}
+                  </ReactMarkdown>
+                </Box>
               )}
 
               <Box sx={{ mt: 3 }}>

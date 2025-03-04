@@ -1,31 +1,36 @@
 import React, { useState, useEffect } from "react";
-import {
+import { useNavigate } from "react-router-dom";
+import { 
   auth,
-  db,
-  googleProvider,
-  facebookProvider,
+  db 
 } from "../../config/firebase";
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
+import { 
+  signInWithEmailAndPassword, 
+  signInWithPopup, 
+  GoogleAuthProvider,
+  FacebookAuthProvider,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   setPersistence,
-  browserSessionPersistence,
-  sendPasswordResetEmail,
+  browserLocalPersistence,
+  sendPasswordResetEmail
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+
+// Componentes de Material-UI
+import Button from "@mui/material/Button";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import "../../styles/pages/login.css";
 import logo from "../../assets/To-Do-Logo.png";
 
-const AppLogin = () => {
+const Login = () => {
   const [isRightPanelActive, setIsRightPanelActive] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [credentials, setCredentials] = useState({
-    email: "",
+    email: localStorage.getItem("lastEmail") || "",
     password: "",
     name: "",
   });
@@ -38,36 +43,18 @@ const AppLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [rememberMe, setRememberMe] = useState(true);
   const navigate = useNavigate();
 
-  // Función para validar el email
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  // Función para calcular la fortaleza de la contraseña
-  const calculatePasswordStrength = (password) => {
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[!@#$%^&*]/.test(password)) strength++;
-    return strength;
-  };
-
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigate("/home");
+        console.log("Usuario autenticado:", user.email);
+        navigate("/home", { replace: true });
       }
     });
 
-    // Cargar el correo del último usuario desde localStorage
-    const lastEmail = localStorage.getItem("lastEmail");
-    if (lastEmail) {
-      setCredentials((prev) => ({ ...prev, email: lastEmail }));
-    }
+    return () => unsubscribe();
   }, [navigate]);
 
   useEffect(() => {
@@ -81,72 +68,22 @@ const AppLogin = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useEffect(() => {
-    // Create particles
-    const createParticles = () => {
-      const container = document.querySelector('.login-container');
-      if (!container) return;
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
-      const particleCount = Math.min(50, Math.floor(window.innerWidth / 20));
-      const particles = [];
-
-      for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        const size = Math.random();
-        
-        // Assign size class based on random value
-        if (size < 0.4) {
-          particle.className = 'particle particle-small';
-        } else if (size < 0.7) {
-          particle.className = 'particle particle-medium';
-        } else {
-          particle.className = 'particle particle-large';
-        }
-
-        // Random initial position
-        const left = Math.random() * 100;
-        const top = Math.random() * 100;
-        particle.style.left = `${left}%`;
-        particle.style.top = `${top}%`;
-
-        // Random animation delay
-        particle.style.animationDelay = `${Math.random() * 5}s`;
-
-        container.appendChild(particle);
-        particles.push(particle);
-      }
-
-      return () => {
-        particles.forEach(particle => {
-          if (particle.parentNode) {
-            particle.parentNode.removeChild(particle);
-          }
-        });
-      };
-    };
-
-    const cleanup = createParticles();
-    
-    // Recreate particles on window resize
-    const handleResize = () => {
-      if (cleanup) cleanup();
-      createParticles();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      if (cleanup) cleanup();
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[!@#$%^&*]/.test(password)) strength++;
+    return strength;
+  };
 
   const togglePanel = (isActive) => {
-    if (!isMobile) {
-      setIsRightPanelActive(isActive);
-    } else {
-      // En móvil, simplemente cambiamos el estado sin animación
-      setIsRightPanelActive(isActive);
-    }
+    setIsRightPanelActive(isActive);
   };
 
   const handleInputChange = (e) => {
@@ -157,6 +94,7 @@ const AppLogin = () => {
     if (name === "password") {
       setPasswordStrength(calculatePasswordStrength(value));
     }
+
     if (name === "email") {
       setErrors((prev) => ({ ...prev, email: !isValidEmail(value) }));
     }
@@ -174,63 +112,77 @@ const AppLogin = () => {
       name: isRightPanelActive && !nameValid,
     });
 
-    if (!emailValid || !passwordValid || (isRightPanelActive && !nameValid)) {
-      setMessage("*Por favor, verifica los campos marcados en rojo.");
-      return false;
-    }
-    return true;
+    return emailValid && passwordValid && (!isRightPanelActive || nameValid);
   };
 
   const handleAuth = async (provider) => {
     setIsLoading(true);
+    setMessage("");
+
     try {
-      const result = await signInWithPopup(auth, provider);
-      const { user } = result;
-      await saveUser(user, provider.providerId);
-      localStorage.setItem("lastEmail", user.email);
-      setMessage(`Inicio de sesión con ${provider.providerId} exitoso.`);
-      navigate("/home");
+      let authProvider;
+      switch (provider) {
+        case 'google':
+          authProvider = new GoogleAuthProvider();
+          break;
+        case 'facebook':
+          authProvider = new FacebookAuthProvider();
+          break;
+        default:
+          throw new Error('Proveedor no soportado');
+      }
+      
+      const result = await signInWithPopup(auth, authProvider);
+      console.log("Auth social exitoso:", result.user.email);
+      
+      await saveUser(result.user, provider);
+      if (rememberMe) {
+        localStorage.setItem("lastEmail", result.user.email);
+      }
+      
+      navigate("/home", { replace: true });
     } catch (error) {
-      setMessage(
-        `Error al autenticar con ${provider.providerId}: ${error.message}`
-      );
+      console.error("Error en auth social:", error);
+      setMessage(`Error al autenticar con ${provider}: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleEmailAuth = async (isSignUp) => {
-    if (!validateFields()) return;
+    if (!validateFields()) {
+      setMessage("Por favor, verifica los campos marcados en rojo.");
+      return;
+    }
+    
     setIsLoading(true);
-    try {
-      console.log('Iniciando autenticación...', {
-        isSignUp,
-        emailLength: credentials.email?.length,
-        passwordLength: credentials.password?.length
-      });
+    setMessage("");
 
-      // Establecer la persistencia antes de la autenticación
-      await setPersistence(auth, browserSessionPersistence);
-      console.log('Persistencia establecida');
+    try {
+      await setPersistence(auth, browserLocalPersistence);
       
       const authFunc = isSignUp
         ? createUserWithEmailAndPassword
         : signInWithEmailAndPassword;
       
-      console.log('Intentando autenticación...');
       const { user } = await authFunc(
         auth,
         credentials.email,
         credentials.password
       );
-      console.log('Autenticación exitosa');
 
-      if (isSignUp) await saveUser(user, "email");
-      localStorage.setItem("lastEmail", credentials.email);
-      setMessage(`${isSignUp ? "Registro" : "Inicio de sesión"} exitoso.`);
-      navigate("/home");
+      if (isSignUp) {
+        await saveUser(user, "email");
+      }
+      
+      if (rememberMe) {
+        localStorage.setItem("lastEmail", credentials.email);
+      } else {
+        localStorage.removeItem("lastEmail");
+      }
+      
+      navigate("/home", { replace: true });
     } catch (error) {
-      console.error('Error completo:', error);
       let errorMessage = "";
       switch (error.code) {
         case "auth/weak-password":
@@ -248,19 +200,8 @@ const AppLogin = () => {
         case "auth/user-not-found":
           errorMessage = "No existe una cuenta con este correo.";
           break;
-        case "auth/password-does-not-meet-requirements":
-          // Extraer el mensaje de los requisitos y simplificarlo
-          const requirements =
-            error.message.match(/\[(.*)\]/)?.[1] ||
-            "No cumple con los requisitos de seguridad.";
-          errorMessage = `Contraseña inválida: ${requirements.replace(
-            "Password must",
-            "Debe"
-          )}.`;
-          break;
         default:
           errorMessage = "Error al procesar la solicitud. Inténtalo de nuevo.";
-          break;
       }
       setMessage(errorMessage);
     } finally {
@@ -319,28 +260,18 @@ const AppLogin = () => {
 
   return (
     <div className="login-container">
-      <div
-        className={`container ${isRightPanelActive ? "right-panel-active" : ""}`}
-      >
+      <div className={`container ${isRightPanelActive ? "right-panel-active" : ""}`}>
         <div className="form-container sign-in-container">
           <form>
             <img src={logo} alt="MyDoTime Logo" className="auth-logo" />
             <h1>Iniciar Sesión</h1>
             {message && <p className="message error-message">{message}</p>}
             <div className="social-container">
-              <a
-                href="#"
-                className="social"
-                onClick={() => handleAuth(facebookProvider)}
-              >
-                <i className="fab fa-facebook-f"></i>
-              </a>
-              <a
-                href="#"
-                className="social"
-                onClick={() => handleAuth(googleProvider)}
-              >
+              <a href="#" className="social" onClick={() => handleAuth('google')}>
                 <i className="fab fa-google-plus-g"></i>
+              </a>
+              <a href="#" className="social" onClick={() => handleAuth('facebook')}>
+                <i className="fab fa-facebook-f"></i>
               </a>
             </div>
             <span className="account-option">o usa tu cuenta</span>
@@ -361,10 +292,7 @@ const AppLogin = () => {
                 onChange={handleInputChange}
                 className={`input ${errors.password ? "input-error" : ""}`}
               />
-              <span
-                onClick={togglePasswordVisibility}
-                className="password-toggle"
-              >
+              <span onClick={togglePasswordVisibility} className="password-toggle">
                 <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
               </span>
             </div>
@@ -381,21 +309,31 @@ const AppLogin = () => {
                 />
               </div>
             )}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+              }
+              label="Recordarme"
+            />
             <button
               type="button"
               onClick={() => handleEmailAuth(false)}
               className={isLoading ? "loading" : ""}
               disabled={isLoading}
             >
-              Iniciar Sesión
+              {isLoading ? "Cargando..." : "Iniciar Sesión"}
             </button>
-            <a
-              href="#"
+            <div style={{ height: '10px' }} /> {/* Espaciador */}
+            <button 
               onClick={handleForgotPassword}
-              className="account-option"
+              type="button"
+              className="forgot-password-link"
             >
               ¿Olvidaste tu contraseña?
-            </a>
+            </button>
           </form>
         </div>
 
@@ -405,24 +343,14 @@ const AppLogin = () => {
             <h1>Crear Cuenta</h1>
             {message && <p className="message error-message">{message}</p>}
             <div className="social-container">
-              <a
-                href="#"
-                className="social"
-                onClick={() => handleAuth(facebookProvider)}
-              >
-                <i className="fab fa-facebook-f"></i>
-              </a>
-              <a
-                href="#"
-                className="social"
-                onClick={() => handleAuth(googleProvider)}
-              >
+              <a href="#" className="social" onClick={() => handleAuth('google')}>
                 <i className="fab fa-google-plus-g"></i>
               </a>
+              <a href="#" className="social" onClick={() => handleAuth('facebook')}>
+                <i className="fab fa-facebook-f"></i>
+              </a>
             </div>
-            <span className="account-option">
-              o usa tu email para registrarte
-            </span>
+            <span className="account-option">o usa tu email para registrarte</span>
             <input
               type="text"
               name="name"
@@ -448,10 +376,7 @@ const AppLogin = () => {
                 onChange={handleInputChange}
                 className={`input ${errors.password ? "input-error" : ""}`}
               />
-              <span
-                onClick={togglePasswordVisibility}
-                className="password-toggle"
-              >
+              <span onClick={togglePasswordVisibility} className="password-toggle">
                 <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
               </span>
             </div>
@@ -468,6 +393,15 @@ const AppLogin = () => {
                 />
               </div>
             )}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+              }
+              label="Recordarme"
+            />
             <button
               type="button"
               onClick={() => handleEmailAuth(true)}
@@ -483,10 +417,7 @@ const AppLogin = () => {
           <div className="overlay">
             <div className="overlay-panel overlay-left">
               <h1>¡Bienvenido de nuevo!</h1>
-              <p>
-                Para mantenerte conectado, por favor inicia sesión con tu
-                información personal.
-              </p>
+              <p>Para mantenerte conectado, por favor inicia sesión con tu información personal.</p>
               <button className="ghost" onClick={() => togglePanel(false)}>
                 Iniciar Sesión
               </button>
@@ -495,7 +426,7 @@ const AppLogin = () => {
               <h1>¡Hola, Amigo!</h1>
               <p>Ingresa tus datos personales y comienza tu lista de tareas.</p>
               <button className="ghost" onClick={() => togglePanel(true)}>
-                Crear Cuenta
+                Crear cuenta
               </button>
             </div>
           </div>
@@ -505,4 +436,4 @@ const AppLogin = () => {
   );
 };
 
-export default AppLogin;
+export default Login;

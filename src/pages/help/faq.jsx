@@ -377,7 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
   faqQuestions.forEach((question) => {
     question.addEventListener(
       isTouchScreen ? "touchstart" : "click",
-      (event) => {
+      (_event) => {
         const answer = question.nextElementSibling;
 
         // Alternar clases para animaciones

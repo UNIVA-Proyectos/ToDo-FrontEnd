@@ -66,8 +66,8 @@ const useComments = (db) => {
         }
     };
 
-    const eliminarComentario = async (taskId, comentarioId, userId) => {
-        if (!comentarioId || !taskId || !userId) {
+    const eliminarComentario = async (taskId, comentarioId) => {
+        if (!comentarioId || !taskId) {
             console.error("Faltan datos necesarios para eliminar el comentario");
             return;
         }

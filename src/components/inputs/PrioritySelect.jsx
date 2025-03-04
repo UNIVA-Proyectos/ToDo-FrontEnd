@@ -62,11 +62,11 @@ const customStyles = {
     maxHeight: "none !important",
     overflowY: "visible",
   }),
-  option: (provided, { data, isFocused, isSelected }) => ({
+  option: (provided, { _data, isFocused, isSelected }) => ({
     ...provided,
     color: "#fff",
     backgroundColor: isSelected 
-      ? data.color 
+      ? _data.color 
       : isFocused 
         ? "rgba(255, 255, 255, 0.1)" 
         : "transparent",
@@ -78,32 +78,32 @@ const customStyles = {
     borderRadius: "4px",
     margin: "2px 0",
     "& svg": {
-      color: isSelected ? "white !important" : `${data.color} !important`
+      color: isSelected ? "white !important" : `${_data.color} !important`
     },
     "&:hover": {
-      backgroundColor: data.color,
+      backgroundColor: _data.color,
       color: "white",
       "& svg": {
         color: "white !important"
       }
     },
   }),
-  singleValue: (provided, { data }) => ({
+  singleValue: (provided, { _data }) => ({
     ...provided,
     display: "flex",
     alignItems: "center",
     gap: "8px",
     color: "white",
-    backgroundColor: data.color,
+    backgroundColor: _data.color,
     padding: "2px 8px",
     borderRadius: "15px",
     "& svg": {
       color: "white !important"
     }
   }),
-  multiValue: (styles, { data }) => ({
+  multiValue: (styles, { _data }) => ({
     ...styles,
-    backgroundColor: data.color,
+    backgroundColor: _data.color,
     borderRadius: "15px",
     padding: "2px 2px 2px 8px",
     margin: "2px 4px 2px 0",
@@ -117,7 +117,7 @@ const customStyles = {
     fontSize: "0.875rem",
     padding: "0",
   }),
-  multiValueRemove: (styles, { data }) => ({
+  multiValueRemove: (styles, { _data }) => ({
     ...styles,
     color: "white",
     borderRadius: "0 15px 15px 0",

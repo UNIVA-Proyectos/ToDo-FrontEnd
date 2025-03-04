@@ -412,6 +412,8 @@ const TaskCard = React.memo(({ task, deleteTask }) => {
   );
 });
 
+TaskCard.displayName = 'TaskCard';
+
 TaskCard.propTypes = {
   task: PropTypes.shape({
     id: PropTypes.string.isRequired,

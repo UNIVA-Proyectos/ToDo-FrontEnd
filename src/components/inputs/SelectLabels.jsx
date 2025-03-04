@@ -8,7 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import React, { useState } from 'react';
 import CreateLabelDialog from '../dialog/CreateLabelDialog';
 
-const SelectLabels = ({ selectedTags, setSelectedTags, customIcon }) => {
+const SelectLabels = ({ _value, _onChange, _label, _customIcon, selectedTags, setSelectedTags }) => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [customOptions, setCustomOptions] = useState([]);
 
@@ -51,7 +51,7 @@ const SelectLabels = ({ selectedTags, setSelectedTags, customIcon }) => {
     }
   ];
 
-  const handleChange = (selected) => {
+  const handleChange = (_data, selected) => {
     if (selected?.some(option => option.value === "__create__")) {
       setCreateDialogOpen(true);
       // Remove the "Crear etiqueta" option from selection
@@ -108,11 +108,11 @@ const SelectLabels = ({ selectedTags, setSelectedTags, customIcon }) => {
       maxHeight: "none !important",
       overflowY: "visible",
     }),
-    option: (provided, { data, isFocused, isSelected }) => ({
+    option: (provided, { _data, isFocused, isSelected }) => ({
       ...provided,
       color: "#fff",
       backgroundColor: isSelected 
-        ? data.color 
+        ? _data.color 
         : isFocused 
           ? "rgba(255, 255, 255, 0.1)" 
           : "transparent",
@@ -124,16 +124,16 @@ const SelectLabels = ({ selectedTags, setSelectedTags, customIcon }) => {
       borderRadius: "4px",
       margin: "2px 0",
       "&:hover": {
-        backgroundColor: data.color,
+        backgroundColor: _data.color,
         color: "white",
         "& svg": {
           color: "white !important"
         }
       },
     }),
-    multiValue: (styles, { data }) => ({
+    multiValue: (styles, { _data }) => ({
       ...styles,
-      backgroundColor: data.color,
+      backgroundColor: _data.color,
       borderRadius: "15px",
       padding: "2px 2px 2px 8px",
       margin: "2px 4px 2px 0",
@@ -147,7 +147,7 @@ const SelectLabels = ({ selectedTags, setSelectedTags, customIcon }) => {
       fontSize: "0.875rem",
       padding: "0",
     }),
-    multiValueRemove: (styles, { data }) => ({
+    multiValueRemove: (styles, { _data }) => ({
       ...styles,
       color: "white",
       borderRadius: "0 15px 15px 0",
@@ -170,7 +170,7 @@ const SelectLabels = ({ selectedTags, setSelectedTags, customIcon }) => {
       margin: "0",
       padding: "0",
     }),
-    singleValue: (provided) => ({
+    singleValue: (provided, { _data }) => ({
       ...provided,
       color: "white",
     }),

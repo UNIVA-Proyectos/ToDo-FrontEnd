@@ -87,7 +87,7 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
         return () => {
             unsubscribes.forEach(unsubscribe => unsubscribe());
         };
-    }, [db, currentTask?.id, currentTask?.sharedWith]); // Solo depender del ID y sharedWith
+    }, [db, currentTask?.id, currentTask?.sharedWith, userPhotoUpdates]); // Agregada la dependencia faltante
 
     // Aplicar actualizaciones de fotos al currentTask
     useEffect(() => {
@@ -113,7 +113,7 @@ const ShareTaskDialog = ({ open, onClose, task, db }) => {
 
         setCurrentTask(updatedTask);
         setUserPhotoUpdates({});
-    }, [userPhotoUpdates]);
+    }, [userPhotoUpdates, currentTask]); // Agregada la dependencia faltante
 
     // Validación de email
     const isValidEmail = (email) => {

@@ -9,7 +9,9 @@ const useAIChat = (apiEndpoint, apiKey, TaskInfo) => {
       setMessages((prev) => [...prev, { sender: "user", text: message }]);
 
       if (!apiKey) {
-        throw new Error("API key no encontrada");
+        const errorMessage = "No se encontró la clave de API. Por favor, configura la variable de entorno REACT_APP_OPEN_AI_KEY en el archivo .env";
+        setMessages(prev => [...prev, { sender: "assistant", text: errorMessage }]);
+        throw new Error(errorMessage);
       }
 
       const response = await axios.post(
@@ -20,14 +22,15 @@ const useAIChat = (apiEndpoint, apiKey, TaskInfo) => {
             {
               role: "system",
               content: `
-                Eres un asistente diseñado para ayudar a estudiantes a organizarse mejor y completar sus tareas de manera eficiente. Debes proporcionar consejos detallados sobre cómo abordar las tareas, ofrecer información útil que pueda ayudar al estudiante a entender los temas, y recomendar aplicaciones o recursos que puedan hacer las tareas más rápidas y fáciles.
-                # Pasos
+                Eres CheckMate, un asistente diseñado para ayudar a estudiantes a organizarse mejor y completar sus tareas de manera eficiente. 
+                Tu objetivo es proporcionar pasos claros y detallados sobre cómo abordar las tareas, dividiendo la información en secciones numeradas para mejor comprensión.
 
-                1. **Entender la tarea**: Primero, solicita detalles de la tarea que necesita ser completada. Esto puede incluir el tipo de asignatura, requirements específicos y cualquier dificultad que el estudiante enfrente.
-                2. **Organizar la tarea**: Ayuda al estudiante a dividir la tarea en partes más manejables. Crea un plan de acción simple que permita organizar mejor el tiempo.
-                3. **Consejo útil**: Proporciona sugerencias para llevar a cabo cada parte de la tarea de forma eficiente. Explica paso a paso cómo resolver el problema planteado si es posible.
-                4. **Recursos recomendados**: Sugiere apps, recursos en línea, o sitios web que el estudiante pueda usar para completar la tarea más fácilmente o para mejorar su conocimiento sobre el tema.
-                5. **Motivación y apoyo**: Anima al estudiante y dale motivación a medida que avanza, ofreciendo palabras de apoyo y estrategias para mantenerse enfocado.
+                Al responder:
+                1. Usa un tono amigable y profesional
+                2. Divide tus respuestas en pasos numerados
+                3. Usa negritas (**texto**) para resaltar puntos importantes
+                4. Si es relevante, sugiere recursos o herramientas útiles
+                5. Mantén tus respuestas concisas pero informativas
               `
             },
             {
@@ -59,7 +62,9 @@ const useAIChat = (apiEndpoint, apiKey, TaskInfo) => {
       if (error.response) {
         console.error("Respuesta de error:", error.response.data);
       }
-      // En lugar de lanzar el error, manejamos el mensaje de error aquí
+      if (error.message.includes('REACT_APP_OPEN_AI_KEY')) {
+        throw error; // Re-lanzar el error específico de la API key
+      }
       const errorMessage = "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.";
       setMessages(prev => [...prev, { sender: "assistant", text: errorMessage }]);
       return errorMessage;
@@ -68,10 +73,18 @@ const useAIChat = (apiEndpoint, apiKey, TaskInfo) => {
 
   useEffect(() => {
     if (TaskInfo?.titulo) {
-      const initialMessage = `Hola, ¿en qué puedo ayudarte para completar tu tarea de "${TaskInfo.titulo}"?`;
+      const initialMessage = `¡Hola! Soy CheckMate, aquí tienes los pasos para tu tarea "${TaskInfo.titulo}":\n\n` +
+        `1. **Identificar:** Clarifica qué necesitas saber/hacer con "${TaskInfo.titulo}". ¿Es un proyecto? ¿Una investigación? ¡Define el objetivo!\n` +
+        `2. **Planificar:** Vamos a dividir la tarea en pasos más pequeños y manejables.\n` +
+        `3. **Recursos:** ¿Qué materiales o información necesitas? Te ayudaré a encontrarlos.\n` +
+        `4. **Organizar:** Estableceremos un plan de trabajo con fechas y prioridades.\n` +
+        `5. **¡Empezar!:** ¿Por dónde quieres comenzar? ¡Estoy aquí para guiarte!`;
       setMessages([{ sender: "assistant", text: initialMessage }]);
     } else {
-      setMessages([{ sender: "assistant", text: "Hola, ¿en qué puedo ayudarte?" }]);
+      setMessages([{ 
+        sender: "assistant", 
+        text: "¡Hola! Soy CheckMate, tu asistente para organizar y completar tareas. ¿En qué puedo ayudarte hoy?" 
+      }]);
     }
   }, [TaskInfo]);
 
